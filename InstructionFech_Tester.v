@@ -30,23 +30,20 @@ module InstructionFech_Tester;
 	// Outputs
 	wire [31:0] Instruccion;
 
+	always #20 clk=~clk;
+
 	// Instantiate the Unit Under Test (UUT)
 	IntructionFetchBlock uut (
 		.clk(clk), 
 		.Instruccion(Instruccion)
 	);
-
-	always #10 clk=~clk;
-
-
+	
+	
+	
 	initial begin
 		// Initialize Inputs
 		clk = 0;
 
-		// Wait 100 ns for global reset to finish
-		//#100;
-        
-		// Add stimulus here
 
 	end
       

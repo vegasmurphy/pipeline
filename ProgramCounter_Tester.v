@@ -26,36 +26,37 @@ module ProgramCounter_Tester;
 
 	// Inputs
 	reg clk;
-	reg [9:0] PC_in;
-
+	reg jump_flag;
+	reg [9:0] jump_addr;
+	
 	// Outputs
-	wire [9:0] PC_out;
+	wire [9:0] PC_to_ROM;
 
 	// Instantiate the Unit Under Test (UUT)
-	ProgramCounter uut (
-		.clk(clk), 
-		.PC_in(PC_in), 
-		.PC_out(PC_out)
-	);
+	ProgramCounter PC (
+		.clk(clk),			//clock
+		.jump_flag(jump_flag),		//Flag que indica si se tiene un salto o no
+		.jump_addr(jump_addr),		//Direccion de salto
+		.PC_reg(PC_to_ROM)//Valor actual del contador de programa (tambien lo usa la unidad de debugging)
+	 );
 
+
+
+	always #10 clk=~clk;
+	
+	
 	initial begin
 		// Initialize Inputs
 		clk = 0;
-		PC_in = 0;
-
+		jump_flag = 0;
+		jump_addr = 0;
+		
 		// Wait 100 ns for global reset to finish
 		#100;
-        
-		// Add stimulus here
-		PC_in = 10'b1000000001;
-		clk=1;
-		#10
-		clk=0;
-		PC_in = 10'b0111111110;
-		#50
-		clk=1;
-		#10
-		clk=0;
+      jump_flag = 1;
+		jump_addr = 3;
+		#20;
+		jump_flag = 0;
 
 	end
       
