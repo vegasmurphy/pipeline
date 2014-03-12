@@ -4,9 +4,9 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   23:21:56 03/11/2014
+// Create Date:   13:14:06 03/12/2014
 // Design Name:   ALUwithControl
-// Module Name:   C:/Users/vegas/Desktop/Arquitectura/pipeline/ALUtest.v
+// Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ALUtest.v
 // Project Name:  ArquitecturaPIPELINE
 // Target Device:  
 // Tool versions:  
@@ -24,6 +24,7 @@
 
 module ALUtest;
 
+	
 	// Inputs
 	reg [5:0] instruction;
 	reg [31:0] data1;
