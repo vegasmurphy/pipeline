@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module Control(
     input [5:0] opcode,
-    output  RegDest,
+    output RegDest,
 	 output Branch,
 	 output MemRead,
 	 output MemToReg,

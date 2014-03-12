@@ -23,7 +23,7 @@ module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,opcode,carry_out,zero,re
 	//Inputs y outputs son wire por defecto
    input signed [WORD_WIDTH-1:0] a_input;
    input signed [WORD_WIDTH-1:0] b_input;
-	input [5:0] opcode;
+	input [3:0] opcode;
    output reg carry_out;
 	output reg zero;
 	output reg [WORD_WIDTH-1:0] resultado;
@@ -31,14 +31,11 @@ module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,opcode,carry_out,zero,re
 	always @(opcode)
 	begin
 		case (opcode)
-			6'b100000: {carry_out, resultado} = a_input + b_input; //SUMA
-			6'b100010: resultado = a_input - b_input; //RESTA	
-			6'b100100: resultado = a_input & b_input;//AND
-			6'b100101: resultado = a_input | b_input;//OR
-			6'b100110: resultado = a_input ^ b_input;//XOR
-			6'b000011: resultado = a_input >>> b_input;//SRA
-			6'b000010: resultado = a_input >> b_input;//SRL
-			6'b100111: resultado = ~(a_input | b_input);//NOR
+			4'b0010: {carry_out, resultado} = a_input + b_input; //SUMA
+			4'b0110: resultado = a_input - b_input; //RESTA	
+			4'b0000: resultado = a_input & b_input;//AND
+			4'b0001: resultado = a_input | b_input;//OR
+			4'b1100: resultado = ~(a_input | b_input);//NOR
 		endcase
 	if(resultado==0)
 		zero=1;
