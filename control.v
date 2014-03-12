@@ -20,7 +20,15 @@
 //////////////////////////////////////////////////////////////////////////////////
 module Control(
     input [5:0] opcode,
-    output [9:0] flags
+    output  RegDest,
+	 output Branch,
+	 output MemRead,
+	 output MemToReg,
+	 output ALUPp,
+	 output memWrite,
+	 output ALUSrc,
+	 output RegWrite
+	 
     );
 
 
