@@ -1,12 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <report-views version="2.0" >
  <header>
-  <DateModified>2014-03-11T21:27:15</DateModified>
+  <DateModified>2014-03-12T13:11:02</DateModified>
   <ModuleName>IntructionFetchBlock</ModuleName>
   <SummaryTimeStamp>Unknown</SummaryTimeStamp>
-  <SavedFilePath>C:/Users/vegas/Desktop/Arquitectura/pipeline/iseconfig/IntructionFetchBlock.xreport</SavedFilePath>
-  <ImplementationReportsDirectory>C:/Users/vegas/Desktop/Arquitectura/pipeline\</ImplementationReportsDirectory>
-  <DateInitialized>2014-03-11T21:27:14</DateInitialized>
+  <SavedFilePath>C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/iseconfig/IntructionFetchBlock.xreport</SavedFilePath>
+  <ImplementationReportsDirectory>C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE\</ImplementationReportsDirectory>
+  <DateInitialized>2014-03-10T14:50:31</DateInitialized>
   <EnableMessageFiltering>false</EnableMessageFiltering>
  </header>
  <body>
