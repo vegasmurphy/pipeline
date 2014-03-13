@@ -25,11 +25,12 @@ module IntructionFetchBlock #
 						Addr_B = 10
 	)	
 	(	input clk,
+		input jumpFlag,
+		input [width_B-1:0] jumpAddr,
 		output [width_B-1:0] Instruccion
    );
 	
 	//Registros provisorios (hasta que se implementen los saltos)
-	reg zero = 0;
 	reg [Addr_B-1:0] zero_addr = 0;
 
 
@@ -38,8 +39,8 @@ module IntructionFetchBlock #
 	wire [Addr_B-1:0] PC_to_ROM;
 	ProgramCounter PC (
 		.clk(clk),					//clock
-		.jump_flag(zero),			//Flag que indica si se tiene un salto o no
-		.jump_addr(zero_addr),	//Direccion de salto
+		.jump_flag(jumpFlag),			//Flag que indica si se tiene un salto o no
+		.jump_addr(jumpAddr[9:0]),	//Direccion de salto
 		.PC_reg(PC_to_ROM)		//Valor actual del contador de programa (tambien lo usa la unidad de debugging)
 	 );
 	

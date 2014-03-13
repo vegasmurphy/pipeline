@@ -28,7 +28,8 @@ module Control(
 	 output reg ALUOp2,
 	 output reg memWrite,
 	 output reg ALUSrc,
-	 output reg RegWrite
+	 output reg RegWrite,
+	 output reg Jump
 	 
     );
 
@@ -79,6 +80,10 @@ always @(*)
 					memWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
+				end
+			6'b00010://Jump 
+				begin
+					Jump=1;
 				end
 			default:
 				begin
