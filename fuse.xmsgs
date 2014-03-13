@@ -5,5 +5,8 @@
      behavior or data corruption.  It is strongly advised that
      users do not edit the contents of this file. -->
 <messages>
+<msg type="warning" file="HDLCompiler" num="1007" delta="unknown" >"C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/SignExtender.v" Line 34: Element index <arg fmt="%d" index="1">32</arg> into <arg fmt="%s" index="2">aux</arg> is out of bounds
+</msg>
+
 </messages>
 

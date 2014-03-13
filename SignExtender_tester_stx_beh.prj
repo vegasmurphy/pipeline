@@ -1,0 +1,3 @@
+verilog isim_temp "SignExtender.v"
+verilog isim_temp "SignExtender_tester.v"
+verilog isim_temp "D:/Programas/XilinxISE/14.2/ISE_DS/ISE//verilog/src/glbl.v"
