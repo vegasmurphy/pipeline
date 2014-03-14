@@ -22,7 +22,8 @@ module ALUwithControl(
     input [5:0] instruction,
     input [31:0] data1,
     input [31:0] data2,
-    input [1:0] ALUop,
+    input ALUOp1,
+	 input ALUOp2,
     output zero,
     output [31:0] result
     );
@@ -30,7 +31,8 @@ module ALUwithControl(
 	wire carry;
 	ALUcontrol control (
 		.instruction(instruction),
-		.ALUop(ALUop),
+		.ALUOp1(ALUOp1),
+		.ALUOp2(ALUOp2),
 		.operation(aluInstruction)
 	);
 	

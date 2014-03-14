@@ -20,16 +20,17 @@
 //////////////////////////////////////////////////////////////////////////////////
 module ALUcontrol(
     input [5:0] instruction,
-    input [1:0] ALUop,
+    input ALUOp1,
+	 input ALUOp2,
 	 output reg[3:0] operation
     );
 
 always @(*) begin
-	if(ALUop[1:0]==2'b00)begin
+	if(ALUOp1==0&&ALUOp2==0)begin
 	operation=4'b0010;
 	end
 	else
-		if(ALUop[0]==1'b1)begin
+		if(ALUOp1==1'b1)begin
 			operation=4'b0110;
 		end
 		else 

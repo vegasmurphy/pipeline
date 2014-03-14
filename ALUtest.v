@@ -29,7 +29,8 @@ module ALUtest;
 	reg [5:0] instruction;
 	reg [31:0] data1;
 	reg [31:0] data2;
-	reg [1:0] ALUop;
+	reg ALUOp1;
+	reg ALUOp2;
 
 	// Outputs
 	wire zero;
@@ -40,7 +41,8 @@ module ALUtest;
 		.instruction(instruction), 
 		.data1(data1), 
 		.data2(data2), 
-		.ALUop(ALUop), 
+		.ALUOp1(ALUOp1),
+		.ALUOp2(ALUOp2),
 		.zero(zero), 
 		.result(result)
 	);
@@ -50,26 +52,27 @@ module ALUtest;
 		instruction = 0;
 		data1 = 2;
 		data2 = 2;
-		ALUop = 2'b00;
+		ALUOp1 = 0;
+		ALUOp2 = 0;
 
 		// Wait 100 ns for global reset to finish
 		#100;
 		instruction = 0;
 		data1 = 2;
 		data2 = 2;
-		ALUop = 2'b01;
+		ALUOp2 = 1;
       
 		#100;
 		instruction = 4'b0000;
 		data1 = 2;
 		data2 = 2;
-		ALUop = 2'b10;
+		ALUOp1 = 1;
+		ALUOp1 = 0;
 
 		#100;
 		instruction = 4'b0010;
 		data1 = 2;
 		data2 = 2;
-		ALUop = 2'b10;
 		// Add stimulus here
 
 	end
