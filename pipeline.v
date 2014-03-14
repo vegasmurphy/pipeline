@@ -38,38 +38,58 @@ module Pipeline(
 	wire MemToReg;
 	wire ALUOp1;
 	wire ALUOp2;
-	wire memWrite;
+	wire MemWrite;
 	wire ALUSrc;
 	wire RegWrite;
-	wire dataMemoryReadData;
+	wire [31:0] dataMemoryReadData;
 	wire Jump;
-	// Instantiate the Unit Under Test (UUT)
+	wire branchAndZero_flag;
+	
+	
+	
+	assign branchAndZero_flag = zeroALU & Branch;
+	//***********************MUXes*****************************//
+	//Mux de antes de los registros
+	wire [4:0] Write_Addr;
+	assign Write_Addr = RegDest ? Instruction[15:11] : Instruction[20:16];
+	
+	//Mux de antes de la ALU
+	wire [31:0] Read_Data_2,signExtended;
+	assign rtData = ALUSrc ? signExtended : Read_Data_2;
+	
+	//Mux de WriteBack
+	wire [31:0] Write_Data;
+	assign Write_Data = MemToReg ? dataMemoryReadData : resultadoALU;
+
+
+	//****************Modulos Instanciados*********************//
 	
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
-		.jumpFlag(),
-		.jumpAddress(jumpAddress),
-		.Instruccion(Instruccion)
+		.branchAndZero_flag(branchAndZero_flag),
+		.jumpFlag(Jump),
+		.signExtended(signExtended),
+		.Instruccion(Instruction)
 	);
 	
 	DataMemoryAccessBlock dataMemoryAccessBlock (
 		.clk(clk),
 		.MemWrite(MemWrite),
-		.MemRead(memRead),
+		.MemRead(MemRead),
 		.Address(resultadoALU),
-		.WriteData(rtData),
+		.WriteData(Read_Data_2),
 		.ReadData(dataMemoryReadData)
 	);
 	
 	Registers registers (
-		.clk(clk),						//clock
-		.RegWrite(flags[0]),					// (debe ser un Write Enable)
-		.Read_Addr_1(Instruction[25:21]),	//Se pueden leer dos registros
-		.Read_Addr_2(Instruction[20:16]),	//(-)
-		.Write_Addr(Instruction[15:11]),	//Direccion (numero de registro) a escribir
-		.Write_Data(writeData),	//Dato a escribir
-		.Read_Data_1(rsData),//Dato leido con la direccion Read_Addr_1
-		.Read_Data_2(rtData)
+		.clk(clk),								//clock
+		.RegWrite(RegWrite),					// (debe ser un Write Enable)
+		.Read_Addr_1(Instruction[25:21]),//Se pueden leer dos registros
+		.Read_Addr_2(Instruction[20:16]),//(-)
+		.Write_Addr(Write_Addr),	//Direccion (numero de registro) a escribir
+		.Write_Data(Write_Data),				//Dato a escribir
+		.Read_Data_1(rsData),				//Dato leido con la direccion Read_Addr_1
+		.Read_Data_2(Read_Data_2)
 	);
 	
 	Control control (
@@ -80,7 +100,7 @@ module Pipeline(
 		.MemToReg(MemToReg),
 		.ALUOp1(ALUOp1),
 		.ALUOp2(ALUOp2),
-		.memWrite(memWrite),
+		.MemWrite(MemWrite),
 		.ALUSrc(ALUSrc),
 		.RegWrite(RegWrite),
 		.Jump(Jump)

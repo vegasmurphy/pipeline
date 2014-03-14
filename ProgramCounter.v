@@ -23,11 +23,10 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module ProgramCounter #(
-		parameter PC_width = 10					//Cantidad de bits del contador de programa
+		parameter PC_width = 32					//Cantidad de bits del contador de programa
 	)
 	(	input clk,									//clock
-		input jump_flag,							//Flag que indica si se tiene un salto o no
-		input [PC_width-1:0] jump_addr,		//Direccion de salto
+		input [PC_width-1:0] PC_next,		//Direccion de salto
 		output reg [PC_width-1:0] PC_reg = 0//Valor actual del contador de programa (tambien lo usa la unidad de debugging)
 	 );
 
@@ -37,10 +36,7 @@ module ProgramCounter #(
 
 	//Modificacion del PC
 	always @(posedge clk)
-		if(jump_flag) //Este es el selector del MUX
-			PC_reg <= jump_addr;
-		else
-			PC_reg <= PC_reg+1;
+		PC_reg <= PC_next;
 
 
 endmodule

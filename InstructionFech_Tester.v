@@ -4,7 +4,7 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   15:36:33 03/07/2014
+// Create Date:   17:24:37 03/14/2014
 // Design Name:   IntructionFetchBlock
 // Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/InstructionFech_Tester.v
 // Project Name:  ArquitecturaPIPELINE
@@ -26,24 +26,34 @@ module InstructionFech_Tester;
 
 	// Inputs
 	reg clk;
+	reg branchAndZero_flag;
+	reg jumpFlag;
 
 	// Outputs
+	wire [31:0] PC_value;
 	wire [31:0] Instruccion;
-
-	always #20 clk=~clk;
-
+	
 	// Instantiate the Unit Under Test (UUT)
 	IntructionFetchBlock uut (
 		.clk(clk), 
+		.branchAndZero_flag(branchAndZero_flag), 
+		.jumpFlag(jumpFlag),
+		.PC_value(PC_value),
 		.Instruccion(Instruccion)
 	);
-	
-	
-	
+
+	always #10 clk=~clk;
+
 	initial begin
 		// Initialize Inputs
 		clk = 0;
+		branchAndZero_flag = 0;
+		jumpFlag = 0;
 
+		// Wait 100 ns for global reset to finish
+		#100;
+        
+		// Add stimulus here
 
 	end
       

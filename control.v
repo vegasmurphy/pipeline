@@ -26,7 +26,7 @@ module Control(
 	 output reg MemToReg,
 	 output reg ALUOp1,
 	 output reg ALUOp2,
-	 output reg memWrite,
+	 output reg MemWrite,
 	 output reg ALUSrc,
 	 output reg RegWrite,
 	 output reg Jump
@@ -45,7 +45,7 @@ always @(*)
 					MemToReg=0;
 					ALUOp1=1;
 					ALUOp2=0;
-					memWrite=0;
+					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=1;
 				end
@@ -57,7 +57,7 @@ always @(*)
 					MemToReg=1;
 					ALUOp1=0;
 					ALUOp2=0;
-					memWrite=0;
+					MemWrite=0;
 					ALUSrc=1;
 					RegWrite=1;
 				end
@@ -67,7 +67,7 @@ always @(*)
 					MemRead=0;
 					ALUOp1=0;
 					ALUOp2=0;
-					memWrite=1;
+					MemWrite=1;
 					ALUSrc=1;
 					RegWrite=0;
 				end
@@ -77,7 +77,7 @@ always @(*)
 					MemRead=0;
 					ALUOp1=1;
 					ALUOp2=0;
-					memWrite=0;
+					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
 				end
@@ -93,7 +93,7 @@ always @(*)
 					MemToReg=0;
 					ALUOp1=0;
 					ALUOp2=0;
-					memWrite=0;
+					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
 				end

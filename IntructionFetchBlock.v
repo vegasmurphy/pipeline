@@ -10,8 +10,8 @@
 // Target Devices: 
 // Tool versions: 
 // Description: Bloque de Instruction Fetch.
-//			-  Faltaria ponerle entradas para la direccion de salto del PC
-//				y el flag del MUX que determina si el PC cuenta o salta.
+//			-  Falta verificar si el branch esta funcionando correctamente
+//			-	Falta ver si las banderas de los mux no estan alrevez
 //
 // Dependencies: 
 //
@@ -24,32 +24,59 @@ module IntructionFetchBlock #
 	(	parameter 	width_B = 32,
 						Addr_B = 10
 	)	
-	(	input clk,
-		input jumpFlag,
-		input [width_B-1:0] jumpAddr,
-		output [width_B-1:0] Instruccion
+	(	input clk,										//clock
+		input branchAndZero_flag,					//Bandera de Branch
+		input jumpFlag,								//Bandera de Salto
+		output [width_B-1:0] signExtended,
+		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
+		output [width_B-1:0] Instruccion			//Instruccion
    );
-	
-	//Registros provisorios (hasta que se implementen los saltos)
-	reg [Addr_B-1:0] zero_addr = 0;
 
+	assign PC_value = PC_actual;	//Esto es para ver el valor del PC en el debugger
 
 	//****************Modulos Instanciados*********************//
-	//Contador de Programa
-	wire [Addr_B-1:0] PC_to_ROM;
-	ProgramCounter PC (
-		.clk(clk),					//clock
-		.jump_flag(jumpFlag),			//Flag que indica si se tiene un salto o no
-		.jump_addr(jumpAddr[9:0]),	//Direccion de salto
-		.PC_reg(PC_to_ROM)		//Valor actual del contador de programa (tambien lo usa la unidad de debugging)
-	 );
+	//Contador de Programa (Ya no es un modulo, pero igual queda aca)
+	reg [width_B-1:0] PC_actual=0;//Valor Actual del PC para las instrucciones (debe iniciarse en cero)
+	reg [width_B-1:0] PC_sumado;	//PC+1
+	reg [width_B-1:0] PC_next=1;	//Valor que tomara el PC actual en el proximo clock
 	
 	
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
-	  .clka(clk), 			//Entrada de clock
-	  .addra(PC_to_ROM), //Direccion dada por el valor del PC
-	  .douta(Instruccion)//Instruccion obtenida
+	  .clka(clk), 					//Entrada de clock
+	  .addra(PC_actual[9:0]), 	//Direccion dada por el valor del PC
+	  .douta(Instruccion)		//Instruccion obtenida
 	);
+	
+	
+	wire [31:0] signExtended;
+	//SignExtender
+	SignExtender SignEx (
+		.unextended(Instruccion[15:0]),	//Salto de 16bits
+		.extended(signExtended)				//Extension
+	);
+	
+
+	//************Logica de Asignacion del PC******************//
+	always @(posedge clk)
+		begin
+			//Sumar 1 al PC_to_ROM para pasar a la siguiente direccion
+			PC_sumado = PC_actual +1;
+			if(branchAndZero_flag)
+				begin
+					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
+					PC_next[25:0] = Instruccion[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
+				end
+			else
+				begin
+					if(jumpFlag)
+						PC_next = signExtended + PC_sumado;
+					else
+						PC_next =  PC_sumado;
+				end	
+
+			PC_actual=PC_next;
+		//Fin del Always		
+		end
 	
 endmodule

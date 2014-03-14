@@ -31,7 +31,7 @@ module SignExtender #
 	//Hacer un Shift Logico para completar los espacios que faltan
 	always@*
 		begin
-			aux[outputBits:outputBits-inputBits] = unextended;
+			aux[outputBits-1:outputBits-inputBits] = unextended;
 			extended = aux>>>(outputBits-inputBits);
 		end 
 
