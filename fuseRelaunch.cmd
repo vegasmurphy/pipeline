@@ -1,1 +1,0 @@
--intstyle "ise" -incremental -lib "unisims_ver" -lib "unimacro_ver" -lib "xilinxcorelib_ver" -lib "secureip" -o "C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/DataMemoryAccessBlock_tester_isim_beh.exe" -prj "C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/DataMemoryAccessBlock_tester_beh.prj" "work.DataMemoryAccessBlock_tester" "work.glbl" 
