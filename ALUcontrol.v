@@ -26,11 +26,11 @@ module ALUcontrol(
     );
 
 always @(*) begin
-	if(ALUOp1==0&&ALUOp2==0)begin
+	if((ALUOp1==0)&&(ALUOp2==0))begin
 	operation=4'b0010;
 	end
 	else
-		if(ALUOp1==1'b1)begin
+		if(ALUOp2==1'b1)begin
 			operation=4'b0110;
 		end
 		else 

@@ -38,7 +38,8 @@ module Pipeline(
 	 output wire RegWrite,
 	 output wire [31:0] dataMemoryReadData,
 	 output wire Jump,
-	 output wire branchAndZero_flag
+	 output wire branchAndZero_flag,
+	 output wire [3:0]aluInstruction
 	 
 	 
 	 );
@@ -115,7 +116,8 @@ module Pipeline(
 		.ALUOp1(ALUOp1),
 		.ALUOp2(ALUOp2),
 		.zero(zeroALU),
-		.result(resultadoALU)
+		.result(resultadoALU),
+		.aluInstruction(aluInstruction)
 	);
 	
 	
