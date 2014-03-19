@@ -37,7 +37,40 @@ module Registers#(
 	//señales (Aca se define un arreglo para indexar, como si fuera lenguage C)
 	// reg [tamaño en bits-1:0] <nombre> [cantidad de elementos - 1:0]
 	reg [width_B-1:0] reg_array [2**Addr_B-1:0]; //arreglo de 2^Addr_B posiciones (32 registros)
-	
+	initial begin
+	reg_array[0]=0;
+	reg_array[1]=0;
+	reg_array[2]=0;
+	reg_array[3]=0;
+	reg_array[4]=0;
+	reg_array[5]=0;
+	reg_array[6]=0;
+	reg_array[7]=0;
+	reg_array[8]=0;
+	reg_array[9]=0;
+	reg_array[10]=0;
+	reg_array[11]=0;
+	reg_array[12]=0;
+	reg_array[13]=0;
+	reg_array[14]=0;
+	reg_array[15]=0;
+	reg_array[16]=0;
+	reg_array[17]=0;
+	reg_array[18]=0;
+	reg_array[19]=0;
+	reg_array[20]=0;
+	reg_array[21]=0;
+	reg_array[22]=0;
+	reg_array[23]=0;
+	reg_array[24]=0;
+	reg_array[25]=0;
+	reg_array[26]=0;
+	reg_array[27]=0;
+	reg_array[28]=0;
+	reg_array[29]=0;
+	reg_array[30]=0;
+	reg_array[31]=0;
+	end
 	//Operacion de Escritura
 	always @(posedge clk)
 		if(RegWrite)

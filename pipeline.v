@@ -20,33 +20,32 @@
 //////////////////////////////////////////////////////////////////////////////////
 module Pipeline(
     input wire clk,
-    output wire [31:0] resultadoALU
-	
+    output wire [31:0] resultadoALU,
+	 output wire [31:0] Instruction,
+	 output wire [31:0] writeData,
+	 output wire [31:0] rsData,
+	 output wire [31:0] rtData,
+	 output wire carryALU,
+	 output wire zeroALU,
+	 output wire RegDest,
+	 output wire Branch,
+	 output wire MemRead,
+	 output wire MemToReg,
+	 output wire ALUOp1,
+	 output wire ALUOp2,
+	 output wire MemWrite,
+	 output wire ALUSrc,
+	 output wire RegWrite,
+	 output wire [31:0] dataMemoryReadData,
+	 output wire Jump,
+	 output wire branchAndZero_flag
 	 
 	 
 	 );
 
 
 	// Outputs
-	wire [31:0] Instruction;
-	wire [9:0] flags;
-	wire [31:0] writeData;
-	wire [31:0] rsData;
-	wire [31:0] rtData;
-	wire carryALU;
-	wire zeroALU;
-	wire RegDest;
-	wire Branch;
-	wire MemRead;
-	wire MemToReg;
-	wire ALUOp1;
-	wire ALUOp2;
-	wire MemWrite;
-	wire ALUSrc;
-	wire RegWrite;
-	wire [31:0] dataMemoryReadData;
-	wire Jump;
-	wire branchAndZero_flag;
+	
 	
 	
 	
