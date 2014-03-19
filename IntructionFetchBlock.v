@@ -31,7 +31,6 @@ module IntructionFetchBlock #
 		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
 		output [width_B-1:0] Instruccion			//Instruccion
    );
-
 	assign PC_value = PC_actual;	//Esto es para ver el valor del PC en el debugger
 
 	//****************Modulos Instanciados*********************//
@@ -49,7 +48,6 @@ module IntructionFetchBlock #
 	);
 	
 	
-	wire [31:0] signExtended;
 	//SignExtender
 	SignExtender SignEx (
 		.unextended(Instruccion[15:0]),	//Salto de 16bits

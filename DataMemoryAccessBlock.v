@@ -20,7 +20,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 module DataMemoryAccessBlock #
 	(	parameter 	Width_B = 32,
-						Addr_B = 10
+						Addr_B = 32
 	)
 	(	input  clk,
 		input  MemWrite,
@@ -38,7 +38,7 @@ module DataMemoryAccessBlock #
 	DataMemory RAM (
 	  .clka(clk), 			//Entrada de Clock
 	  .wea(WriteEnable), //WriteEnable (1bit)
-	  .addra(Address), 	//Bus de Direccion (10 bits)
+	  .addra(Address[9:0]), 	//Bus de Direccion (10 bits)
 	  .dina(WriteData),	//Bus de Datos (entrada) (32bits)
 	  .douta(ReadData) 	//Bus de Datos (salida) (32bits)
 	);

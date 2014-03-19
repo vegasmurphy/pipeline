@@ -18,24 +18,24 @@
 // Additional Comments: 
 //
 //////////////////////////////////////////////////////////////////////////////////
-module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,opcode,carry_out,zero,resultado
+module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,opcode,zero,resultado
     );
 	//Inputs y outputs son wire por defecto
    input signed [WORD_WIDTH-1:0] a_input;
    input signed [WORD_WIDTH-1:0] b_input;
 	input [3:0] opcode;
-   output reg carry_out;
 	output reg zero;
 	output reg [WORD_WIDTH-1:0] resultado;
   
-	always @(opcode)
+	always @*
 	begin
 		case (opcode)
-			4'b0010: {carry_out, resultado} = a_input + b_input; //SUMA
+			4'b0010: resultado = a_input + b_input; //SUMA
 			4'b0110: resultado = a_input - b_input; //RESTA	
 			4'b0000: resultado = a_input & b_input;//AND
 			4'b0001: resultado = a_input | b_input;//OR
 			4'b1100: resultado = ~(a_input | b_input);//NOR
+			default: resultado=a_input;
 		endcase
 	if(resultado==0)
 		zero=1;

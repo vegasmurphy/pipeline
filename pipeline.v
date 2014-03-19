@@ -19,8 +19,12 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module Pipeline(
-    input wire clk
-    );
+    input wire clk,
+    output wire [31:0] resultadoALU
+	
+	 
+	 
+	 );
 
 
 	// Outputs
@@ -29,7 +33,6 @@ module Pipeline(
 	wire [31:0] writeData;
 	wire [31:0] rsData;
 	wire [31:0] rtData;
-	wire [31:0] resultadoALU;
 	wire carryALU;
 	wire zeroALU;
 	wire RegDest;

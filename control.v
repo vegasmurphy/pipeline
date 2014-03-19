@@ -37,7 +37,7 @@ module Control(
 always @(*)
 	begin
 		case (opcode)
-			6'b000000: 
+			6'b000000: //R-format (ALU)
 				begin
 					RegDest=1;
 					Branch=0;
@@ -49,7 +49,7 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=1;
 				end
-			6'b100011: 
+			6'b100011: //LW
 				begin
 					RegDest=0;
 					Branch=0;
@@ -61,7 +61,7 @@ always @(*)
 					ALUSrc=1;
 					RegWrite=1;
 				end
-			6'b101011:
+			6'b101011://SW
 				begin
 					Branch=0;
 					MemRead=0;

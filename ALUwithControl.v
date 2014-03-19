@@ -28,7 +28,6 @@ module ALUwithControl(
     output [31:0] result
     );
 	wire [3:0]aluInstruction;
-	wire carry;
 	ALUcontrol control (
 		.instruction(instruction),
 		.ALUOp1(ALUOp1),
@@ -40,7 +39,6 @@ module ALUwithControl(
 		.a_input(data1),
 		.b_input(data2),
 		.opcode(aluInstruction),
-		.carry_out(carry),
 		.zero(zero),
 		.resultado(result));
 		
