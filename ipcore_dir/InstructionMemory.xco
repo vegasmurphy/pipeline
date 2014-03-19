@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.2
-# Date: Fri Mar 07 19:00:52 2014
+# Date: Wed Mar 19 20:24:34 2014
 #
 ##############################################################
 #
@@ -46,7 +46,7 @@ CSET axi_id_width=4
 CSET axi_slave_type=Memory_Slave
 CSET axi_type=AXI4_Full
 CSET byte_size=9
-CSET coe_file=C:\Users\Marcelo\Documents\Xilinx\ArquitecturaPIPELINE\Instructions.coe
+CSET coe_file=C:\Users\Marcelo\Desktop\Instrucciones.coe
 CSET collision_warnings=ALL
 CSET component_name=InstructionMemory
 CSET disable_collision_warnings=false
@@ -103,4 +103,4 @@ CSET write_width_b=32
 MISC pkg_timestamp=2012-06-25T21:54:09Z
 # END Extra information
 GENERATE
-# CRC: 288f47b0
+# CRC: e12d2722

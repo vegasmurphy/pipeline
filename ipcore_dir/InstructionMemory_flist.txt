@@ -53,4 +53,5 @@ InstructionMemory\simulation\timing\wave_ncsim.sv
 InstructionMemory_flist.txt
 InstructionMemory_synth.v
 InstructionMemory_xmdf.tcl
+_xmsgs\pn_parser.xmsgs
 summary.log
