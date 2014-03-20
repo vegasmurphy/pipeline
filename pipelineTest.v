@@ -72,7 +72,7 @@ module pipelineTest;
 		.branchAndZero_flag(branchAndZero_flag),
 		.aluInstruction(aluInstruction)
 	);
-	always #100 clk=~clk;
+	always #10 clk=~clk;
 	initial begin
 		// Initialize Inputs
 		clk = 0;

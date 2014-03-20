@@ -89,7 +89,7 @@ always @(*)
 					RegDest=0;
 					MemToReg=0;
 				end
-			6'b00010://Jump 
+			6'b000010://Jump 
 				begin
 					RegDest=0;
 					Branch=0;
