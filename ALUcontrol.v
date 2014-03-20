@@ -25,8 +25,10 @@ module ALUcontrol(
 	 output reg[3:0] operation
     );
 
-always @(*) begin
-	if((ALUOp1==0)&&(ALUOp2==0))begin
+
+always @* 
+begin
+	if((~ALUOp1)&&(~ALUOp2))begin
 	operation=4'b0010;
 	end
 	else

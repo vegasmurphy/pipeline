@@ -48,6 +48,7 @@ always @(*)
 					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=1;
+					Jump=0;
 				end
 			6'b100011: //LW
 				begin
@@ -60,6 +61,7 @@ always @(*)
 					MemWrite=0;
 					ALUSrc=1;
 					RegWrite=1;
+					Jump=0;
 				end
 			6'b101011://SW
 				begin
@@ -70,6 +72,9 @@ always @(*)
 					MemWrite=1;
 					ALUSrc=1;
 					RegWrite=0;
+					Jump=0;
+					RegDest=0;
+					MemToReg=0;
 				end
 			6'b000100: 
 				begin
@@ -80,9 +85,21 @@ always @(*)
 					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
+					Jump=0;
+					RegDest=0;
+					MemToReg=0;
 				end
 			6'b00010://Jump 
 				begin
+					RegDest=0;
+					Branch=0;
+					MemRead=0;
+					MemToReg=0;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=0;
+					ALUSrc=0;
+					RegWrite=0;
 					Jump=1;
 				end
 			default:
@@ -96,6 +113,7 @@ always @(*)
 					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
+					Jump=0;
 				end
 		endcase
 		
