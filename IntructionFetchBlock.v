@@ -67,14 +67,14 @@ module IntructionFetchBlock #
 	//************Muxes(logica combinacional)******************//
 	always @(*)
 		begin
-			if(branchAndZero_flag)
+			if(jumpFlag)
 				begin
 					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
 					PC_next[25:0] = Instruccion[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
 				end
 			else
 				begin
-					if(jumpFlag)
+					if(branchAndZero_flag)
 						PC_next = signExtended + PC_sumado;
 					else
 						PC_next =  PC_sumado;
