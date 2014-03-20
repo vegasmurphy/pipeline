@@ -35,7 +35,7 @@ module ALUtest;
 	// Outputs
 	wire zero;
 	wire [31:0] result;
-
+	wire [3:0]aluInstruction;
 	// Instantiate the Unit Under Test (UUT)
 	ALUwithControl uut (
 		.instruction(instruction), 
@@ -44,7 +44,8 @@ module ALUtest;
 		.ALUOp1(ALUOp1),
 		.ALUOp2(ALUOp2),
 		.zero(zero), 
-		.result(result)
+		.result(result),
+		.aluInstruction(aluInstruction)
 	);
 
 	initial begin
@@ -60,14 +61,13 @@ module ALUtest;
 		instruction = 0;
 		data1 = 2;
 		data2 = 2;
-		ALUOp2 = 1;
+		ALUOp1 = 1;
       
 		#100;
 		instruction = 4'b0000;
 		data1 = 2;
 		data2 = 2;
 		ALUOp1 = 1;
-		ALUOp1 = 0;
 
 		#100;
 		instruction = 4'b0010;
