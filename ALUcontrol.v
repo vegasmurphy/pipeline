@@ -33,7 +33,7 @@ begin
 	end
 	else
 		if(ALUOp2)begin
-			operation=4'b0110;
+			operation=4'b0110;//BEQ
 		end
 		else 
 		case (instruction[5:0])

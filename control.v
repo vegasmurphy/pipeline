@@ -76,12 +76,12 @@ always @(*)
 					RegDest=0;
 					MemToReg=0;
 				end
-			6'b000100: 
+			6'b000100: //BEQ
 				begin
 					Branch=1;
 					MemRead=0;
-					ALUOp1=1;
-					ALUOp2=0;
+					ALUOp1=0;
+					ALUOp2=1;
 					MemWrite=0;
 					ALUSrc=0;
 					RegWrite=0;
