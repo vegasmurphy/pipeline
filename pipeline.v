@@ -112,7 +112,7 @@ module Pipeline(
 	ALUwithControl alu (
 		.data1(rsData),
 		.data2(rtData),
-		.instruction(Instruction[31:26]),
+		.instruction(Instruction[5:0]),
 		.ALUOp1(ALUOp1),
 		.ALUOp2(ALUOp2),
 		.zero(zeroALU),

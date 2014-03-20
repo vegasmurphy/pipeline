@@ -32,23 +32,23 @@ begin
 	operation=4'b0010;
 	end
 	else
-		if(ALUOp2==1'b1)begin
+		if(ALUOp2)begin
 			operation=4'b0110;
 		end
 		else 
-		case (instruction[3:0])
-			4'b0000: 
+		case (instruction[5:0])
+			6'b100000: 
 				operation=4'b0010;
-			4'b0010: 
+			6'b100010: 
 				operation=4'b0110;
-			4'b0100: 
+			6'b100100: 
 				operation=4'b0000;
-			4'b0101: 
+			6'b100101: 
 				operation=4'b0001;
-			4'b1010: 
+			6'b101010: 
 				operation=4'b0111;
 			default:
-				operation=4'b0010;
+				operation=4'b0000;
 		endcase
 	end
 
