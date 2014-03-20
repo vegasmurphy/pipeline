@@ -4,7 +4,7 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   17:24:37 03/14/2014
+// Create Date:   16:03:47 03/20/2014
 // Design Name:   IntructionFetchBlock
 // Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/InstructionFech_Tester.v
 // Project Name:  ArquitecturaPIPELINE
@@ -30,17 +30,20 @@ module InstructionFech_Tester;
 	reg jumpFlag;
 
 	// Outputs
-	wire [31:0] PC_value;
+	wire [31:0] signExtended;
+	wire [31:0] PC_debug_value;
 	wire [31:0] Instruccion;
-	
+
 	// Instantiate the Unit Under Test (UUT)
 	IntructionFetchBlock uut (
 		.clk(clk), 
 		.branchAndZero_flag(branchAndZero_flag), 
-		.jumpFlag(jumpFlag),
-		.PC_value(PC_value),
+		.jumpFlag(jumpFlag), 
+		.signExtended(signExtended), 
+		.PC_debug_value(PC_debug_value), 
 		.Instruccion(Instruccion)
 	);
+
 
 	always #10 clk=~clk;
 
