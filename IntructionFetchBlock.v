@@ -25,33 +25,25 @@ module IntructionFetchBlock #
 						Addr_B = 10
 	)	
 	(	input clk,										//clock
-		input branchAndZero_flag,					//Bandera de Branch
-		input jumpFlag,								//Bandera de Salto
-		output [width_B-1:0] signExtended,
+		input [width_B-1:0] PC_next,				//Creo que hay que inicializarlo en uno (1)		
 		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
+		output [width_B-1:0] PC_sumado_value,	//Salida del PC sumado para el bloque IFID
 		output [width_B-1:0] Instruccion			//Instruccion
    );
+	
 	assign PC_debug_value = PC_actual;	//Esto es para ver el valor del PC en el debugger
-
+	assign PC_sumado_value = PC_sumado;
+	
 	//****************Modulos Instanciados*********************//
 	//Contador de Programa (Ya no es un modulo, pero igual queda aca)
 	reg [width_B-1:0] PC_actual=0;//Valor Actual del PC para las instrucciones (debe iniciarse en cero)
-	reg [width_B-1:0] PC_sumado=0;	//PC+1
-	reg [width_B-1:0] PC_next=1;	//Valor que tomara el PC actual en el proximo clock
-	
+	reg [width_B-1:0] PC_sumado=0;//PC+1	
 	
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
 	  .clka(clk), 					//Entrada de clock
 	  .addra(PC_actual[9:0]), 	//Direccion dada por el valor del PC
 	  .douta(Instruccion)		//Instruccion obtenida
-	);
-	
-	
-	//SignExtender
-	SignExtender SignEx (
-		.unextended(Instruccion[15:0]),	//Salto de 16bits
-		.extended(signExtended)				//Extension
 	);
 	
 
@@ -63,22 +55,6 @@ module IntructionFetchBlock #
 			PC_sumado = PC_actual +1;
 			PC_actual=PC_next;
 		end
-		
-	//************Muxes(logica combinacional)******************//
-	always @(*)
-		begin
-			if(jumpFlag)
-				begin
-					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
-					PC_next[25:0] = Instruccion[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
-				end
-			else
-				begin
-					if(branchAndZero_flag)
-						PC_next = signExtended + PC_sumado;
-					else
-						PC_next =  PC_sumado;
-				end		
-		end
+			
 	
 endmodule

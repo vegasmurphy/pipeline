@@ -37,17 +37,39 @@ module Pipeline(
 	 output wire ALUSrc,
 	 output wire RegWrite,
 	 output wire [31:0] dataMemoryReadData,
-	 output wire Jump,
-	 output wire branchAndZero_flag,
+	 output wire jumpFlag,							//Bandera de Salto
+	 output wire branchAndZero_flag,				//Bandera de Branch
 	 output wire [3:0]aluInstruction
 	 
 	 
 	 );
 
+	//Partes del fetch
+	reg [31:0] PC_next=1;
+	wire [31:0] signExtended, PC_sumado;
+	//SignExtender
+	SignExtender SignEx (
+		.unextended(Instruction[15:0]),	//Salto de 16bits
+		.extended(signExtended)				//Extension
+	);
 
-	// Outputs
-	
-	
+	//*****************Muxes para el PC************************//
+	always @(*)
+		begin
+			if(jumpFlag)
+				begin
+					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
+					PC_next[25:0] = Instruction[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
+				end
+			else
+				begin
+					if(branchAndZero_flag)
+						PC_next = signExtended + PC_sumado;
+					else
+						PC_next =  PC_sumado;
+				end		
+		end
+	//**************Fin de Muxes para el PC********************//
 	
 	
 	assign branchAndZero_flag = zeroALU & Branch;
@@ -57,7 +79,7 @@ module Pipeline(
 	assign Write_Addr = RegDest ? Instruction[15:11] : Instruction[20:16];
 	
 	//Mux de antes de la ALU
-	wire [31:0] Read_Data_2,signExtended;
+	wire [31:0] Read_Data_2;
 	assign rtData = ALUSrc ? signExtended : Read_Data_2;
 	
 	//Mux de WriteBack
@@ -69,10 +91,10 @@ module Pipeline(
 	
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
-		.branchAndZero_flag(branchAndZero_flag),
-		.jumpFlag(Jump),
+		.PC_next(PC_next),
+		.PC_sumado_value(PC_sumado),
 		.signExtended(signExtended),
-		.Instruccion(Instruction)
+		.Instruction(Instruction)
 	);
 	
 	DataMemoryAccessBlock dataMemoryAccessBlock (
@@ -106,7 +128,7 @@ module Pipeline(
 		.MemWrite(MemWrite),
 		.ALUSrc(ALUSrc),
 		.RegWrite(RegWrite),
-		.Jump(Jump)
+		.Jump(jumpFlag)
 	);
 	
 	ALUwithControl alu (
