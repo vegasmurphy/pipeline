@@ -44,7 +44,36 @@ module Pipeline(
 	 
 	 );
 
-
+		//EX_MEM WIRES
+		wire [31:0] PC_next_EX; 
+		wire zeroALU_EX; 
+		wire [31:0] resultadoALU_EX;  
+		wire [31:0] PC_next_MEM; 
+		wire zeroALU_MEM; 
+		wire [31:0] resultadoALU_MEM; 
+		wire [31:0] Read_Data_2_MEM;
+		
+		//ID_EX WIRES
+		wire [31:0] Read_Data_1_ID; 
+		wire [31:0] Read_Data_2_ID; 
+		wire [31:0] signExtended_ID; 
+		wire [31:0] PC_sumado_ID; 
+		wire [31:0] PC_sumado_EX; 
+		wire [31:0] Read_Data_1_EX; 
+		wire [31:0] Read_Data_2_EX; 
+		wire [31:0] signExtended_EX;
+		
+		//MEM_WB WIRES
+		wire [31:0] Read_data_MEM; 
+		wire [31:0] ALU_result_MEM; 
+		wire [31:0] Read_data_WB; 
+		wire [31:0] ALU_result_WB;
+		
+		//IF_ID 
+		wire [31:0] instruction_IF; 
+		wire [31:0] PC_sumado_IF; 
+		wire [31:0] instruction_ID; 
+		
 	// Outputs
 	
 	
@@ -120,6 +149,44 @@ module Pipeline(
 		.aluInstruction(aluInstruction)
 	);
 	
+	EX_MEM ex_mem (
+		.clk(clk), 
+		.PC_next_EX(PC_next_EX), 
+		.zeroALU_EX(zeroALU_EX), 
+		.resultadoALU_EX(resultadoALU_EX), 
+		.Read_Data_2_EX(Read_Data_2_EX), 
+		.PC_next_MEM(PC_next_MEM), 
+		.zeroALU_MEM(zeroALU_MEM), 
+		.resultadoALU_MEM(resultadoALU_MEM), 
+		.Read_Data_2_MEM(Read_Data_2_MEM)
+	);
 	
+	ID_EX id_ex(
+		.clk(clk), 
+		.Read_Data_1_ID(Read_Data_1_ID), 
+		.Read_Data_2_ID(Read_Data_2_ID), 
+		.signExtended_ID(signExtended_ID), 
+		.PC_sumado_ID(PC_sumado_ID), 
+		.PC_sumado_EX(PC_sumado_EX), 
+		.Read_Data_1_EX(Read_Data_1_EX), 
+		.Read_Data_2_EX(Read_Data_2_EX), 
+		.signExtended_EX(signExtended_EX)
+	);
+	
+	MEM_WB mem_wb (
+		.clk(clk), 
+		.Read_data_MEM(Read_data_MEM), 
+		.ALU_result_MEM(ALU_result_MEM), 
+		.Read_data_WB(Read_data_WB), 
+		.ALU_result_WB(ALU_result_WB)
+	);
+	
+	IF_ID if_id (
+		.clk(clk), 
+		.instruction_IF(instruction_IF), 
+		.PC_sumado_IF(PC_sumado_IF), 
+		.instruction_ID(instruction_ID), 
+		.PC_sumado_ID(PC_sumado_ID)
+	);
 
 endmodule
