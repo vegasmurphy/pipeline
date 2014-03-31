@@ -23,6 +23,8 @@ module ID_EX(
     input [31:0] Read_Data_1_ID,
     input [31:0] Read_Data_2_ID,
     input [31:0] signExtended_ID,
+	 input [31:0] PC_sumado_ID,
+	 output [31:0] PC_sumado_EX,
     output [31:0] Read_Data_1_EX,
     output [31:0] Read_Data_2_EX,
     output [31:0] signExtended_EX
@@ -32,6 +34,7 @@ begin
 	Read_Data_1_ID=Read_Data_1_EX;
 	Read_Data_2_ID=Read_Data_2_EX;
 	signExtended_ID=signExtended_EX;
+	PC_sumado_ID=PC_sumado_EX;
 end
 
 endmodule
