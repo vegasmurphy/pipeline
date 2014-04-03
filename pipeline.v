@@ -40,7 +40,7 @@ module Pipeline(
 	 output wire RegWrite,
 	 output wire [31:0] dataMemoryReadData,
 	 output wire jumpFlag,							//Bandera de Salto
-	 output wire branchAndZero_flag,				//Bandera de Branch
+	 output wire PCSrc,				//Bandera de Branch
 	 output wire [3:0]aluInstruction,
 	 
 	 
@@ -76,53 +76,34 @@ module Pipeline(
 	 
 	 );
 
-		//Partes del fetch
-		reg [31:0] PC_next=1;
-		wire [31:0] signExtended, PC_sumado;
+	//Partes del fetch
+	reg [31:0] PC_next=1;
 		
 		
-		
-		
-	
-	//*****************Muxes para el PC************************//
-	always @(*)
-		begin
-			if(jumpFlag)
-				begin
-					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
-					PC_next[25:0] = Instruction[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
-				end
-			else
-				begin
-					if(branchAndZero_flag)
-						PC_next = signExtended + PC_sumado;
-					else
-						PC_next =  PC_sumado;
-				end		
-		end
-	//**************Fin de Muxes para el PC********************//
-	
-	
-	assign branchAndZero_flag = zeroALU & Branch;
+	assign PCSrc = zeroALU_MEM & Branch_MEM;
 	//***********************MUXes*****************************//
+	//Mux del PC
+	assign PC_next = PCSrc ? PC_next_MEM : PC_sumado_IF;
+	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
-	assign Write_Addr = RegDest ? Instruction[15:11] : Instruction[20:16];
+	assign Write_register_EX = RegDest_EX ? Instruction_EX[15:11] : Instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
-	wire [31:0] Read_Data_2;
-	assign rtData = ALUSrc ? signExtended : Read_Data_2;
+	wire [31:0] Read_Data_2_EX;
+	assign rtData = ALUSrc_EX ? signExtended_EX : Read_Data_2_EX;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
-	assign Write_Data = MemToReg ? dataMemoryReadData : resultadoALU;
+	assign Write_Data = MemToReg_WB ? dataMemoryReadData_WB : resultadoALU_WB;
+
 
 
 	//****************Modulos Instanciados*********************//
 	
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
-		.PC_next(PC_next_MEM),
+		.PC_next(PC_next),
 		.PC_sumado_value(PC_sumado_IF),
 		.Instruction(instruction_IF)
 	);
@@ -146,7 +127,7 @@ module Pipeline(
 		.RegWrite(RegWrite_WB),					// (debe ser un Write Enable)
 		.Read_Addr_1(instruction_ID[25:21]),//Se pueden leer dos registros
 		.Read_Addr_2(instruction_ID[20:16]),//(-)
-		.Write_Addr(Write_Register_WB),		//Direccion (numero de registro) a escribir
+		.Write_Addr(Write_register_WB),		//Direccion (numero de registro) a escribir
 		.Write_Data(Write_Data),				//Dato a escribir (Viene del Mux)
 		.Read_Data_1(Read_Data_1_ID),			//Dato leido con la direccion Read_Addr_1
 		.Read_Data_2(Read_Data_2_ID)
