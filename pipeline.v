@@ -20,7 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 module Pipeline(
     input wire clk,
-    output wire [31:0] resultadoALU,
+    
+	 //Old Wires
+	 output wire [31:0] resultadoALU,
 	 output wire [31:0] Instruction,
 	 output wire [31:0] writeData,
 	 output wire [31:0] rsData,
@@ -38,80 +40,63 @@ module Pipeline(
 	 output wire RegWrite,
 	 output wire [31:0] dataMemoryReadData,
 	 output wire jumpFlag,							//Bandera de Salto
-	 output wire branchAndZero_flag,				//Bandera de Branch
-	 output wire [3:0]aluInstruction
+	 output wire PCSrc,				//Bandera de Branch
+	 output wire [3:0]aluInstruction,
 	 
+	 
+		//IF_ID  WIRES
+		output [31:0] instruction_IF, 
+		output [31:0] PC_sumado_IF, 
+		output [31:0] instruction_ID,
+
+		//ID_EX WIRES
+		output [31:0] Read_Data_1_ID, 
+		output [31:0] Read_Data_2_ID, 
+		output [31:0] signExtended_ID, 
+		output [31:0] PC_sumado_ID, 
+		output [31:0] PC_sumado_EX, 
+		output [31:0] Read_Data_1_EX, 
+		output [31:0] Read_Data_2_EX, 
+		output [31:0] signExtended_EX,
+		
+		//EX_MEM WIRES
+		output [31:0] PC_next_EX, 
+		output zeroALU_EX, 
+		output [31:0] resultadoALU_EX,  
+		output [31:0] PC_next_MEM, 
+		output zeroALU_MEM, 
+		output [31:0] resultadoALU_MEM, 
+		output [31:0] Read_Data_2_MEM,
+		
+		//MEM_WB WIRES
+		output [31:0] Read_data_MEM, 
+		output [31:0] ALU_result_MEM, 
+		output [31:0] Read_data_WB, 
+		output [31:0] ALU_result_WB
 	 
 	 );
 
-//Partes del fetch
+	//Partes del fetch
 	reg [31:0] PC_next=1;
-	wire [31:0] signExtended, PC_sumado;
-	//SignExtender
-	SignExtender SignEx (
-		.unextended(Instruction[15:0]),	//Salto de 16bits
-		.extended(signExtended)				//Extension
-	);		//EX_MEM WIRES
-		wire [31:0] PC_next_EX; 
-		wire zeroALU_EX; 
-		wire [31:0] resultadoALU_EX;  
-		wire [31:0] PC_next_MEM; 
-		wire zeroALU_MEM; 
-		wire [31:0] resultadoALU_MEM; 
-		wire [31:0] Read_Data_2_MEM;
 		
-		//ID_EX WIRES
-		wire [31:0] Read_Data_1_ID; 
-		wire [31:0] Read_Data_2_ID; 
-		wire [31:0] signExtended_ID; 
-		wire [31:0] PC_sumado_ID; 
-		wire [31:0] PC_sumado_EX; 
-		wire [31:0] Read_Data_1_EX; 
-		wire [31:0] Read_Data_2_EX; 
-		wire [31:0] signExtended_EX;
 		
-		//MEM_WB WIRES
-		wire [31:0] Read_data_MEM; 
-		wire [31:0] ALU_result_MEM; 
-		wire [31:0] Read_data_WB; 
-		wire [31:0] ALU_result_WB;
-		
-		//IF_ID 
-		wire [31:0] instruction_IF; 
-		wire [31:0] PC_sumado_IF; 
-		wire [31:0] instruction_ID; 
-			//*****************Muxes para el PC************************//
-	always @(*)
-		begin
-			if(jumpFlag)
-				begin
-					PC_next[31:26] = PC_sumado[31:26];	//No se hace el shift porque el pc avanza de a uno
-					PC_next[25:0] = Instruction[25:0]; 	//en lugar de avanzar de a cuatro posiciones.
-				end
-			else
-				begin
-					if(branchAndZero_flag)
-						PC_next = signExtended + PC_sumado;
-					else
-						PC_next =  PC_sumado;
-				end		
-		end
-	//**************Fin de Muxes para el PC********************//
-	
-	
-	assign branchAndZero_flag = zeroALU & Branch;
+	assign PCSrc = zeroALU_MEM & Branch_MEM;
 	//***********************MUXes*****************************//
+	//Mux del PC
+	assign PC_next = PCSrc ? PC_next_MEM : PC_sumado_IF;
+	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
-	assign Write_Addr = RegDest ? Instruction[15:11] : Instruction[20:16];
+	assign Write_register_EX = RegDest_EX ? Instruction_EX[15:11] : Instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
-	wire [31:0] Read_Data_2;
-	assign rtData = ALUSrc ? signExtended : Read_Data_2;
+	wire [31:0] Read_Data_2_EX;
+	assign rtData = ALUSrc_EX ? signExtended_EX : Read_Data_2_EX;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
-	assign Write_Data = MemToReg ? dataMemoryReadData : resultadoALU;
+	assign Write_Data = MemToReg_WB ? dataMemoryReadData_WB : resultadoALU_WB;
+
 
 
 	//****************Modulos Instanciados*********************//
@@ -119,54 +104,58 @@ module Pipeline(
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
 		.PC_next(PC_next),
-		.PC_sumado_value(PC_sumado),
-		.signExtended(signExtended),
-		.Instruction(Instruction)
+		.PC_sumado_value(PC_sumado_IF),
+		.Instruction(instruction_IF)
 	);
+	
+	SignExtender SignEx (
+		.unextended(instruction_ID[15:0]),	//Salto de 16bits
+		.extended(signExtended_ID)				//Extension
+	);		
 	
 	DataMemoryAccessBlock dataMemoryAccessBlock (
 		.clk(clk),
-		.MemWrite(MemWrite),
-		.MemRead(MemRead),
-		.Address(resultadoALU),
-		.WriteData(Read_Data_2),
-		.ReadData(dataMemoryReadData)
+		.MemWrite(MemWrite_MEM),
+		.MemRead(MemRead_MEM),
+		.Address(resultadoALU_MEM),
+		.WriteData(Read_Data_2_MEM),
+		.ReadData(dataMemoryReadData_MEM)
 	);
 	
 	Registers registers (
-		.clk(clk),								//clock
-		.RegWrite(RegWrite),					// (debe ser un Write Enable)
-		.Read_Addr_1(Instruction[25:21]),//Se pueden leer dos registros
-		.Read_Addr_2(Instruction[20:16]),//(-)
-		.Write_Addr(Write_Addr),	//Direccion (numero de registro) a escribir
-		.Write_Data(Write_Data),				//Dato a escribir
-		.Read_Data_1(rsData),				//Dato leido con la direccion Read_Addr_1
-		.Read_Data_2(Read_Data_2)
+		.clk(clk),									//clock
+		.RegWrite(RegWrite_WB),					// (debe ser un Write Enable)
+		.Read_Addr_1(instruction_ID[25:21]),//Se pueden leer dos registros
+		.Read_Addr_2(instruction_ID[20:16]),//(-)
+		.Write_Addr(Write_register_WB),		//Direccion (numero de registro) a escribir
+		.Write_Data(Write_Data),				//Dato a escribir (Viene del Mux)
+		.Read_Data_1(Read_Data_1_ID),			//Dato leido con la direccion Read_Addr_1
+		.Read_Data_2(Read_Data_2_ID)
 	);
 	
 	Control control (
-		.opcode(Instruction[31:26]),
-		.RegDest(RegDest),
-		.Branch(Branch),
-		.MemRead(MemRead),
-		.MemToReg(MemToReg),
-		.ALUOp1(ALUOp1),
-		.ALUOp2(ALUOp2),
-		.MemWrite(MemWrite),
-		.ALUSrc(ALUSrc),
-		.RegWrite(RegWrite),
-		.Jump(jumpFlag)
+		.opcode(instruction_ID[31:26]),
+		.RegDest(RegDest_ID),
+		.Branch(Branch_ID),
+		.MemRead(MemRead_ID),
+		.MemToReg(MemToReg_ID),
+		.ALUOp1(ALUOp1_ID),
+		.ALUOp2(ALUOp2_ID),
+		.MemWrite(MemWrite_ID),
+		.ALUSrc(ALUSrc_ID),
+		.RegWrite(RegWrite_ID),
+		.Jump(jumpFlag_ID)
 	);
 	
 	ALUwithControl alu (
-		.data1(rsData),
-		.data2(rtData),
-		.instruction(Instruction[5:0]),
-		.ALUOp1(ALUOp1),
-		.ALUOp2(ALUOp2),
-		.zero(zeroALU),
-		.result(resultadoALU),
-		.aluInstruction(aluInstruction)
+		.data1(rsData_EX),
+		.data2(rtData_EX),
+		.instruction(signExtended_EX[5:0]),
+		.ALUOp1(ALUOp1_EX),
+		.ALUOp2(ALUOp2_EX),
+		.zero(zeroALU_EX),
+		.result(resultadoALU_EX),
+		.aluInstruction(aluInstruction_EX)
 	);
 	
 	EX_MEM ex_mem (
@@ -231,7 +220,7 @@ module Pipeline(
 	
 	MEM_WB mem_wb (
 		.clk(clk), 
-		.Read_data_MEM(Read_data_MEM), 
+		.Read_data_MEM(dataMemoryReadData_MEM), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_data_WB(Read_data_WB), 
 		.ALU_result_WB(ALU_result_WB),
