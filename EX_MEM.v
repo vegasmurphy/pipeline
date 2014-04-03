@@ -21,10 +21,10 @@
 module EX_MEM(
 	input clk,
 	input [31:0] PC_next_EX,
-	input [31:0] resultadoALU_EX,
+	input [31:0] ALU_result_EX,
 	input [31:0] Read_Data_2_EX,
-	output reg [31:0] PC_next_MEM,
-	output reg [31:0] resultadoALU_MEM,
+	output reg [31:0] PC_next_MEM=1,
+	output reg [31:0] ALU_result_MEM,
 	output reg [31:0] Read_Data_2_MEM,
 	input Branch_EX,
 	input MemRead_EX,
@@ -33,7 +33,7 @@ module EX_MEM(
 	input RegWrite_EX,
 	input Jump_EX,
 	input Zero_EX,
-	input Write_register_EX,
+	input [4:0] Write_register_EX,
 	output reg Branch_MEM,
 	output reg MemRead_MEM,
 	output reg MemToReg_MEM,
@@ -41,14 +41,14 @@ module EX_MEM(
 	output reg RegWrite_MEM,
 	output reg Jump_MEM,
 	output reg Zero_MEM,
-	output reg Write_register_MEM
+	output reg [4:0] Write_register_MEM
     );
 
 
 	always@(posedge clk)
 	begin
 		PC_next_MEM <= PC_next_EX;
-		resultadoALU_MEM <= resultadoALU_EX;
+		ALU_result_MEM <= ALU_result_EX;
 		Read_Data_2_MEM <= Read_Data_2_EX;
 		Branch_MEM<=Branch_EX;
 		MemRead_MEM<=MemRead_EX;

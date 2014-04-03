@@ -28,7 +28,7 @@ module IntructionFetchBlock #
 		input [width_B-1:0] PC_next,				//Creo que hay que inicializarlo en uno (1)		
 		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
 		output [width_B-1:0] PC_sumado_value,	//Salida del PC sumado para el bloque IFID
-		output [width_B-1:0] Instruccion			//Instruccion
+		output [width_B-1:0] Instruction			//Instruccion
    );
 	
 	assign PC_debug_value = PC_actual;	//Esto es para ver el valor del PC en el debugger
@@ -43,7 +43,7 @@ module IntructionFetchBlock #
 	InstructionMemory ROM (
 	  .clka(clk), 					//Entrada de clock
 	  .addra(PC_actual[9:0]), 	//Direccion dada por el valor del PC
-	  .douta(Instruccion)		//Instruccion obtenida
+	  .douta(Instruction)		//Instruccion obtenida
 	);
 	
 

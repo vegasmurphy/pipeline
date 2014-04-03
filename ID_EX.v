@@ -24,6 +24,7 @@ module ID_EX(
     input [31:0] Read_Data_2_ID,
     input [31:0] signExtended_ID,
 	 input [31:0] PC_sumado_ID,
+	 input [31:0] instruction_ID,
 	 input RegDest_ID,
 	 input Branch_ID,
 	 input MemRead_ID,
@@ -38,6 +39,7 @@ module ID_EX(
     output reg [31:0] Read_Data_1_EX,
     output reg [31:0] Read_Data_2_EX,
     output reg [31:0] signExtended_EX,
+	 output reg [31:0] instruction_EX,
 	 output reg RegDest_EX,
 	 output reg Branch_EX,
 	 output reg MemRead_EX,
@@ -54,6 +56,7 @@ begin
 	Read_Data_1_EX<=Read_Data_1_ID;
 	Read_Data_2_EX<=Read_Data_2_ID;
 	signExtended_EX<=signExtended_ID;
+	instruction_EX<=instruction_ID;
 	PC_sumado_EX<=PC_sumado_ID;
 	RegDest_EX<=RegDest_ID;
 	Branch_EX<=Branch_ID;

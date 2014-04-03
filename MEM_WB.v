@@ -24,12 +24,12 @@ module MEM_WB(
     input [31:0] ALU_result_MEM,
     input RegWrite_MEM,
 	 input MemToReg_MEM,
-	 input Write_register_MEM,
+	 input [4:0] Write_register_MEM,
 	 output reg [31:0] Read_data_WB,
     output reg [31:0] ALU_result_WB,
 	 output reg MemToReg_WB,
     output reg RegWrite_WB,
-	 output reg Write_register_WB
+	 output reg [4:0] Write_register_WB
 	 );
 always @(posedge clk)
 begin

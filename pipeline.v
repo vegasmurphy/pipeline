@@ -21,81 +21,95 @@
 module Pipeline(
     input wire clk,
     
-	 //Old Wires
-	 output wire [31:0] resultadoALU,
-	 output wire [31:0] Instruction,
-	 output wire [31:0] writeData,
-	 output wire [31:0] rsData,
-	 output wire [31:0] rtData,
-	 output wire carryALU,
-	 output wire zeroALU,
-	 output wire RegDest,
-	 output wire Branch,
-	 output wire MemRead,
-	 output wire MemToReg,
-	 output wire ALUOp1,
-	 output wire ALUOp2,
-	 output wire MemWrite,
-	 output wire ALUSrc,
-	 output wire RegWrite,
-	 output wire [31:0] dataMemoryReadData,
-	 output wire jumpFlag,							//Bandera de Salto
-	 output wire PCSrc,				//Bandera de Branch
-	 output wire [3:0]aluInstruction,
+	//Debugging outputs
+	output wire [3:0]aluInstruction,
 	 
 	 
-		//IF_ID  WIRES
-		output [31:0] instruction_IF, 
-		output [31:0] PC_sumado_IF, 
-		output [31:0] instruction_ID,
+	//IF_ID  WIRES
+	output [31:0] instruction_IF, 
+	output [31:0] PC_sumado_IF, 
+	output [31:0] instruction_ID,
 
-		//ID_EX WIRES
-		output [31:0] Read_Data_1_ID, 
-		output [31:0] Read_Data_2_ID, 
-		output [31:0] signExtended_ID, 
-		output [31:0] PC_sumado_ID, 
-		output [31:0] PC_sumado_EX, 
-		output [31:0] Read_Data_1_EX, 
-		output [31:0] Read_Data_2_EX, 
-		output [31:0] signExtended_EX,
-		
-		//EX_MEM WIRES
-		output [31:0] PC_next_EX, 
-		output zeroALU_EX, 
-		output [31:0] resultadoALU_EX,  
-		output [31:0] PC_next_MEM, 
-		output zeroALU_MEM, 
-		output [31:0] resultadoALU_MEM, 
-		output [31:0] Read_Data_2_MEM,
-		
-		//MEM_WB WIRES
-		output [31:0] Read_data_MEM, 
-		output [31:0] ALU_result_MEM, 
-		output [31:0] Read_data_WB, 
-		output [31:0] ALU_result_WB
-	 
+	//ID_EX WIRES
+	output [31:0] Read_Data_1_ID,
+	output [31:0] Read_Data_2_ID,
+	output [31:0] signExtended_ID,
+	output [31:0] PC_sumado_ID,
+	output RegDest_ID,
+	output Branch_ID,
+	output MemRead_ID,
+	output MemToReg_ID,
+	output ALUOp1_ID,
+	output ALUOp2_ID,
+	output MemWrite_ID,
+	output ALUSrc_ID,
+	output RegWrite_ID,
+	output Jump_ID,
+	output [31:0] PC_sumado_EX,
+	output [31:0] Read_Data_1_EX,
+	output [31:0] Read_Data_2_EX,
+	output [31:0] signExtended_EX,
+	output [31:0] instruction_EX,
+	output RegDest_EX,
+	output Branch_EX,
+	output MemRead_EX,
+	output MemToReg_EX,
+	output ALUOp1_EX,
+	output ALUOp2_EX,
+	output MemWrite_EX,
+	output ALUSrc_EX,
+	output RegWrite_EX,
+	output Jump_EX,
+	
+	
+	//EX_MEM WIRES
+	output [31:0] PC_next_EX,
+	output [31:0] ALU_result_EX,
+	output [31:0] PC_next_MEM,
+	output [31:0] ALU_result_MEM,
+	output [31:0] Read_Data_2_MEM,
+	output Zero_EX,
+	output [4:0] Write_register_EX,
+	output Branch_MEM,
+	output MemRead_MEM,
+	output MemToReg_MEM,
+	output MemWrite_MEM,
+	output RegWrite_MEM,
+	output Jump_MEM,
+	output Zero_MEM,
+	output [4:0] Write_register_MEM,
+	
+	//MEM_WB WIRES
+	output [31:0] Read_data_MEM,
+	output [31:0] Read_data_WB,
+	output [31:0] ALU_result_WB,
+	output MemToReg_WB,
+	output RegWrite_WB,
+	output [4:0] Write_register_WB
+ 
 	 );
 
-	//Partes del fetch
-	reg [31:0] PC_next=1;
+	//Internal Wires
+	wire [31:0] PC_next, rtData;
+	wire PCSrc;
 		
 		
-	assign PCSrc = zeroALU_MEM & Branch_MEM;
+	assign PCSrc = Zero_MEM & Branch_MEM;
+	assign PC_next_EX = signExtended_EX + PC_sumado_EX;
 	//***********************MUXes*****************************//
 	//Mux del PC
 	assign PC_next = PCSrc ? PC_next_MEM : PC_sumado_IF;
 	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
-	assign Write_register_EX = RegDest_EX ? Instruction_EX[15:11] : Instruction_EX[20:16];
+	assign Write_register_EX = RegDest_EX ? instruction_EX[15:11] : instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
-	wire [31:0] Read_Data_2_EX;
 	assign rtData = ALUSrc_EX ? signExtended_EX : Read_Data_2_EX;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
-	assign Write_Data = MemToReg_WB ? dataMemoryReadData_WB : resultadoALU_WB;
+	assign Write_Data = MemToReg_WB ? Read_data_WB : ALU_result_WB;
 
 
 
@@ -117,9 +131,9 @@ module Pipeline(
 		.clk(clk),
 		.MemWrite(MemWrite_MEM),
 		.MemRead(MemRead_MEM),
-		.Address(resultadoALU_MEM),
+		.Address(ALU_result_MEM),
 		.WriteData(Read_Data_2_MEM),
-		.ReadData(dataMemoryReadData_MEM)
+		.ReadData(Read_data_MEM)
 	);
 	
 	Registers registers (
@@ -144,47 +158,21 @@ module Pipeline(
 		.MemWrite(MemWrite_ID),
 		.ALUSrc(ALUSrc_ID),
 		.RegWrite(RegWrite_ID),
-		.Jump(jumpFlag_ID)
+		.Jump(Jump_ID)
 	);
 	
 	ALUwithControl alu (
-		.data1(rsData_EX),
-		.data2(rtData_EX),
+		.data1(Read_Data_1_EX),
+		.data2(rtData),
 		.instruction(signExtended_EX[5:0]),
 		.ALUOp1(ALUOp1_EX),
 		.ALUOp2(ALUOp2_EX),
-		.zero(zeroALU_EX),
-		.result(resultadoALU_EX),
-		.aluInstruction(aluInstruction_EX)
+		.zero(Zero_EX),
+		.result(ALU_result_EX),
+		.aluInstruction(aluInstruction)//output para debug nomas
 	);
 	
-	EX_MEM ex_mem (
-		.clk(clk), 
-		.PC_next_EX(PC_next_EX), 
-		.zeroALU_EX(zeroALU_EX), 
-		.resultadoALU_EX(resultadoALU_EX), 
-		.Read_Data_2_EX(Read_Data_2_EX), 
-		.PC_next_MEM(PC_next_MEM), 
-		.zeroALU_MEM(zeroALU_MEM), 
-		.resultadoALU_MEM(resultadoALU_MEM), 
-		.Read_Data_2_MEM(Read_Data_2_MEM),
-		.Branch_EX(Branch_EX),
-		.MemRead_EX(MemRead_EX),
-		.MemToReg_EX(MemToReg_EX),
-		.MemWrite_EX(MemWrite_EX),
-		.RegWrite_EX(RegWrite_EX),
-		.Jump_EX(Jump_EX),
-		.Zero_EX(Zero_EX),
-		.Write_register_EX(Write_register_EX),
-		.Branch_MEM(Branch_MEM),
-		.MemRead_MEM(MemRead_MEM),
-		.MemToReg_MEM(MemToReg_MEM),
-		.MemWrite_MEM(MemWrite_MEM),
-		.RegWrite_MEM(RegWrite_MEM),
-		.Jump_MEM(Jump_MEM),
-		.Zero_MEM(Zero_MEM),
-		.Write_register_MEM(Write_register_MEM)
-	);
+	
 	
 	ID_EX id_ex(
 		.clk(clk), 
@@ -192,10 +180,12 @@ module Pipeline(
 		.Read_Data_2_ID(Read_Data_2_ID), 
 		.signExtended_ID(signExtended_ID), 
 		.PC_sumado_ID(PC_sumado_ID), 
-		.PC_sumado_EX(PC_sumado_EX), 
+		.PC_sumado_EX(PC_sumado_EX),
+		.instruction_ID(instruction_ID),
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
 		.signExtended_EX(signExtended_EX),
+		.instruction_EX(instruction_EX),
 		.RegDest_ID(RegDest_ID),
 		.Branch_ID(Branch_ID),
 		.MemRead_ID(MemRead_ID),
@@ -218,12 +208,37 @@ module Pipeline(
 		.Jump_EX(Jump_EX)
 	);
 	
+	EX_MEM ex_mem (
+		.clk(clk), 
+		.PC_next_EX(PC_next_EX), 
+		.ALU_result_EX(ALU_result_EX), 
+		.Read_Data_2_EX(Read_Data_2_EX), 
+		.PC_next_MEM(PC_next_MEM), 
+		.ALU_result_MEM(ALU_result_MEM), 
+		.Read_Data_2_MEM(Read_Data_2_MEM),
+		.Branch_EX(Branch_EX),
+		.MemRead_EX(MemRead_EX),
+		.MemToReg_EX(MemToReg_EX),
+		.MemWrite_EX(MemWrite_EX),
+		.RegWrite_EX(RegWrite_EX),
+		.Jump_EX(Jump_EX),
+		.Zero_EX(Zero_EX),
+		.Write_register_EX(Write_register_EX),
+		.Branch_MEM(Branch_MEM),
+		.MemRead_MEM(MemRead_MEM),
+		.MemToReg_MEM(MemToReg_MEM),
+		.MemWrite_MEM(MemWrite_MEM),
+		.RegWrite_MEM(RegWrite_MEM),
+		.Jump_MEM(Jump_MEM),
+		.Zero_MEM(Zero_MEM),
+		.Write_register_MEM(Write_register_MEM)
+	);
+	
+	
 	MEM_WB mem_wb (
 		.clk(clk), 
-		.Read_data_MEM(dataMemoryReadData_MEM), 
-		.ALU_result_MEM(ALU_result_MEM), 
-		.Read_data_WB(Read_data_WB), 
-		.ALU_result_WB(ALU_result_WB),
+		.Read_data_MEM(Read_data_MEM), 
+		.ALU_result_MEM(ALU_result_MEM),
 		.RegWrite_MEM(RegWrite_MEM),
 		.MemToReg_MEM(MemToReg_MEM),
 		.Write_register_MEM(Write_register_MEM),
