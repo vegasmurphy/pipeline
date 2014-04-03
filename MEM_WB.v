@@ -22,13 +22,19 @@ module MEM_WB(
 	 input clk,
     input [31:0] Read_data_MEM,
     input [31:0] ALU_result_MEM,
-    output reg [31:0] Read_data_WB,
-    output reg [31:0] ALU_result_WB
-    );
+    input RegWrite_MEM,
+	 input MemToReg_MEM,
+	 output reg [31:0] Read_data_WB,
+    output reg [31:0] ALU_result_WB,
+	 output reg MemToReg_WB,
+    output reg RegWrite_WB
+	 );
 always @(posedge clk)
 begin
-	Read_data_WB=Read_data_MEM;
-	ALU_result_WB=ALU_result_MEM;
+	Read_data_WB<=Read_data_MEM;
+	ALU_result_WB<=ALU_result_MEM;
+	MemToReg_WB<=MemToReg_MEM;
+   RegWrite_WB<=RegWrite_MEM;
 end
 
 endmodule
