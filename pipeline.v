@@ -178,7 +178,23 @@ module Pipeline(
 		.PC_next_MEM(PC_next_MEM), 
 		.zeroALU_MEM(zeroALU_MEM), 
 		.resultadoALU_MEM(resultadoALU_MEM), 
-		.Read_Data_2_MEM(Read_Data_2_MEM)
+		.Read_Data_2_MEM(Read_Data_2_MEM),
+		.Branch_EX(Branch_EX),
+		.MemRead_EX(MemRead_EX),
+		.MemToReg_EX(MemToReg_EX),
+		.MemWrite_EX(MemWrite_EX),
+		.RegWrite_EX(RegWrite_EX),
+		.Jump_EX(Jump_EX),
+		.Zero_EX(Zero_EX),
+		.Write_register_EX(Write_register_EX),
+		.Branch_MEM(Branch_MEM),
+		.MemRead_MEM(MemRead_MEM),
+		.MemToReg_MEM(MemToReg_MEM),
+		.MemWrite_MEM(MemWrite_MEM),
+		.RegWrite_MEM(RegWrite_MEM),
+		.Jump_MEM(Jump_MEM),
+		.Zero_MEM(Zero_MEM),
+		.Write_register_MEM(Write_register_MEM)
 	);
 	
 	ID_EX id_ex(
@@ -190,7 +206,27 @@ module Pipeline(
 		.PC_sumado_EX(PC_sumado_EX), 
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
-		.signExtended_EX(signExtended_EX)
+		.signExtended_EX(signExtended_EX),
+		.RegDest_ID(RegDest_ID),
+		.Branch_ID(Branch_ID),
+		.MemRead_ID(MemRead_ID),
+		.MemToReg_ID(MemToReg_ID),
+		.ALUOp1_ID(ALUOp1_ID),
+		.ALUOp2_ID(ALUOp2_ID),
+		.MemWrite_ID(MemWrite_ID),
+		.ALUSrc_ID(ALUSrc_ID),
+		.RegWrite_ID(RegWrite_ID),
+		.Jump_ID(Jump_ID),
+		.RegDest_EX(RegDest_EX),
+		.Branch_EX(Branch_EX),
+		.MemRead_EX(MemRead_EX),
+		.MemToReg_EX(MemToReg_EX),
+		.ALUOp1_EX(ALUOp1_EX),
+		.ALUOp2_EX(ALUOp2_EX),
+		.MemWrite_EX(MemWrite_EX),
+		.ALUSrc_EX(ALUSrc_EX),
+		.RegWrite_EX(RegWrite_EX),
+		.Jump_EX(Jump_EX)
 	);
 	
 	MEM_WB mem_wb (
@@ -198,7 +234,15 @@ module Pipeline(
 		.Read_data_MEM(Read_data_MEM), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_data_WB(Read_data_WB), 
-		.ALU_result_WB(ALU_result_WB)
+		.ALU_result_WB(ALU_result_WB),
+		.RegWrite_MEM(RegWrite_MEM),
+		.MemToReg_MEM(MemToReg_MEM),
+		.Write_register_MEM(Write_register_MEM),
+		.Read_data_WB(Read_data_WB),
+		.ALU_result_WB(ALU_result_WB),
+		.MemToReg_WB(MemToReg_WB),
+		.RegWrite_WB(RegWrite_WB),
+		.Write_register_WB(Write_register_WB)
 	);
 	
 	IF_ID if_id (
