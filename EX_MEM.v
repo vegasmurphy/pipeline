@@ -35,13 +35,15 @@ module EX_MEM(
 	input RegWrite_EX,
 	input Jump_EX,
 	input Zero_EX,
+	input Write_register_EX,
 	output reg Branch_MEM,
 	output reg MemRead_MEM,
 	output reg MemToReg_MEM,
 	output reg MemWrite_MEM,
 	output reg RegWrite_MEM,
 	output reg Jump_MEM,
-	output reg Zero_MEM
+	output reg Zero_MEM,
+	output reg Write_register_MEM
     );
 
 
