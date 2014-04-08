@@ -57,6 +57,7 @@ module EX_MEM(
 		RegWrite_MEM<=RegWrite_EX;
 		Jump_MEM<=Jump_EX;
 		Zero_MEM<=Zero_EX;
+		Write_register_MEM[4:0]<=Write_register_EX[4:0];
 	end
 
 

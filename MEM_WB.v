@@ -37,6 +37,7 @@ begin
 	ALU_result_WB<=ALU_result_MEM;
 	MemToReg_WB<=MemToReg_MEM;
    RegWrite_WB<=RegWrite_MEM;
+	Write_register_WB[4:0]<=Write_register_MEM[4:0];
 end
 
 endmodule
