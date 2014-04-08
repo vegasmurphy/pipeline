@@ -117,13 +117,36 @@ module Pipeline(
 	wire [31:0] Write_Data;
 	assign Write_Data = MemToReg_WB ? Read_data_WB : ALU_result_WB;
 
+	//Muxes de Hazard Detection Unit
+	assign RegDest_ID  = nopMux ? 1'b0 : RegDest_control;
+	assign Branch_ID   = nopMux ? 1'b0 : Branch_control;
+	assign MemRead_ID  = nopMux ? 1'b0 : MemRead_control;
+	assign MemToReg_ID = nopMux ? 1'b0 : MemToReg_control;
+	assign ALUOp1_ID   = nopMux ? 1'b0 : ALUOp1_control;
+	assign ALUOp2_ID   = nopMux ? 1'b0 : ALUOp2_control;
+	assign MemWrite_ID = nopMux ? 1'b0 : MemWrite_control;
+	assign ALUSrc_ID   = nopMux ? 1'b0 : ALUSrc_control;
+	assign RegWrite_ID = nopMux ? 1'b0 : RegWrite_control;
+	assign Jump_ID 	 = nopMux ? 1'b0 : Jump_control;
 
 
 	//****************Modulos Instanciados*********************//
 	
+	wire IF_ID_write,PC_write,nopMux;
+	HazardDetectionUnit hazardDetectionUnit(
+		.MemRead_EX(MemRead_EX),					//Flag
+		.RegisterRt_EX(instruction_EX[20:16]),	//Este esta bien (segun vegas)
+		.RegisterRs_ID(instruction_ID[25:21]), //Falta verificar que este bien
+		.RegisterRt_ID(instruction_ID[20:16]), //Falta verificar que este bien
+		.IF_ID_write(IF_ID_write),					//if ==0 ID/IF stalls
+		.PC_write(PC_write),							//if ==0 PC stalls
+		.nopMux(nopMux)								//if ==1 nop
+	);
+		
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
 		.PC_next(PC_next),
+		.PC_write(PC_write),
 		.PC_sumado_value(PC_sumado_IF),
 		.Instruction(instruction_IF)
 	);
@@ -155,16 +178,16 @@ module Pipeline(
 	
 	Control control (
 		.opcode(instruction_ID[31:26]),
-		.RegDest(RegDest_ID),
-		.Branch(Branch_ID),
-		.MemRead(MemRead_ID),
-		.MemToReg(MemToReg_ID),
-		.ALUOp1(ALUOp1_ID),
-		.ALUOp2(ALUOp2_ID),
-		.MemWrite(MemWrite_ID),
-		.ALUSrc(ALUSrc_ID),
-		.RegWrite(RegWrite_ID),
-		.Jump(Jump_ID)
+		.RegDest(RegDest_control),
+		.Branch(Branch_control),
+		.MemRead(MemRead_control),
+		.MemToReg(MemToReg_control),
+		.ALUOp1(ALUOp1_control),
+		.ALUOp2(ALUOp2_control),
+		.MemWrite(MemWrite_control),
+		.ALUSrc(ALUSrc_control),
+		.RegWrite(RegWrite_control),
+		.Jump(Jump_control)
 	);
 	
 	ALUwithControl alu (
@@ -259,6 +282,7 @@ module Pipeline(
 		.clk(clk), 
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
+		.IF_ID_write(IF_ID_write),
 		.instruction_ID(instruction_ID), 
 		.PC_sumado_ID(PC_sumado_ID)
 	);

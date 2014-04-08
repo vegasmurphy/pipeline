@@ -26,6 +26,7 @@ module IntructionFetchBlock #
 	)	
 	(	input clk,										//clock
 		input [width_B-1:0] PC_next,				//Creo que hay que inicializarlo en uno (1)		
+		input PC_write,								//Escribir o no el PC (Hazard Detection Unit)
 		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
 		output [width_B-1:0] PC_sumado_value,	//Salida del PC sumado para el bloque IFID
 		output [width_B-1:0] Instruction			//Instruccion
@@ -37,7 +38,8 @@ module IntructionFetchBlock #
 	//****************Modulos Instanciados*********************//
 	//Contador de Programa (Ya no es un modulo, pero igual queda aca)
 	reg [width_B-1:0] PC_actual=0;//Valor Actual del PC para las instrucciones (debe iniciarse en cero)
-	reg [width_B-1:0] PC_sumado=0;//PC+1	
+	wire [width_B-1:0] PC_sumado;//PC+1
+	//reg [width_B-1:0] PC_sumado=0;//PC+1	
 	
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
@@ -47,13 +49,13 @@ module IntructionFetchBlock #
 	);
 	
 
+	assign PC_sumado = PC_actual +1;
 	//************Logica de Asignacion del PC******************//
 	//Logica secuencial
 	always @(posedge clk)
 		begin
 			//Sumar 1 al PC_to_ROM para pasar a la siguiente direccion
-			PC_sumado = PC_actual +1;
-			PC_actual=PC_next;
+			if(PC_write) PC_actual=PC_next;
 		end
 			
 	

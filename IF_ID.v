@@ -22,6 +22,7 @@ module IF_ID(
 	input clk,
 	input [31:0] instruction_IF,
 	input [31:0] PC_sumado_IF,
+	input IF_ID_write,
 	output reg [31:0] instruction_ID,
 	output reg [31:0] PC_sumado_ID
     );
@@ -33,8 +34,11 @@ module IF_ID(
 	
 	always@(posedge clk)
 	begin
-		instruction_ID <= instruction_IF;
-		PC_sumado_ID 	<= PC_sumado_IF;	
+		if(IF_ID_write)
+			begin
+				instruction_ID <= instruction_IF;
+				PC_sumado_ID 	<= PC_sumado_IF;	
+			end
 	end
 
 
