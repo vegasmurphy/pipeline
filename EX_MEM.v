@@ -44,6 +44,20 @@ module EX_MEM(
 	output reg [4:0] Write_register_MEM
     );
 
+	initial
+	begin
+	Branch_MEM=0;
+	MemRead_MEM=0;
+	MemToReg_MEM=0;
+	MemWrite_MEM=0;
+	RegWrite_MEM=0;
+	Jump_MEM=0;
+	Zero_MEM=0;
+	Write_register_MEM=0;
+	PC_next_MEM=0;
+	ALU_result_MEM=0;
+	Read_Data_2_MEM=0;
+	end
 
 	always@(posedge clk)
 	begin

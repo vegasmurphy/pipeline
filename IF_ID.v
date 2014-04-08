@@ -25,7 +25,11 @@ module IF_ID(
 	output reg [31:0] instruction_ID,
 	output reg [31:0] PC_sumado_ID
     );
-
+	initial
+	begin
+	instruction_ID=0;
+	PC_sumado_ID=0;
+	end
 	
 	always@(posedge clk)
 	begin

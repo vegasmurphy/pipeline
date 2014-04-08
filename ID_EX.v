@@ -51,6 +51,24 @@ module ID_EX(
 	 output reg RegWrite_EX,
 	 output reg Jump_EX
     );
+initial
+	begin
+		PC_sumado_EX=0;
+		Read_Data_1_EX=0;
+		Read_Data_2_EX=0;
+		signExtended_EX=0;
+		instruction_EX=0;
+		RegDest_EX=0;
+		Branch_EX=0;
+		MemRead_EX=0;
+		MemToReg_EX=0;
+		ALUOp1_EX=0;
+		ALUOp2_EX=0;
+		MemWrite_EX=0;
+		ALUSrc_EX=0;
+		RegWrite_EX=0;
+		Jump_EX=0;
+	end
 always @(posedge clk)
 begin
 	Read_Data_1_EX<=Read_Data_1_ID;

@@ -31,6 +31,16 @@ module MEM_WB(
     output reg RegWrite_WB,
 	 output reg [4:0] Write_register_WB
 	 );
+initial
+	begin
+	Read_data_WB=0;
+	ALU_result_WB=0;
+	MemToReg_WB=0;
+	RegWrite_WB=0;
+	Write_register_WB=0;
+	end
+
+
 always @(posedge clk)
 begin
 	Read_data_WB<=Read_data_MEM;
