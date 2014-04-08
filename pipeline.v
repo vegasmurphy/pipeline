@@ -78,6 +78,8 @@ module Pipeline(
 	output Jump_MEM,
 	output Zero_MEM,
 	output [4:0] Write_register_MEM,
+	output [4:0] RegisterRs_MEM,
+	output [4:0] RegisterRt_MEM,
 	
 	//MEM_WB WIRES
 	output [31:0] Read_data_MEM,
@@ -85,7 +87,11 @@ module Pipeline(
 	output [31:0] ALU_result_WB,
 	output MemToReg_WB,
 	output RegWrite_WB,
-	output [4:0] Write_register_WB
+	output [4:0] Write_register_WB,
+ 
+ //Forwarding unit
+	output [1:0] forwardA,
+	output [1:0] forwardB 
  
 	 );
 
@@ -256,5 +262,17 @@ module Pipeline(
 		.instruction_ID(instruction_ID), 
 		.PC_sumado_ID(PC_sumado_ID)
 	);
+
+	ForwardingUnit forwardingUnit(
+	.rs_ex(instruction_EX[25:21]),
+	.rt_ex(instruction_EX[20:16]),
+	.rd_mem(Write_register_MEM),
+	.rd_wb(Write_register_WB),
+	.regWrite_mem(RegWrite_MEM),
+	.regWrite_wb(RegWrite_WB),
+	.forwardA(forwardA),
+	.forwardB(forwardB)
+    );
+
 
 endmodule
