@@ -113,7 +113,7 @@ module Pipeline(
 	assign Write_register_EX = RegDest_EX ? instruction_EX[15:11] : instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
-	assign rtData = ALUSrc_EX ? signExtended_EX : Read_Data_2_EX;
+	assign rtData = ALUSrc_EX ? signExtended_EX : aluInput2;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
@@ -194,7 +194,7 @@ module Pipeline(
 	
 	ALUwithControl alu (
 		.data1(aluInput1),
-		.data2(aluInput2),
+		.data2(rtData),
 		.instruction(signExtended_EX[5:0]),
 		.ALUOp1(ALUOp1_EX),
 		.ALUOp2(ALUOp2_EX),
@@ -243,7 +243,7 @@ module Pipeline(
 		.clk(clk), 
 		.PC_next_EX(PC_next_EX), 
 		.ALU_result_EX(ALU_result_EX), 
-		.Read_Data_2_EX(Read_Data_2_EX), 
+		.Read_Data_2_EX(aluInput2), 
 		.PC_next_MEM(PC_next_MEM), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM),
@@ -311,10 +311,10 @@ always @(forwardA, Read_Data_1_EX, ALU_result_MEM, ALU_result_WB)
 
 always @(forwardB, rtData, ALU_result_MEM, ALU_result_WB)
       case (forwardB)
-         2'b00: aluInput2 = rtData;
+         2'b00: aluInput2 = Read_Data_2_EX;
          2'b01: aluInput2 = ALU_result_MEM;
          2'b10: aluInput2 = ALU_result_WB;
-         2'b11: aluInput2 = rtData;
+         2'b11: aluInput2 = Read_Data_2_EX;
       endcase
 
 endmodule
