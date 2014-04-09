@@ -82,7 +82,8 @@ module pipelineTest;
 	wire MemToReg_WB;
 	wire RegWrite_WB;
 	wire [4:0] Write_register_WB;
-
+	wire [1:0] forwardA;
+	wire [1:0] forwardB;
 	// Instantiate the Unit Under Test (UUT)
 	Pipeline uut (
 		.clk(clk), 
@@ -139,7 +140,9 @@ module pipelineTest;
 		.ALU_result_WB(ALU_result_WB), 
 		.MemToReg_WB(MemToReg_WB), 
 		.RegWrite_WB(RegWrite_WB), 
-		.Write_register_WB(Write_register_WB)
+		.Write_register_WB(Write_register_WB),
+		.forwardA(forwardA),
+		.forwardB(forwardB)
 	);
 
 	always #10 clk=~clk;

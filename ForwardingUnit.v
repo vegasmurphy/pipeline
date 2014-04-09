@@ -31,16 +31,16 @@ module ForwardingUnit(
 
 always @(*)
 	begin
-forwardA=2'b00;
-forwardB=2'b00;
-if (regWrite_wb && rs_ex==rd_wb)
-	forwardA=2'b01;
-if (regWrite_wb && rt_ex==rd_wb)
-	forwardB=2'b01;
-if (regWrite_mem && rs_ex==rd_mem)
-	forwardA=2'b10;
-if (regWrite_mem && rt_ex==rd_mem)
-	forwardB=2'b10;	
+		forwardA=2'b00;
+		forwardB=2'b00;
+		if (regWrite_wb && rs_ex==rd_wb && rd_wb!=4'b0000)
+			forwardA=2'b01;
+		if (regWrite_wb && rt_ex==rd_wb && rd_wb!=4'b0000)
+			forwardB=2'b01;
+		if (regWrite_mem && rs_ex==rd_mem && rd_mem!=4'b0000)
+			forwardA=2'b10;
+		if (regWrite_mem && rt_ex==rd_mem && rd_mem!=4'b0000)
+			forwardB=2'b10;	
 	end
 
 
