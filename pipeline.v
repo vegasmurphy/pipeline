@@ -48,6 +48,8 @@ module Pipeline(
 	output [31:0] PC_sumado_EX,
 	output [31:0] Read_Data_1_EX,
 	output [31:0] Read_Data_2_EX,
+	output reg [31:0] aluInput1,
+	output reg [31:0] aluInput2,
 	output [31:0] signExtended_EX,
 	output [31:0] instruction_EX,
 	output RegDest_EX,
@@ -168,8 +170,8 @@ module Pipeline(
 	);
 	
 	ALUwithControl alu (
-		.data1(Read_Data_1_EX),
-		.data2(rtData),
+		.data1(aluInput1),
+		.data2(aluInput2),
 		.instruction(signExtended_EX[5:0]),
 		.ALUOp1(ALUOp1_EX),
 		.ALUOp2(ALUOp2_EX),
@@ -274,5 +276,21 @@ module Pipeline(
 	.forwardB(forwardB)
     );
 
+// *******************************  Forwarding unit multiplexors  ************************************
+always @(forwardA, Read_Data_1_EX, ALU_result_MEM, ALU_result_WB)
+      case (forwardA)
+         2'b00: aluInput1 = Read_Data_1_EX;
+         2'b01: aluInput1 = ALU_result_MEM;
+         2'b10: aluInput1 = ALU_result_WB;
+         2'b11: aluInput1 = Read_Data_1_EX;
+      endcase
+
+always @(forwardB, rtData, ALU_result_MEM, ALU_result_WB)
+      case (forwardB)
+         2'b00: aluInput2 = rtData;
+         2'b01: aluInput2 = ALU_result_MEM;
+         2'b10: aluInput2 = ALU_result_WB;
+         2'b11: aluInput2 = rtData;
+      endcase
 
 endmodule
