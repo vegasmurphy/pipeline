@@ -301,19 +301,19 @@ module Pipeline(
     );
 
 // *******************************  Forwarding unit multiplexors  ************************************
-always @(forwardA, Read_Data_1_EX, ALU_result_MEM, ALU_result_WB)
+always @(forwardA, Read_Data_1_EX, ALU_result_MEM, Write_Data)
       case (forwardA)
          2'b00: aluInput1 = Read_Data_1_EX;
-         2'b01: aluInput1 = ALU_result_MEM;
-         2'b10: aluInput1 = ALU_result_WB;
+         2'b01: aluInput1 = Write_Data;
+         2'b10: aluInput1 = ALU_result_MEM;
          2'b11: aluInput1 = Read_Data_1_EX;
       endcase
 
-always @(forwardB, rtData, ALU_result_MEM, ALU_result_WB)
+always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
       case (forwardB)
          2'b00: aluInput2 = Read_Data_2_EX;
-         2'b01: aluInput2 = ALU_result_MEM;
-         2'b10: aluInput2 = ALU_result_WB;
+         2'b01: aluInput2 = Write_Data;
+         2'b10: aluInput2 = ALU_result_MEM;
          2'b11: aluInput2 = Read_Data_2_EX;
       endcase
 
