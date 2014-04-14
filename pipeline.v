@@ -65,9 +65,8 @@ module Pipeline(
 	
 	
 	//EX_MEM WIRES
-	output [31:0] PC_next_EX,
+	output [31:0] PC_next_ID,
 	output [31:0] ALU_result_EX,
-	output [31:0] PC_next_MEM,
 	output [31:0] ALU_result_MEM,
 	output [31:0] Read_Data_2_MEM,
 	output Zero_EX,
@@ -103,10 +102,10 @@ module Pipeline(
 		
 		
 	assign PCSrc = Zero_MEM & Branch_MEM;
-	assign PC_next_EX = signExtended_EX + PC_sumado_EX;
+	assign PC_next_ID = signExtended_ID + PC_sumado_ID;
 	//***********************MUXes*****************************//
 	//Mux del PC
-	assign PC_next = PCSrc ? PC_next_MEM : PC_sumado_IF;
+	assign PC_next = PCSrc ? PC_next_ID : PC_sumado_IF;
 	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
@@ -241,10 +240,8 @@ module Pipeline(
 	
 	EX_MEM ex_mem (
 		.clk(clk), 
-		.PC_next_EX(PC_next_EX), 
 		.ALU_result_EX(ALU_result_EX), 
 		.Read_Data_2_EX(aluInput2), 
-		.PC_next_MEM(PC_next_MEM), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM),
 		.Branch_EX(Branch_EX),
