@@ -29,8 +29,8 @@ module Control(
 	 output reg MemWrite,
 	 output reg ALUSrc,
 	 output reg RegWrite,
-	 output reg Jump
-	 
+	 output reg Jump,
+	 output reg IF_Flush
     );
 
 
@@ -49,6 +49,7 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=1;
 					Jump=0;
+					IF_Flush=0;
 				end
 			6'b100011: //LW
 				begin
@@ -62,6 +63,7 @@ always @(*)
 					ALUSrc=1;
 					RegWrite=1;
 					Jump=0;
+					IF_Flush=0;
 				end
 			6'b101011://SW
 				begin
@@ -75,6 +77,7 @@ always @(*)
 					Jump=0;
 					RegDest=0;
 					MemToReg=0;
+					IF_Flush=0;
 				end
 			6'b000100: //BEQ
 				begin
@@ -88,6 +91,7 @@ always @(*)
 					Jump=0;
 					RegDest=0;
 					MemToReg=0;
+					IF_Flush=1;
 				end
 			6'b000010://Jump 
 				begin
@@ -101,6 +105,7 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=0;
 					Jump=1;
+					IF_Flush=1;
 				end
 			default:
 				begin
@@ -114,6 +119,7 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=0;
 					Jump=0;
+					IF_Flush=0;
 				end
 		endcase
 		

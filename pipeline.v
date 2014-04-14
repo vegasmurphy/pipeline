@@ -188,7 +188,8 @@ module Pipeline(
 		.MemWrite(MemWrite_control),
 		.ALUSrc(ALUSrc_control),
 		.RegWrite(RegWrite_control),
-		.Jump(Jump_control)
+		.Jump(Jump_control),
+		.IF_Flush(IF_Flush)
 	);
 	
 	ALUwithControl alu (
@@ -322,6 +323,6 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 
 // ********************************* Branch Flag **********************************************
 	wire branchTaken;
-	assign branchTaken = equalFlag & Branch_control;
+	assign branchTaken = equalFlag & Branch_ID;
 
 endmodule
