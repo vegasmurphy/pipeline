@@ -23,6 +23,7 @@ module IF_ID(
 	input [31:0] instruction_IF,
 	input [31:0] PC_sumado_IF,
 	input IF_ID_write,
+	input IF_Flush,
 	output reg [31:0] instruction_ID,
 	output reg [31:0] PC_sumado_ID
     );
@@ -36,9 +37,18 @@ module IF_ID(
 	begin
 		if(IF_ID_write)
 			begin
+			if(IF_Flush)
+				begin
+				instruction_ID <= 0;
+				PC_sumado_ID 	<= 0;
+				end
+			else
+				begin
 				instruction_ID <= instruction_IF;
 				PC_sumado_ID 	<= PC_sumado_IF;	
+				end
 			end
+		
 	end
 
 
