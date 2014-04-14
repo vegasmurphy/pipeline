@@ -192,7 +192,8 @@ module Pipeline(
 		.MemWrite(MemWrite_control),
 		.ALUSrc(ALUSrc_control),
 		.RegWrite(RegWrite_control),
-		.Jump(Jump_control)
+		.Jump(Jump_control),
+		.IF_Flush(IF_Flush)
 	);
 	
 	ALUwithControl alu (
@@ -286,6 +287,7 @@ module Pipeline(
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
 		.IF_ID_write(IF_ID_write),
+		.IF_Flush(IF_Flush),
 		.instruction_ID(instruction_ID), 
 		.PC_sumado_ID(PC_sumado_ID)
 	);
@@ -317,5 +319,14 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
          2'b10: aluInput2 = ALU_result_MEM;
          2'b11: aluInput2 = Read_Data_2_EX;
       endcase
+
+
+// ********************************* Register Comparison for branch *************************************
+	wire equalFlag;
+	assign equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
+
+// ********************************* Branch Flag **********************************************
+	wire branchTaken;
+	assign branchTaken = equalFlag & Branch_ID;
 
 endmodule
