@@ -97,15 +97,19 @@ module Pipeline(
 	 );
 
 	//Internal Wires
-	wire [31:0] PC_next, rtData;
+	wire [31:0] PC_next, rtData, PC_next_2, Jump_Addr;
 	wire PCSrc;
 		
 		
 	assign PCSrc = Zero_MEM & Branch_MEM;
 	assign PC_next_ID = signExtended_ID + PC_sumado_ID;
 	//***********************MUXes*****************************//
-	//Mux del PC
+	//Mux del PC (Branch)
 	assign PC_next = PCSrc ? PC_next_ID : PC_sumado_IF;
+	
+	//Mux2 del PC (Jump)
+	assign PC_next_2 = Jump_ID ? Jump_Addr : PC_next;
+	assign Jump_Addr = {PC_sumado_ID[31:28],instruction_ID[27:0]};
 	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
@@ -146,7 +150,7 @@ module Pipeline(
 		
 	IntructionFetchBlock fetchBlock (
 		.clk(clk),
-		.PC_next(PC_next),
+		.PC_next(PC_next_2),
 		.PC_write(PC_write),
 		.PC_sumado_value(PC_sumado_IF),
 		.Instruction(instruction_IF)
