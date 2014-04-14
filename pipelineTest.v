@@ -36,6 +36,7 @@ module pipelineTest;
 	wire [31:0] Read_Data_2_ID;
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
+	wire [31:0] PC_next_ID;
 	wire RegDest_ID;
 	wire Branch_ID;
 	wire MemRead_ID;
@@ -61,9 +62,7 @@ module pipelineTest;
 	wire ALUSrc_EX;
 	wire RegWrite_EX;
 	wire Jump_EX;
-	wire [31:0] PC_next_EX;
 	wire [31:0] ALU_result_EX;
-	wire [31:0] PC_next_MEM;
 	wire [31:0] ALU_result_MEM;
 	wire [31:0] Read_Data_2_MEM;
 	wire Zero_EX;
@@ -94,7 +93,8 @@ module pipelineTest;
 		.Read_Data_1_ID(Read_Data_1_ID), 
 		.Read_Data_2_ID(Read_Data_2_ID), 
 		.signExtended_ID(signExtended_ID), 
-		.PC_sumado_ID(PC_sumado_ID), 
+		.PC_sumado_ID(PC_sumado_ID),
+		.PC_next_ID(PC_next_ID),
 		.RegDest_ID(RegDest_ID), 
 		.Branch_ID(Branch_ID), 
 		.MemRead_ID(MemRead_ID), 
@@ -119,10 +119,8 @@ module pipelineTest;
 		.MemWrite_EX(MemWrite_EX), 
 		.ALUSrc_EX(ALUSrc_EX), 
 		.RegWrite_EX(RegWrite_EX), 
-		.Jump_EX(Jump_EX), 
-		.PC_next_EX(PC_next_EX), 
+		.Jump_EX(Jump_EX),
 		.ALU_result_EX(ALU_result_EX), 
-		.PC_next_MEM(PC_next_MEM), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM), 
 		.Zero_EX(Zero_EX), 
