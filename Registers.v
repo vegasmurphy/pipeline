@@ -38,13 +38,18 @@ module Registers#(
 	// reg [tamaño en bits-1:0] <nombre> [cantidad de elementos - 1:0]
 	reg [width_B-1:0] reg_array [2**Addr_B-1:0]; //arreglo de 2^Addr_B posiciones (32 registros)
 	initial begin
-	reg_array[0]=1;
+	reg_array[0]=0;
 	reg_array[1]=2;
 	reg_array[2]=3;
 	reg_array[3]=5;
 	reg_array[4]=6;
-	reg_array[5]=7;
-	reg_array[6]=8;
+	/*reg_array[0]=0;
+	reg_array[1]=0;
+	reg_array[2]=0;
+	reg_array[3]=0;
+	reg_array[4]=0;*/
+	reg_array[5]=0;
+	reg_array[6]=0;
 	reg_array[7]=9;
 	reg_array[8]=10;
 	reg_array[9]=11;

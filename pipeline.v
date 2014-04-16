@@ -44,7 +44,7 @@ module Pipeline(
 	output MemWrite_ID,
 	output ALUSrc_ID,
 	output RegWrite_ID,
-	output Jump_ID,
+	//output Jump_ID,
 	output [31:0] PC_sumado_EX,
 	output [31:0] Read_Data_1_EX,
 	output [31:0] Read_Data_2_EX,
@@ -79,8 +79,6 @@ module Pipeline(
 	output Jump_MEM,
 	output Zero_MEM,
 	output [4:0] Write_register_MEM,
-	output [4:0] RegisterRs_MEM,
-	output [4:0] RegisterRt_MEM,
 	
 	//MEM_WB WIRES
 	output [31:0] Read_data_MEM,
@@ -92,8 +90,12 @@ module Pipeline(
  
  //Forwarding unit
 	output [1:0] forwardA,
-	output [1:0] forwardB 
+	output [1:0] forwardB,
  
+	//Brances and Jump
+	output BranchTaken,
+	output Jump_ID,
+	output IF_Flush
 	 );
 
 	//Internal Wires
@@ -105,7 +107,7 @@ module Pipeline(
 	assign PC_next_ID = signExtended_ID + PC_sumado_ID;
 	//***********************MUXes*****************************//
 	//Mux del PC (Branch)
-	assign PC_next = PCSrc ? PC_next_ID : PC_sumado_IF;
+	assign PC_next = BranchTaken ? PC_next_ID : PC_sumado_IF;
 	
 	//Mux2 del PC (Jump)
 	assign PC_next_2 = Jump_ID ? Jump_Addr : PC_next;
@@ -192,8 +194,7 @@ module Pipeline(
 		.MemWrite(MemWrite_control),
 		.ALUSrc(ALUSrc_control),
 		.RegWrite(RegWrite_control),
-		.Jump(Jump_control),
-		.IF_Flush(IF_Flush)
+		.Jump(Jump_control)
 	);
 	
 	ALUwithControl alu (
@@ -321,12 +322,13 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
       endcase
 
 
-// ********************************* Register Comparison for branch *************************************
+// ********************************* Register Comparison for Branch *************************************
 	wire equalFlag;
 	assign equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
 
 // ********************************* Branch Flag **********************************************
-	wire branchTaken;
-	assign branchTaken = equalFlag & Branch_ID;
+	assign BranchTaken = equalFlag & Branch_ID;
 
+// ********************************** IF_Flush flag ********************************************
+	assign IF_Flush = BranchTaken || Jump_ID;
 endmodule

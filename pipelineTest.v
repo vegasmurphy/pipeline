@@ -4,7 +4,7 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   16:19:14 04/08/2014
+// Create Date:   18:23:52 04/14/2014
 // Design Name:   Pipeline
 // Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/pipelineTest.v
 // Project Name:  ArquitecturaPIPELINE
@@ -36,7 +36,6 @@ module pipelineTest;
 	wire [31:0] Read_Data_2_ID;
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
-	wire [31:0] PC_next_ID;
 	wire RegDest_ID;
 	wire Branch_ID;
 	wire MemRead_ID;
@@ -46,10 +45,11 @@ module pipelineTest;
 	wire MemWrite_ID;
 	wire ALUSrc_ID;
 	wire RegWrite_ID;
-	wire Jump_ID;
 	wire [31:0] PC_sumado_EX;
 	wire [31:0] Read_Data_1_EX;
 	wire [31:0] Read_Data_2_EX;
+	wire [31:0] aluInput1;
+	wire [31:0] aluInput2;
 	wire [31:0] signExtended_EX;
 	wire [31:0] instruction_EX;
 	wire RegDest_EX;
@@ -62,6 +62,7 @@ module pipelineTest;
 	wire ALUSrc_EX;
 	wire RegWrite_EX;
 	wire Jump_EX;
+	wire [31:0] PC_next_ID;
 	wire [31:0] ALU_result_EX;
 	wire [31:0] ALU_result_MEM;
 	wire [31:0] Read_Data_2_MEM;
@@ -83,6 +84,10 @@ module pipelineTest;
 	wire [4:0] Write_register_WB;
 	wire [1:0] forwardA;
 	wire [1:0] forwardB;
+	wire branchTaken;
+	wire Jump_ID;
+	wire IF_Flush;
+
 	// Instantiate the Unit Under Test (UUT)
 	Pipeline uut (
 		.clk(clk), 
@@ -93,8 +98,7 @@ module pipelineTest;
 		.Read_Data_1_ID(Read_Data_1_ID), 
 		.Read_Data_2_ID(Read_Data_2_ID), 
 		.signExtended_ID(signExtended_ID), 
-		.PC_sumado_ID(PC_sumado_ID),
-		.PC_next_ID(PC_next_ID),
+		.PC_sumado_ID(PC_sumado_ID), 
 		.RegDest_ID(RegDest_ID), 
 		.Branch_ID(Branch_ID), 
 		.MemRead_ID(MemRead_ID), 
@@ -104,10 +108,11 @@ module pipelineTest;
 		.MemWrite_ID(MemWrite_ID), 
 		.ALUSrc_ID(ALUSrc_ID), 
 		.RegWrite_ID(RegWrite_ID), 
-		.Jump_ID(Jump_ID), 
 		.PC_sumado_EX(PC_sumado_EX), 
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
+		.aluInput1(aluInput1), 
+		.aluInput2(aluInput2), 
 		.signExtended_EX(signExtended_EX), 
 		.instruction_EX(instruction_EX), 
 		.RegDest_EX(RegDest_EX), 
@@ -119,7 +124,8 @@ module pipelineTest;
 		.MemWrite_EX(MemWrite_EX), 
 		.ALUSrc_EX(ALUSrc_EX), 
 		.RegWrite_EX(RegWrite_EX), 
-		.Jump_EX(Jump_EX),
+		.Jump_EX(Jump_EX), 
+		.PC_next_ID(PC_next_ID), 
 		.ALU_result_EX(ALU_result_EX), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM), 
@@ -138,9 +144,12 @@ module pipelineTest;
 		.ALU_result_WB(ALU_result_WB), 
 		.MemToReg_WB(MemToReg_WB), 
 		.RegWrite_WB(RegWrite_WB), 
-		.Write_register_WB(Write_register_WB),
-		.forwardA(forwardA),
-		.forwardB(forwardB)
+		.Write_register_WB(Write_register_WB), 
+		.forwardA(forwardA), 
+		.forwardB(forwardB), 
+		.BranchTaken(branchTaken), 
+		.Jump_ID(Jump_ID),
+		.IF_Flush(IF_Flush)
 	);
 
 	always #10 clk=~clk;
@@ -154,6 +163,6 @@ module pipelineTest;
 		// Add stimulus here
 
 	end
-
+      
 endmodule
 

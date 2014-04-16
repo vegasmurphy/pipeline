@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <symbol version="7" name="InstructionMemory">
     <symboltype>BLOCK</symboltype>
-    <timestamp>2014-3-20T20:40:0</timestamp>
+    <timestamp>2014-4-14T22:55:33</timestamp>
     <pin polarity="Input" x="0" y="80" name="addra[9:0]" />
+    <pin polarity="Input" x="0" y="144" name="ena" />
     <pin polarity="Input" x="0" y="272" name="clka" />
     <pin polarity="Output" x="576" y="80" name="douta[31:0]" />
     <graph>
@@ -10,6 +11,8 @@
         <rect width="512" x="32" y="32" height="1344" />
         <line x2="32" y1="80" y2="80" style="linewidth:W" x1="0" />
         <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="36" y="80" type="pin addra[9:0]" />
+        <line x2="32" y1="144" y2="144" x1="0" />
+        <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="36" y="144" type="pin ena" />
         <line x2="32" y1="272" y2="272" x1="0" />
         <attrtext style="fontsize:24;fontname:Arial" attrname="PinName" x="36" y="272" type="pin clka" />
         <line x2="544" y1="80" y2="80" style="linewidth:W" x1="576" />

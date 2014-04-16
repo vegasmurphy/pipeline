@@ -13,5 +13,6 @@ waveform  using  "Waves for BMG Example Design"
       waveform add -signals /InstructionMemory_tb/status
       waveform add -signals /InstructionMemory_tb/InstructionMemory_synth_inst/bmg_port/CLKA
       waveform add -signals /InstructionMemory_tb/InstructionMemory_synth_inst/bmg_port/ADDRA
+      waveform add -signals /InstructionMemory_tb/InstructionMemory_synth_inst/bmg_port/ENA
       waveform add -signals /InstructionMemory_tb/InstructionMemory_synth_inst/bmg_port/DOUTA
 console submit -using simulator -wait no "run"

@@ -63,6 +63,7 @@
 //----------- Begin Cut here for INSTANTIATION Template ---// INST_TAG
 InstructionMemory your_instance_name (
   .clka(clka), // input clka
+  .ena(ena), // input ena
   .addra(addra), // input [9 : 0] addra
   .douta(douta) // output [31 : 0] douta
 );

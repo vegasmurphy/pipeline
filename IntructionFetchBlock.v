@@ -43,12 +43,13 @@ module IntructionFetchBlock #
 	
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
-	  .clka(clk), 					//Entrada de clock
+	  .clka(~clk), 					//Entrada de clock
+	  .ena(PC_write), 			//Read Enable
 	  .addra(PC_actual[9:0]), 	//Direccion dada por el valor del PC
 	  .douta(Instruction)		//Instruccion obtenida
 	);
 	
-
+	//assign clka = (clk && PC_write);
 	assign PC_sumado = PC_actual +1;
 	//************Logica de Asignacion del PC******************//
 	//Logica secuencial
@@ -56,6 +57,7 @@ module IntructionFetchBlock #
 		begin
 			//Sumar 1 al PC_to_ROM para pasar a la siguiente direccion
 			if(PC_write) PC_actual=PC_next;
+			//PC_actual=PC_next;
 		end
 			
 	

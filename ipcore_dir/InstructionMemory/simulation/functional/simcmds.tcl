@@ -55,6 +55,7 @@ isim set radix hex
 wave add /InstructionMemory_tb/status
       wave add  /InstructionMemory_tb/InstructionMemory_synth_inst/BMG_PORT/CLKA
       wave add  /InstructionMemory_tb/InstructionMemory_synth_inst/BMG_PORT/ADDRA
+      wave add  /InstructionMemory_tb/InstructionMemory_synth_inst/BMG_PORT/ENA
       wave add  /InstructionMemory_tb/InstructionMemory_synth_inst/BMG_PORT/DOUTA
 run all
 quit

@@ -126,6 +126,7 @@ ENTITY BMG_STIM_GEN IS
             CLK : IN STD_LOGIC;
             RST : IN STD_LOGIC;
             ADDRA: OUT  STD_LOGIC_VECTOR(9 DOWNTO 0) := (OTHERS => '0'); 
+            ENA : OUT STD_LOGIC :='0';
             DATA_IN : IN STD_LOGIC_VECTOR (31 DOWNTO 0);   --OUTPUT VECTOR         
             STATUS : OUT STD_LOGIC:= '0'
     	  );
@@ -419,6 +420,7 @@ CHECK_DATA_REG: ENTITY work.REGISTER_LOGIC_SROM
 
 
 
+       ENA <= DO_READ  ;
 
 
 END ARCHITECTURE;

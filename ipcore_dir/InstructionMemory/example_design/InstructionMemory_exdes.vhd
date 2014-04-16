@@ -88,6 +88,7 @@ USE UNISIM.VCOMPONENTS.ALL;
 ENTITY InstructionMemory_exdes IS
   PORT (
       --Inputs - Port A
+    ENA            : IN STD_LOGIC;  --opt port
     ADDRA          : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
   
     DOUTA          : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -111,6 +112,7 @@ ARCHITECTURE xilinx OF InstructionMemory_exdes IS
   COMPONENT InstructionMemory IS
   PORT (
       --Port A
+    ENA        : IN STD_LOGIC;  --opt port
     ADDRA      : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
   
     DOUTA      : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -139,6 +141,7 @@ BEGIN
   bmg0 : InstructionMemory
     PORT MAP (
       --Port A
+      ENA        => ENA,
       ADDRA      => ADDRA,
   
       DOUTA      => DOUTA,

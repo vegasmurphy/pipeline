@@ -60,11 +60,13 @@
 
 module InstructionMemory (
   clka,
+  ena,
   addra,
   douta
 );
 
   input clka;
+  input ena;
   input [9 : 0] addra;
   output [31 : 0] douta;
 

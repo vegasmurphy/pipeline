@@ -4,7 +4,7 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   15:58:00 03/07/2014
+// Create Date:   19:56:39 04/14/2014
 // Design Name:   InstructionMemory
 // Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ROM_Tester.v
 // Project Name:  ArquitecturaPIPELINE
@@ -26,6 +26,7 @@ module ROM_Tester;
 
 	// Inputs
 	reg clka;
+	reg ena;
 	reg [9:0] addra;
 
 	// Outputs
@@ -34,17 +35,18 @@ module ROM_Tester;
 	// Instantiate the Unit Under Test (UUT)
 	InstructionMemory uut (
 		.clka(clka), 
+		.ena(ena), 
 		.addra(addra), 
 		.douta(douta)
 	);
-	
-	
+
 	always #10 clka=~clka;
 
 	initial begin
 		// Initialize Inputs
 		clka = 0;
 		addra = 0;
+		ena=0;
 
 		// Wait 100 ns for global reset to finish
 		#100;
@@ -63,7 +65,6 @@ module ROM_Tester;
 		addra = 7;
 		#20;
 		addra = 8;
-		// Add stimulus here
 
 	end
       

@@ -94,7 +94,7 @@
 --    C_RST_PRIORITY_A            :  CE 
 --    C_RSTRAM_A                  :  0 
 --    C_INITA_VAL                 :  0 
---    C_HAS_ENA                   :  0 
+--    C_HAS_ENA                   :  1 
 --    C_HAS_REGCEA                :  0 
 --    C_USE_BYTE_WEA              :  0 
 --    C_WEA_WIDTH                 :  1 
@@ -231,6 +231,7 @@ ARCHITECTURE xilinx OF InstructionMemory_prod IS
   COMPONENT InstructionMemory_exdes IS
   PORT (
       --Port A
+    ENA            : IN STD_LOGIC;  --opt port
     ADDRA          : IN STD_LOGIC_VECTOR(9 DOWNTO 0);
   
     DOUTA          : OUT STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -248,6 +249,7 @@ BEGIN
   bmg0 : InstructionMemory_exdes
     PORT MAP (
       --Port A
+      ENA        => ENA,
       ADDRA      => ADDRA,
   
       DOUTA      => DOUTA,
