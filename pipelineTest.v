@@ -28,6 +28,7 @@ module pipelineTest;
 	reg clk;
 
 	// Outputs
+	wire equalFlag;
 	wire [3:0] aluInstruction;
 	wire [31:0] instruction_IF;
 	wire [31:0] PC_sumado_IF;
@@ -90,6 +91,7 @@ module pipelineTest;
 
 	// Instantiate the Unit Under Test (UUT)
 	Pipeline uut (
+		.equalFlag(equalFlag),
 		.clk(clk), 
 		.aluInstruction(aluInstruction), 
 		.instruction_IF(instruction_IF), 

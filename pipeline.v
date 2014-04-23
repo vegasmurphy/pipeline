@@ -23,7 +23,7 @@ module Pipeline(
     
 	//Debugging outputs
 	output wire [3:0]aluInstruction,
-	 
+	output wire equalFlag,
 	 
 	//IF_ID  WIRES
 	output [31:0] instruction_IF, 
@@ -323,7 +323,6 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 
 
 // ********************************* Register Comparison for Branch *************************************
-	wire equalFlag;
 	assign equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
 
 // ********************************* Branch Flag **********************************************
