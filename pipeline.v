@@ -3,7 +3,7 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date:    20:24:22 03/11/2014 
+// Create Date:    15:45:05 04/24/2014 
 // Design Name: 
 // Module Name:    pipeline 
 // Project Name: 
@@ -111,7 +111,7 @@ module Pipeline(
 	
 	//Mux2 del PC (Jump)
 	assign PC_next_2 = Jump_ID ? Jump_Addr : PC_next;
-	assign Jump_Addr = {PC_sumado_ID[31:28],instruction_ID[27:0]};
+	assign Jump_Addr = {PC_sumado_ID[31:26],instruction_ID[25:0]};
 	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
@@ -331,3 +331,4 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 // ********************************** IF_Flush flag ********************************************
 	assign IF_Flush = BranchTaken || Jump_ID;
 endmodule
+

@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   18:23:52 04/14/2014
+// Create Date:   15:48:57 04/24/2014
 // Design Name:   Pipeline
-// Module Name:   C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/pipelineTest.v
-// Project Name:  ArquitecturaPIPELINE
+// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/Pipe/pipelineTest.v
+// Project Name:  Pipe
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -28,8 +28,8 @@ module pipelineTest;
 	reg clk;
 
 	// Outputs
-	wire equalFlag;
 	wire [3:0] aluInstruction;
+	wire equalFlag;
 	wire [31:0] instruction_IF;
 	wire [31:0] PC_sumado_IF;
 	wire [31:0] instruction_ID;
@@ -85,15 +85,15 @@ module pipelineTest;
 	wire [4:0] Write_register_WB;
 	wire [1:0] forwardA;
 	wire [1:0] forwardB;
-	wire branchTaken;
+	wire BranchTaken;
 	wire Jump_ID;
 	wire IF_Flush;
 
 	// Instantiate the Unit Under Test (UUT)
 	Pipeline uut (
-		.equalFlag(equalFlag),
 		.clk(clk), 
 		.aluInstruction(aluInstruction), 
+		.equalFlag(equalFlag), 
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
 		.instruction_ID(instruction_ID), 
@@ -149,12 +149,13 @@ module pipelineTest;
 		.Write_register_WB(Write_register_WB), 
 		.forwardA(forwardA), 
 		.forwardB(forwardB), 
-		.BranchTaken(branchTaken), 
-		.Jump_ID(Jump_ID),
+		.BranchTaken(BranchTaken), 
+		.Jump_ID(Jump_ID), 
 		.IF_Flush(IF_Flush)
 	);
 
-	always #10 clk=~clk;
+	always #20 clk=~clk;
+
 	initial begin
 		// Initialize Inputs
 		clk = 0;

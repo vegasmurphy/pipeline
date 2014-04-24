@@ -43,7 +43,7 @@ module IntructionFetchBlock #
 	
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
-	  .clka(~clk), 					//Entrada de clock
+	  .clka(clk), 					//Entrada de clock
 	  .ena(PC_write), 			//Read Enable
 	  .addra(PC_actual[9:0]), 	//Direccion dada por el valor del PC
 	  .douta(Instruction)		//Instruccion obtenida
