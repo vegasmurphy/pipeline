@@ -40,7 +40,7 @@ module IF_ID(
 			if(IF_Flush)
 				begin
 				instruction_ID <= 0;
-				PC_sumado_ID 	<= 0;
+				PC_sumado_ID 	<= PC_sumado_IF;
 				end
 			else
 				begin

@@ -40,7 +40,7 @@ module IntructionFetchBlock #
 	reg [width_B-1:0] PC_actual=0;//Valor Actual del PC para las instrucciones (debe iniciarse en cero)
 	wire [width_B-1:0] PC_sumado;//PC+1
 	//reg [width_B-1:0] PC_sumado=0;//PC+1	
-	
+	reg memClk=1;
 	//Memoria de Instrucciones (ROM)
 	InstructionMemory ROM (
 	  .clka(clk), 					//Entrada de clock
@@ -53,12 +53,10 @@ module IntructionFetchBlock #
 	assign PC_sumado = PC_actual +1;
 	//************Logica de Asignacion del PC******************//
 	//Logica secuencial
-	always @(posedge clk)
+	always @(negedge clk)
 		begin
 			//Sumar 1 al PC_to_ROM para pasar a la siguiente direccion
 			if(PC_write) PC_actual=PC_next;
 			//PC_actual=PC_next;
-		end
-			
-	
+		end				
 endmodule
