@@ -61,7 +61,7 @@ module uart_baud_gen (
 //***************************************************************************
 
   parameter BAUD_RATE    = 57_600;              // Baud rate
-  parameter CLOCK_RATE   = 50_000_000;
+  parameter CLOCK_RATE   = 100_000_000;
 
   // The OVERSAMPLE_RATE is the BAUD_RATE times 16
   localparam OVERSAMPLE_RATE = BAUD_RATE * 16;

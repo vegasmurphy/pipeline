@@ -41,8 +41,8 @@ uart_tx tx(
   .char_fifo_rd_en(tx_done), // Pop signal to the char FIFO
 	.txd_tx(tx_out)           // The transmit serial signal
 );
+reg [7:0] fifo_din;
 reg fifo_wr_en;
-reg fifo_din;
 fifo f(
   .clk(clk),
   .rst(1'b0),
@@ -181,30 +181,29 @@ fifo f(
 	);
 
 
-reg [7:0] comando;
+
 uart_rx r(
   // Write side inputs
   .clk_rx(clk),       // Clock input
   .rst_clk_rx(0),   // Active HIGH reset - synchronous to clk_rx
   .rxd_i(rx),        // RS232 RXD pin - Directly from pad
-  .rx_data(comando),      // 8 bit data output
+  .rx_data(rx_data),//comando),      // 8 bit data output
                                  //  - valid when rx_data_rdy is asserted
   .rx_data_rdy(rx_data_rdy)  // Ready signal for rx_data
         // The STOP bit was not detected
 );
 
-
-
-always @(rx_data_rdy)
-begin
-	if(comando=="s")
-		begin
-			fifo_wr_en=1;
-			fifo_din="a";
-		end
-end
+reg rx_data_rdy_ant;
 always @(posedge clk)
 begin
-	fifo_wr_en=0;
+	if(rx_data_rdy_ant!=rx_data_rdy&&rx_data_rdy)
+		begin
+		fifo_wr_en=1;
+		fifo_din=8'b01000001;
+		end
+	else
+		fifo_wr_en=0;
+	rx_data_rdy_ant=rx_data_rdy;
 end
+
 endmodule
