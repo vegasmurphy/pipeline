@@ -200,6 +200,7 @@ module Pipeline(
 	ALUwithControl alu (
 		.data1(aluInput1),
 		.data2(rtData),
+		.sa(instruction_EX[10:6]),
 		.instruction(signExtended_EX[5:0]),
 		.ALUOp1(ALUOp1_EX),
 		.ALUOp2(ALUOp2_EX),

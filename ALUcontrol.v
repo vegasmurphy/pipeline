@@ -29,24 +29,30 @@ module ALUcontrol(
 always @* 
 begin
 	if((~ALUOp1)&&(~ALUOp2))begin
-	operation=4'b0010;
+	operation=4'b0010;	//Vegas: "Creo que es un Load"
 	end
 	else
 		if(ALUOp2)begin
-			operation=4'b0110;//BEQ
+			operation=4'b0110;	//BEQ (Idem Resta)
 		end
 		else 
 		case (instruction[5:0])
-			6'b100000: 
-				operation=4'b0010;
-			6'b100010: 
-				operation=4'b0110;
 			6'b100100: 
-				operation=4'b0000;
+				operation=4'b0000;	//AND
 			6'b100101: 
-				operation=4'b0001;
+				operation=4'b0001;	//OR
+			6'b100000: 
+				operation=4'b0010;	//Suma
+			6'b100110:
+				operation=4'b0011;	//XOR (Custom Opcode)
+			6'b000000:
+				operation=4'b0100;	//SLL (Custom Opcode)
+			6'b100010: 
+				operation=4'b0110;	//Resta
 			6'b101010: 
-				operation=4'b0111;
+				operation=4'b0111;	//SLT (Set on less than)
+			6'b100111:
+				operation=4'b1100;	//NOR
 			default:
 				operation=4'b0000;
 		endcase

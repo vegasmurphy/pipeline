@@ -35,8 +35,8 @@ module Control(
 
 always @(*)
 	begin
-		case (opcode)
-			6'b000000: //R-format (ALU)
+		case (opcode)	//Special
+			6'b000000: 	//R-format (ALU)
 				begin
 					RegDest=1;
 					Branch=0;

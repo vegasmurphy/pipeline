@@ -22,6 +22,7 @@ module ALUwithControl(
     input [5:0] instruction,
     input [31:0] data1,
     input [31:0] data2,
+	 input [4:0] sa,
     input ALUOp1,
 	 input ALUOp2,
     output zero,
@@ -38,6 +39,7 @@ module ALUwithControl(
 	ALU alu (
 		.a_input(data1),
 		.b_input(data2),
+		.sa(sa),
 		.opcode(aluInstruction),
 		.zero(zero),
 		.resultado(result));
