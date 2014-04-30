@@ -37,22 +37,38 @@ begin
 		end
 		else 
 		case (instruction[5:0])
-			6'b100100: 
+			6'b100100:
 				operation=4'b0000;	//AND
-			6'b100101: 
+			6'b100101:
 				operation=4'b0001;	//OR
-			6'b100000: 
+			6'b100000:
 				operation=4'b0010;	//Suma
 			6'b100110:
 				operation=4'b0011;	//XOR (Custom Opcode)
 			6'b000000:
 				operation=4'b0100;	//SLL (Custom Opcode)
+			6'b000010:
+				operation=4'b0101;	//SRL (Custom Opcode)	
 			6'b100010: 
 				operation=4'b0110;	//Resta
 			6'b101010: 
 				operation=4'b0111;	//SLT (Set on less than)
+			6'b000011:
+				operation=4'b1000;	//SRA (Custom Opcode)
+			6'b000110:
+				operation=4'b1001;	//SRLV (Custom Opcode)
+			6'b000111:
+				operation=4'b1010;	//SRAV (Custom Opcode)
+			6'b000100:
+				operation=4'b1011;	//SLLV (Custom Opcode)
 			6'b100111:
 				operation=4'b1100;	//NOR
+			6'b100001:
+				operation=4'b1101;	//ADDU (Custom Opcode)
+			6'b100011:
+				operation=4'b1110;	//SUBU (Custom Opcode)
+			6'b101011:
+				operation=4'b1111;	//SLTU (Custom Opcode)
 			default:
 				operation=4'b0000;
 		endcase

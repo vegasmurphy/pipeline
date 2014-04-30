@@ -26,7 +26,8 @@ module ID_EX(
 	 input [31:0] PC_sumado_ID,
 	 input [31:0] instruction_ID,
 	 input RegDest_ID,
-	 input Branch_ID,
+	 input BranchEQ_ID,
+	 input BranchNE_ID,
 	 input MemRead_ID,
 	 input MemToReg_ID,
 	 input ALUOp1_ID,
@@ -41,7 +42,8 @@ module ID_EX(
     output reg [31:0] signExtended_EX,
 	 output reg [31:0] instruction_EX,
 	 output reg RegDest_EX,
-	 output reg Branch_EX,
+	 output reg BranchEQ_EX,
+	 output reg BranchNE_EX,
 	 output reg MemRead_EX,
 	 output reg MemToReg_EX,
 	 output reg ALUOp1_EX,
@@ -59,7 +61,8 @@ initial
 		signExtended_EX=0;
 		instruction_EX=0;
 		RegDest_EX=0;
-		Branch_EX=0;
+		BranchEQ_EX=0;
+		BranchNE_EX=0;
 		MemRead_EX=0;
 		MemToReg_EX=0;
 		ALUOp1_EX=0;
@@ -77,7 +80,8 @@ begin
 	instruction_EX<=instruction_ID;
 	PC_sumado_EX<=PC_sumado_ID;
 	RegDest_EX<=RegDest_ID;
-	Branch_EX<=Branch_ID;
+	BranchEQ_EX<=BranchEQ_ID;
+	BranchNE_EX<=BranchNE_ID;
 	MemRead_EX<=MemRead_ID;
 	MemToReg_EX<=MemToReg_ID;
 	ALUOp1_EX<=ALUOp1_ID;

@@ -47,17 +47,17 @@ module NumericTest;
 	initial begin
 		// Initialize Inputs
 		a_input = 0;
-		b_input = 1;
+		b_input = -2;
 		sa = 0;
-		opcode = 4'b0100;
+		opcode = 4'b1111;
 
 		// Wait 100 ns for global reset to finish
 		#100;
-      sa = 1;
+      sa = 1;a_input = 1;
 		#100;
-		sa = 2;
+		sa = 2;a_input = 2;
 		#100;
-		sa = 3;
+		sa = 3;a_input = -1;
 		
 		// Add stimulus here
 

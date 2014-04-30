@@ -27,12 +27,10 @@ module IntructionFetchBlock #
 	(	input clk,										//clock
 		input [width_B-1:0] PC_next,				//Creo que hay que inicializarlo en uno (1)		
 		input PC_write,								//Escribir o no el PC (Hazard Detection Unit)
-		output [width_B-1:0] PC_debug_value,	//Salida del valor del PC (para debug)
 		output [width_B-1:0] PC_sumado_value,	//Salida del PC sumado para el bloque IFID
 		output [width_B-1:0] Instruction			//Instruccion
    );
-	
-	assign PC_debug_value = PC_actual;	//Esto es para ver el valor del PC en el debugger
+
 	assign PC_sumado_value = PC_sumado;
 	
 	//****************Modulos Instanciados*********************//

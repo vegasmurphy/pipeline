@@ -36,7 +36,8 @@ module Pipeline(
 	output [31:0] signExtended_ID,
 	output [31:0] PC_sumado_ID,
 	output RegDest_ID,
-	output Branch_ID,
+	output BranchEQ_ID,
+	output BranchNE_ID,
 	output MemRead_ID,
 	output MemToReg_ID,
 	output ALUOp1_ID,
@@ -53,7 +54,8 @@ module Pipeline(
 	output [31:0] signExtended_EX,
 	output [31:0] instruction_EX,
 	output RegDest_EX,
-	output Branch_EX,
+	output BranchEQ_EX,
+	output BranchNE_EX,
 	output MemRead_EX,
 	output MemToReg_EX,
 	output ALUOp1_EX,
@@ -71,7 +73,8 @@ module Pipeline(
 	output [31:0] Read_Data_2_MEM,
 	output Zero_EX,
 	output [4:0] Write_register_EX,
-	output Branch_MEM,
+	output BranchEQ_MEM,
+	output BranchNE_MEM,
 	output MemRead_MEM,
 	output MemToReg_MEM,
 	output MemWrite_MEM,
@@ -100,10 +103,10 @@ module Pipeline(
 
 	//Internal Wires
 	wire [31:0] PC_next, rtData, PC_next_2, Jump_Addr;
-	wire PCSrc;
+	//wire PCSrc;
 		
 		
-	assign PCSrc = Zero_MEM & Branch_MEM;
+	//assign PCSrc = Zero_MEM & Branch_MEM;
 	assign PC_next_ID = signExtended_ID + PC_sumado_ID;
 	//***********************MUXes*****************************//
 	//Mux del PC (Branch)
@@ -126,7 +129,8 @@ module Pipeline(
 
 	//Muxes de Hazard Detection Unit
 	assign RegDest_ID  = nopMux ? 1'b0 : RegDest_control;
-	assign Branch_ID   = nopMux ? 1'b0 : Branch_control;
+	assign BranchEQ_ID   = nopMux ? 1'b0 : BranchEQ_control;
+	assign BranchNE_ID   = nopMux ? 1'b0 : BranchNE_control;
 	assign MemRead_ID  = nopMux ? 1'b0 : MemRead_control;
 	assign MemToReg_ID = nopMux ? 1'b0 : MemToReg_control;
 	assign ALUOp1_ID   = nopMux ? 1'b0 : ALUOp1_control;
@@ -186,7 +190,8 @@ module Pipeline(
 	Control control (
 		.opcode(instruction_ID[31:26]),
 		.RegDest(RegDest_control),
-		.Branch(Branch_control),
+		.BranchEQ(BranchEQ_control),
+		.BranchNE(BranchNE_control),
 		.MemRead(MemRead_control),
 		.MemToReg(MemToReg_control),
 		.ALUOp1(ALUOp1_control),
@@ -224,7 +229,8 @@ module Pipeline(
 		.signExtended_EX(signExtended_EX),
 		.instruction_EX(instruction_EX),
 		.RegDest_ID(RegDest_ID),
-		.Branch_ID(Branch_ID),
+		.BranchEQ_ID(BranchEQ_ID),
+		.BranchNE_ID(BranchNE_ID),
 		.MemRead_ID(MemRead_ID),
 		.MemToReg_ID(MemToReg_ID),
 		.ALUOp1_ID(ALUOp1_ID),
@@ -234,7 +240,8 @@ module Pipeline(
 		.RegWrite_ID(RegWrite_ID),
 		.Jump_ID(Jump_ID),
 		.RegDest_EX(RegDest_EX),
-		.Branch_EX(Branch_EX),
+		.BranchEQ_EX(BranchEQ_EX),
+		.BranchNE_EX(BranchNE_EX),
 		.MemRead_EX(MemRead_EX),
 		.MemToReg_EX(MemToReg_EX),
 		.ALUOp1_EX(ALUOp1_EX),
@@ -251,7 +258,8 @@ module Pipeline(
 		.Read_Data_2_EX(aluInput2), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM),
-		.Branch_EX(Branch_EX),
+		.BranchEQ_EX(BranchEQ_EX),
+		.BranchNE_EX(BranchNE_EX),
 		.MemRead_EX(MemRead_EX),
 		.MemToReg_EX(MemToReg_EX),
 		.MemWrite_EX(MemWrite_EX),
@@ -259,7 +267,8 @@ module Pipeline(
 		.Jump_EX(Jump_EX),
 		.Zero_EX(Zero_EX),
 		.Write_register_EX(Write_register_EX),
-		.Branch_MEM(Branch_MEM),
+		.BranchEQ_MEM(BranchEQ_MEM),
+		.BranchNE_MEM(BranchNE_MEM),
 		.MemRead_MEM(MemRead_MEM),
 		.MemToReg_MEM(MemToReg_MEM),
 		.MemWrite_MEM(MemWrite_MEM),
@@ -327,7 +336,7 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 	assign equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
 
 // ********************************* Branch Flag **********************************************
-	assign BranchTaken = equalFlag & Branch_ID;
+	assign BranchTaken = (equalFlag & BranchEQ_ID)||(~equalFlag & BranchNE_ID);
 
 // ********************************** IF_Flush flag ********************************************
 	assign IF_Flush = BranchTaken || Jump_ID;

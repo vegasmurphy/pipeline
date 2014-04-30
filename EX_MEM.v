@@ -24,7 +24,8 @@ module EX_MEM(
 	input [31:0] Read_Data_2_EX,
 	output reg [31:0] ALU_result_MEM,
 	output reg [31:0] Read_Data_2_MEM,
-	input Branch_EX,
+	input BranchEQ_EX,
+	input BranchNE_EX,
 	input MemRead_EX,
 	input MemToReg_EX,
 	input MemWrite_EX,
@@ -32,7 +33,8 @@ module EX_MEM(
 	input Jump_EX,
 	input Zero_EX,
 	input [4:0] Write_register_EX,
-	output reg Branch_MEM,
+	output reg BranchEQ_MEM,
+	output reg BranchNE_MEM,
 	output reg MemRead_MEM,
 	output reg MemToReg_MEM,
 	output reg MemWrite_MEM,
@@ -44,7 +46,8 @@ module EX_MEM(
 
 	initial
 	begin
-	Branch_MEM=0;
+	BranchEQ_MEM=0;
+	BranchNE_MEM=0;
 	MemRead_MEM=0;
 	MemToReg_MEM=0;
 	MemWrite_MEM=0;
@@ -60,7 +63,8 @@ module EX_MEM(
 	begin
 		ALU_result_MEM <= ALU_result_EX;
 		Read_Data_2_MEM <= Read_Data_2_EX;
-		Branch_MEM<=Branch_EX;
+		BranchEQ_MEM<=BranchEQ_EX;
+		BranchNE_MEM<=BranchNE_EX;
 		MemRead_MEM<=MemRead_EX;
 		MemToReg_MEM<=MemToReg_EX;
 		MemWrite_MEM<=MemWrite_EX;

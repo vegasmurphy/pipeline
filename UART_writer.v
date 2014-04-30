@@ -64,7 +64,8 @@ fifo f(
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
 	wire RegDest_ID;
-	wire Branch_ID;
+	wire BranchEQ_ID;
+	wire BranchNE_ID;
 	wire MemRead_ID;
 	wire MemToReg_ID;
 	wire ALUOp1_ID;
@@ -80,7 +81,8 @@ fifo f(
 	wire [31:0] signExtended_EX;
 	wire [31:0] instruction_EX;
 	wire RegDest_EX;
-	wire Branch_EX;
+	wire BranchEQ_EX;
+	wire BranchNE_EX;
 	wire MemRead_EX;
 	wire MemToReg_EX;
 	wire ALUOp1_EX;
@@ -95,7 +97,8 @@ fifo f(
 	wire [31:0] Read_Data_2_MEM;
 	wire Zero_EX;
 	wire [4:0] Write_register_EX;
-	wire Branch_MEM;
+	wire BranchEQ_MEM;
+	wire BranchNE_MEM;
 	wire MemRead_MEM;
 	wire MemToReg_MEM;
 	wire MemWrite_MEM;
@@ -128,7 +131,8 @@ fifo f(
 		.signExtended_ID(signExtended_ID), 
 		.PC_sumado_ID(PC_sumado_ID), 
 		.RegDest_ID(RegDest_ID), 
-		.Branch_ID(Branch_ID), 
+		.BranchEQ_ID(BranchEQ_ID), 
+		.BranchNE_ID(BranchNE_ID), 
 		.MemRead_ID(MemRead_ID), 
 		.MemToReg_ID(MemToReg_ID), 
 		.ALUOp1_ID(ALUOp1_ID), 
@@ -144,7 +148,8 @@ fifo f(
 		.signExtended_EX(signExtended_EX), 
 		.instruction_EX(instruction_EX), 
 		.RegDest_EX(RegDest_EX), 
-		.Branch_EX(Branch_EX), 
+		.BranchEQ_EX(BranchEQ_EX),
+		.BranchNE_EX(BranchNE_EX),		
 		.MemRead_EX(MemRead_EX), 
 		.MemToReg_EX(MemToReg_EX), 
 		.ALUOp1_EX(ALUOp1_EX), 
@@ -159,7 +164,8 @@ fifo f(
 		.Read_Data_2_MEM(Read_Data_2_MEM), 
 		.Zero_EX(Zero_EX), 
 		.Write_register_EX(Write_register_EX), 
-		.Branch_MEM(Branch_MEM), 
+		.BranchEQ_MEM(BranchEQ_MEM), 
+		.BranchNE_MEM(BranchNE_MEM),
 		.MemRead_MEM(MemRead_MEM), 
 		.MemToReg_MEM(MemToReg_MEM), 
 		.MemWrite_MEM(MemWrite_MEM), 

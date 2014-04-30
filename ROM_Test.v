@@ -43,17 +43,17 @@ module ROM_Test;
 
 	always #10 clka=~clka;
 	
-	always #20 addra = addra +1;
+	//always #20 addra = addra +1;
 	
 	initial begin
 		// Initialize Inputs
 		clka = 0;
 		ena = 1;
 		addra = 0;
-
+		#20 addra = addra +1;
 		// Wait 100 ns for global reset to finish
 		#100;
-        
+      addra = 25;  
 		// Add stimulus here
 
 	end
