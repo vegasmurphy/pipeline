@@ -4,7 +4,7 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   15:48:59 05/07/2014
+// Create Date:   16:42:01 05/07/2014
 // Design Name:   Pipeline
 // Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/LineaDePipa/pipelineTest.v
 // Project Name:  LineaDePipa
@@ -30,6 +30,8 @@ module pipelineTest;
 	// Outputs
 	wire [3:0] aluInstruction;
 	wire equalFlag;
+	wire [31:0] rtData;
+	wire [31:0] rsData;
 	wire [31:0] instruction_IF;
 	wire [31:0] PC_sumado_IF;
 	wire [31:0] instruction_ID;
@@ -103,6 +105,8 @@ module pipelineTest;
 		.clk(clk), 
 		.aluInstruction(aluInstruction), 
 		.equalFlag(equalFlag), 
+		.rtData(rtData), 
+		.rsData(rsData), 
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
 		.instruction_ID(instruction_ID), 
@@ -171,6 +175,7 @@ module pipelineTest;
 		.Jump_ID(Jump_ID), 
 		.IF_Flush(IF_Flush)
 	);
+
 
 	always #20 clk=~clk;
 	initial begin

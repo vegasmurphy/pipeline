@@ -24,7 +24,9 @@ module Pipeline(
 	//Debugging outputs
 	output wire [3:0]aluInstruction,
 	output wire equalFlag,
-	 
+	output wire [31:0] rtData,
+	output wire [31:0] rsData,
+		 
 	//IF_ID  WIRES
 	output [31:0] instruction_IF, 
 	output [31:0] PC_sumado_IF, 
@@ -108,7 +110,7 @@ module Pipeline(
 	 );
 
 	//Internal Wires
-	wire [31:0] PC_next, rtData, PC_next_2, Jump_Addr;
+	wire [31:0] PC_next, PC_next_2, Jump_Addr;
 	//wire PCSrc;
 		
 		
@@ -127,9 +129,9 @@ module Pipeline(
 	assign Write_register_EX = RegDest_EX ? instruction_EX[15:11] : instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
-	wire [31:0] rsData;
+	//wire [31:0] rsData,rtData;
 	assign rtData = ALUSrc_EX ? signExtended_EX : aluInput2;
-	assign rsData = ShiftToTrunk_EX ? aluInput2<<2 : aluInput2;
+	assign rsData = ShiftToTrunk_EX ? (aluInput1*4) : aluInput1;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
