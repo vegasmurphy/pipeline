@@ -71,7 +71,7 @@ always @(*)
 					trunkMode=0;//ok
 					ShiftToTrunk=0;
 				end
-			6'b100011: //LW
+			6'b100011: //LW (Load Word)
 				begin
 					RegDest=0;
 					BranchEQ=0;
@@ -87,7 +87,39 @@ always @(*)
 					trunkMode=0;
 					ShiftToTrunk=0;
 				end
-			6'b101011://SW
+			6'b100001: //LH (Load Half)
+				begin
+					RegDest=0;
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=1;
+					MemToReg=1;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=0;
+					ALUSrc=1;
+					RegWrite=1;
+					Jump=0;
+					trunkMode=2'b01;
+					ShiftToTrunk=1;
+				end
+			6'b100000: //LB (Load Byte)
+				begin
+					RegDest=0;
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=1;
+					MemToReg=1;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=0;
+					ALUSrc=1;
+					RegWrite=1;
+					Jump=0;
+					trunkMode=2'b10;
+					ShiftToTrunk=1;
+				end
+			6'b101011:	//SW (Store Word)
 				begin
 					BranchEQ=0;
 					BranchNE=0;
@@ -103,7 +135,39 @@ always @(*)
 					trunkMode=0;
 					ShiftToTrunk=0;
 				end
-			6'b000100: //BEQ
+			6'b101001:	//SH (Store Half)
+				begin
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=0;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=1;
+					ALUSrc=1;
+					RegWrite=0;
+					Jump=0;
+					RegDest=0;
+					MemToReg=0;
+					trunkMode=2'b01;
+					ShiftToTrunk=1;
+				end
+			6'b101000:	//SB (Store Byte)
+				begin
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=0;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=1;
+					ALUSrc=1;
+					RegWrite=0;
+					Jump=0;
+					RegDest=0;
+					MemToReg=0;
+					trunkMode=2'b10;
+					ShiftToTrunk=1;
+				end
+			6'b000100: //BEQ (Branch Equal)
 				begin
 					BranchEQ=1;
 					BranchNE=0;

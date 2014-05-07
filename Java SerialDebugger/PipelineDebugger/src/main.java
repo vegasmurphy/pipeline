@@ -1,15 +1,16 @@
-package pipeline;
+
+
 import jssc.SerialPort;
 import jssc.SerialPortEvent;
 import jssc.SerialPortEventListener;
 import jssc.SerialPortException;
 
-public class Main {
+public class main {
 
     static SerialPort serialPort;
 
     public static void main(String[] args) {
-        serialPort = new SerialPort("COM6"); 
+        serialPort = new SerialPort("COM4"); 
         try {
             serialPort.openPort();//Open port
             serialPort.setParams(2400, 8, 1, 0);//Set params

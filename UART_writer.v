@@ -64,15 +64,16 @@ always @(posedge clk)
 		case(current_state)
 			IDLE:
 				begin
+					fifo_din="S";
 					if(rx_data_rdy)
 						next_state = PROCESSING;
 					else
 						next_state = IDLE;
 				fifo_wr_en=0;
 				end
-			PROCESSING:
-				begin
-					if(rx_data_rdy_ant!=rx_data_rdy&&rx_data_rdy)
+			PROCESSING://Cargar algo en la fifo si es un dato nuevo
+				begin//Si es una A sigue, sino se queda en este estado.
+					if((rx_data_rdy_ant!=rx_data_rdy)&&rx_data_rdy)
 						begin
 						fifo_wr_en=1;
 						end
@@ -83,8 +84,8 @@ always @(posedge clk)
 					
 					if(rx_data=="A")
 					begin
-						next_state = STEP;
 						fifo_din="B";
+						next_state = STEP;
 					end
 					else
 						begin
@@ -92,7 +93,7 @@ always @(posedge clk)
 						end
 					rx_data_rdy_ant=rx_data_rdy;
 				end
-			STEP:
+			STEP: //Poner el valor del clock del pipeline en 1
 				begin
 					/*if(clkPipeline)
 						begin
@@ -103,11 +104,11 @@ always @(posedge clk)
 					//else
 						//begin
 						clkPipeline=1;
-						next_state = SENDING;
 						fifo_din="a";
+						next_state = SENDING;
 						//end	
 				end
-			SENDING:
+			SENDING: //Poner el valor del clk del pipeline en cero y enviar el valor del PC
 				begin
 				clkPipeline=0;
 				fifo_din="b";
@@ -122,7 +123,7 @@ always @(posedge clk)
 								   default:fifo_din = 0;
 								endcase
 								fifo_wr_en=1;
-								next_state=SENDING;
+								//next_state=SENDING;
 							end
 						6'b000001: 
 								begin
@@ -134,17 +135,17 @@ always @(posedge clk)
 								   default:fifo_din = 0;
 								endcase
 								fifo_wr_en=1;
-								next_state=SENDING;
+								//next_state=SENDING;
 							end
 						6'b000010:
 									begin
-										next_state=IDLE;
 										fifo_wr_en=0;
+										next_state=IDLE;										
 									end
 						default: 
 									begin
-										next_state=IDLE;
 										fifo_wr_en=0;
+										next_state=IDLE;
 									end
 					endcase
 					
@@ -205,7 +206,8 @@ fifo f(
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
 	wire RegDest_ID;
-	wire Branch_ID;
+	wire BranchEQ_ID;
+	wire BranchNE_ID;
 	wire MemRead_ID;
 	wire MemToReg_ID;
 	wire ALUOp1_ID;
@@ -221,7 +223,8 @@ fifo f(
 	wire [31:0] signExtended_EX;
 	wire [31:0] instruction_EX;
 	wire RegDest_EX;
-	wire Branch_EX;
+	wire BranchEQ_EX;
+	wire BranchNE_EX;
 	wire MemRead_EX;
 	wire MemToReg_EX;
 	wire ALUOp1_EX;
@@ -236,7 +239,8 @@ fifo f(
 	wire [31:0] Read_Data_2_MEM;
 	wire Zero_EX;
 	wire [4:0] Write_register_EX;
-	wire Branch_MEM;
+	wire BranchEQ_MEM;
+	wire BranchNE_MEM;
 	wire MemRead_MEM;
 	wire MemToReg_MEM;
 	wire MemWrite_MEM;
@@ -258,10 +262,12 @@ fifo f(
 
 	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk));
 	
-	Pipeline pipeline (
+	Pipeline uut (
 		.clk(clkPipeline), 
 		.aluInstruction(aluInstruction), 
 		.equalFlag(equalFlag), 
+		.rtData(rtData), 
+		.rsData(rsData), 
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
 		.instruction_ID(instruction_ID), 
@@ -270,7 +276,8 @@ fifo f(
 		.signExtended_ID(signExtended_ID), 
 		.PC_sumado_ID(PC_sumado_ID), 
 		.RegDest_ID(RegDest_ID), 
-		.Branch_ID(Branch_ID), 
+		.BranchEQ_ID(BranchEQ_ID), 
+		.BranchNE_ID(BranchNE_ID), 
 		.MemRead_ID(MemRead_ID), 
 		.MemToReg_ID(MemToReg_ID), 
 		.ALUOp1_ID(ALUOp1_ID), 
@@ -278,6 +285,8 @@ fifo f(
 		.MemWrite_ID(MemWrite_ID), 
 		.ALUSrc_ID(ALUSrc_ID), 
 		.RegWrite_ID(RegWrite_ID), 
+		.ShiftToTrunk_ID(ShiftToTrunk_ID), 
+		.trunkMode_ID(trunkMode_ID), 
 		.PC_sumado_EX(PC_sumado_EX), 
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
@@ -286,7 +295,8 @@ fifo f(
 		.signExtended_EX(signExtended_EX), 
 		.instruction_EX(instruction_EX), 
 		.RegDest_EX(RegDest_EX), 
-		.Branch_EX(Branch_EX), 
+		.BranchEQ_EX(BranchEQ_EX), 
+		.BranchNE_EX(BranchNE_EX), 
 		.MemRead_EX(MemRead_EX), 
 		.MemToReg_EX(MemToReg_EX), 
 		.ALUOp1_EX(ALUOp1_EX), 
@@ -295,18 +305,23 @@ fifo f(
 		.ALUSrc_EX(ALUSrc_EX), 
 		.RegWrite_EX(RegWrite_EX), 
 		.Jump_EX(Jump_EX), 
+		.trunkMode_EX(trunkMode_EX), 
+		.ShiftToTrunk_EX(ShiftToTrunk_EX), 
 		.PC_next_ID(PC_next_ID), 
 		.ALU_result_EX(ALU_result_EX), 
 		.ALU_result_MEM(ALU_result_MEM), 
 		.Read_Data_2_MEM(Read_Data_2_MEM), 
 		.Zero_EX(Zero_EX), 
 		.Write_register_EX(Write_register_EX), 
-		.Branch_MEM(Branch_MEM), 
+		.BranchEQ_MEM(BranchEQ_MEM), 
+		.BranchNE_MEM(BranchNE_MEM), 
 		.MemRead_MEM(MemRead_MEM), 
 		.MemToReg_MEM(MemToReg_MEM), 
 		.MemWrite_MEM(MemWrite_MEM), 
 		.RegWrite_MEM(RegWrite_MEM), 
 		.Jump_MEM(Jump_MEM), 
+		.trunkMode_MEM(trunkMode_MEM), 
+		.ShiftToTrunk_MEM(ShiftToTrunk_MEM), 
 		.Zero_MEM(Zero_MEM), 
 		.Write_register_MEM(Write_register_MEM), 
 		.Read_data_MEM(Read_data_MEM), 
@@ -321,6 +336,7 @@ fifo f(
 		.Jump_ID(Jump_ID), 
 		.IF_Flush(IF_Flush)
 	);
+
 
 
 
