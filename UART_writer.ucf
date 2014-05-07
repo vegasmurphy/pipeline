@@ -1,0 +1,8 @@
+
+
+NET "rx" LOC = N17;
+NET "tx_out" LOC = N18;
+
+# PlanAhead Generated physical constraints 
+
+NET "fastClk" LOC = V10;
