@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   16:52:08 04/30/2014
+// Create Date:   15:48:59 05/07/2014
 // Design Name:   Pipeline
-// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/Pipe/pipelineTest.v
-// Project Name:  Pipe
+// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/LineaDePipa/pipelineTest.v
+// Project Name:  LineaDePipa
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -47,6 +47,8 @@ module pipelineTest;
 	wire MemWrite_ID;
 	wire ALUSrc_ID;
 	wire RegWrite_ID;
+	wire ShiftToTrunk_ID;
+	wire [1:0] trunkMode_ID;
 	wire [31:0] PC_sumado_EX;
 	wire [31:0] Read_Data_1_EX;
 	wire [31:0] Read_Data_2_EX;
@@ -65,6 +67,8 @@ module pipelineTest;
 	wire ALUSrc_EX;
 	wire RegWrite_EX;
 	wire Jump_EX;
+	wire [1:0] trunkMode_EX;
+	wire ShiftToTrunk_EX;
 	wire [31:0] PC_next_ID;
 	wire [31:0] ALU_result_EX;
 	wire [31:0] ALU_result_MEM;
@@ -78,6 +82,8 @@ module pipelineTest;
 	wire MemWrite_MEM;
 	wire RegWrite_MEM;
 	wire Jump_MEM;
+	wire [1:0] trunkMode_MEM;
+	wire ShiftToTrunk_MEM;
 	wire Zero_MEM;
 	wire [4:0] Write_register_MEM;
 	wire [31:0] Read_data_MEM;
@@ -114,6 +120,8 @@ module pipelineTest;
 		.MemWrite_ID(MemWrite_ID), 
 		.ALUSrc_ID(ALUSrc_ID), 
 		.RegWrite_ID(RegWrite_ID), 
+		.ShiftToTrunk_ID(ShiftToTrunk_ID), 
+		.trunkMode_ID(trunkMode_ID), 
 		.PC_sumado_EX(PC_sumado_EX), 
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
@@ -132,6 +140,8 @@ module pipelineTest;
 		.ALUSrc_EX(ALUSrc_EX), 
 		.RegWrite_EX(RegWrite_EX), 
 		.Jump_EX(Jump_EX), 
+		.trunkMode_EX(trunkMode_EX), 
+		.ShiftToTrunk_EX(ShiftToTrunk_EX), 
 		.PC_next_ID(PC_next_ID), 
 		.ALU_result_EX(ALU_result_EX), 
 		.ALU_result_MEM(ALU_result_MEM), 
@@ -145,6 +155,8 @@ module pipelineTest;
 		.MemWrite_MEM(MemWrite_MEM), 
 		.RegWrite_MEM(RegWrite_MEM), 
 		.Jump_MEM(Jump_MEM), 
+		.trunkMode_MEM(trunkMode_MEM), 
+		.ShiftToTrunk_MEM(ShiftToTrunk_MEM), 
 		.Zero_MEM(Zero_MEM), 
 		.Write_register_MEM(Write_register_MEM), 
 		.Read_data_MEM(Read_data_MEM), 
@@ -159,7 +171,6 @@ module pipelineTest;
 		.Jump_ID(Jump_ID), 
 		.IF_Flush(IF_Flush)
 	);
-
 
 	always #20 clk=~clk;
 	initial begin

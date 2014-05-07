@@ -36,6 +36,8 @@ module ID_EX(
 	 input ALUSrc_ID,
 	 input RegWrite_ID,
 	 input Jump_ID,
+	 input [1:0] trunkMode_ID,
+	 input ShiftToTrunk_ID,
 	 output reg [31:0] PC_sumado_EX,
     output reg [31:0] Read_Data_1_EX,
     output reg [31:0] Read_Data_2_EX,
@@ -51,7 +53,9 @@ module ID_EX(
 	 output reg MemWrite_EX,
 	 output reg ALUSrc_EX,
 	 output reg RegWrite_EX,
-	 output reg Jump_EX
+	 output reg Jump_EX,
+	 output reg [1:0] trunkMode_EX,
+	 output reg ShiftToTrunk_EX
     );
 initial
 	begin
@@ -71,6 +75,8 @@ initial
 		ALUSrc_EX=0;
 		RegWrite_EX=0;
 		Jump_EX=0;
+		trunkMode_EX=2'b00;
+		ShiftToTrunk_EX=0;
 	end
 always @(posedge clk)
 begin
@@ -90,6 +96,8 @@ begin
 	ALUSrc_EX<=ALUSrc_ID;
 	RegWrite_EX<=RegWrite_ID;
 	Jump_EX<=Jump_ID;
+	trunkMode_EX<=trunkMode_ID;
+	ShiftToTrunk_EX<=ShiftToTrunk_ID;
 end
 
 endmodule

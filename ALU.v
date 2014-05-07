@@ -23,7 +23,7 @@ module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,sa,opcode,zero,resultado
 	//Inputs y outputs son wire por defecto
    input signed [WORD_WIDTH-1:0] a_input;
    input signed [WORD_WIDTH-1:0] b_input;
-	input unsigned [4:0]	sa;
+	input [4:0]	sa;
 	input [3:0] opcode;
 	output reg zero;
 	output reg [WORD_WIDTH-1:0] resultado;

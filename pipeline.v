@@ -46,6 +46,8 @@ module Pipeline(
 	output ALUSrc_ID,
 	output RegWrite_ID,
 	//output Jump_ID,
+	output ShiftToTrunk_ID,
+	output [1:0] trunkMode_ID,
 	output [31:0] PC_sumado_EX,
 	output [31:0] Read_Data_1_EX,
 	output [31:0] Read_Data_2_EX,
@@ -64,6 +66,8 @@ module Pipeline(
 	output ALUSrc_EX,
 	output RegWrite_EX,
 	output Jump_EX,
+	output [1:0] trunkMode_EX,
+	output ShiftToTrunk_EX,
 	
 	
 	//EX_MEM WIRES
@@ -80,6 +84,8 @@ module Pipeline(
 	output MemWrite_MEM,
 	output RegWrite_MEM,
 	output Jump_MEM,
+	output [1:0] trunkMode_MEM,
+	output ShiftToTrunk_MEM,
 	output Zero_MEM,
 	output [4:0] Write_register_MEM,
 	
@@ -121,16 +127,19 @@ module Pipeline(
 	assign Write_register_EX = RegDest_EX ? instruction_EX[15:11] : instruction_EX[20:16];
 	
 	//Mux de antes de la ALU
+	wire [31:0] rsData;
 	assign rtData = ALUSrc_EX ? signExtended_EX : aluInput2;
+	assign rsData = ShiftToTrunk_EX ? aluInput2<<2 : aluInput2;
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
 	assign Write_Data = MemToReg_WB ? Read_data_WB : ALU_result_WB;
 
 	//Muxes de Hazard Detection Unit
+	wire [1:0]trunkMode_control;
 	assign RegDest_ID  = nopMux ? 1'b0 : RegDest_control;
-	assign BranchEQ_ID   = nopMux ? 1'b0 : BranchEQ_control;
-	assign BranchNE_ID   = nopMux ? 1'b0 : BranchNE_control;
+	assign BranchEQ_ID = nopMux ? 1'b0 : BranchEQ_control;
+	assign BranchNE_ID = nopMux ? 1'b0 : BranchNE_control;
 	assign MemRead_ID  = nopMux ? 1'b0 : MemRead_control;
 	assign MemToReg_ID = nopMux ? 1'b0 : MemToReg_control;
 	assign ALUOp1_ID   = nopMux ? 1'b0 : ALUOp1_control;
@@ -139,6 +148,8 @@ module Pipeline(
 	assign ALUSrc_ID   = nopMux ? 1'b0 : ALUSrc_control;
 	assign RegWrite_ID = nopMux ? 1'b0 : RegWrite_control;
 	assign Jump_ID 	 = nopMux ? 1'b0 : Jump_control;
+	assign trunkMode_ID= nopMux ? 2'b00 : trunkMode_control;
+	assign ShiftToTrunk_ID = nopMux?1'b0: ShiftToTrunk_control;
 
 
 	//****************Modulos Instanciados*********************//
@@ -171,9 +182,11 @@ module Pipeline(
 		.clk(clk),
 		.MemWrite(MemWrite_MEM),
 		.MemRead(MemRead_MEM),
-		.Address(ALU_result_MEM),
+		.BasePlusOffset(ALU_result_MEM),
 		.WriteData(Read_Data_2_MEM),
-		.ReadData(Read_data_MEM)
+		.trunkMode(trunkMode_MEM),
+		.ShiftToTrunk(ShiftToTrunk_MEM),
+		.TrunkedReadData(Read_data_MEM)
 	);
 	
 	Registers registers (
@@ -199,11 +212,15 @@ module Pipeline(
 		.MemWrite(MemWrite_control),
 		.ALUSrc(ALUSrc_control),
 		.RegWrite(RegWrite_control),
-		.Jump(Jump_control)
+		.Jump(Jump_control),
+		.trunkMode(trunkMode_control),
+		.ShiftToTrunk(ShiftToTrunk_control)
+		
 	);
 	
 	ALUwithControl alu (
-		.data1(aluInput1),
+		//.data1(aluInput1),
+		.data1(rsData),
 		.data2(rtData),
 		.sa(instruction_EX[10:6]),
 		.instruction(signExtended_EX[5:0]),
@@ -239,6 +256,8 @@ module Pipeline(
 		.ALUSrc_ID(ALUSrc_ID),
 		.RegWrite_ID(RegWrite_ID),
 		.Jump_ID(Jump_ID),
+		.trunkMode_ID(trunkMode_ID),
+		.ShiftToTrunk_ID(ShiftToTrunk_ID),
 		.RegDest_EX(RegDest_EX),
 		.BranchEQ_EX(BranchEQ_EX),
 		.BranchNE_EX(BranchNE_EX),
@@ -249,7 +268,9 @@ module Pipeline(
 		.MemWrite_EX(MemWrite_EX),
 		.ALUSrc_EX(ALUSrc_EX),
 		.RegWrite_EX(RegWrite_EX),
-		.Jump_EX(Jump_EX)
+		.Jump_EX(Jump_EX),
+		.trunkMode_EX(trunkMode_EX),
+		.ShiftToTrunk_EX(ShiftToTrunk_EX)
 	);
 	
 	EX_MEM ex_mem (
@@ -265,6 +286,8 @@ module Pipeline(
 		.MemWrite_EX(MemWrite_EX),
 		.RegWrite_EX(RegWrite_EX),
 		.Jump_EX(Jump_EX),
+		.trunkMode_EX(trunkMode_EX),
+		.ShiftToTrunk_EX(ShiftToTrunk_EX),
 		.Zero_EX(Zero_EX),
 		.Write_register_EX(Write_register_EX),
 		.BranchEQ_MEM(BranchEQ_MEM),
@@ -274,6 +297,8 @@ module Pipeline(
 		.MemWrite_MEM(MemWrite_MEM),
 		.RegWrite_MEM(RegWrite_MEM),
 		.Jump_MEM(Jump_MEM),
+		.trunkMode_MEM(trunkMode_MEM),
+		.ShiftToTrunk_MEM(ShiftToTrunk_MEM),
 		.Zero_MEM(Zero_MEM),
 		.Write_register_MEM(Write_register_MEM)
 	);

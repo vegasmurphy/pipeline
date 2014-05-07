@@ -31,6 +31,8 @@ module EX_MEM(
 	input MemWrite_EX,
 	input RegWrite_EX,
 	input Jump_EX,
+	input [1:0] trunkMode_EX,
+	input ShiftToTrunk_EX,
 	input Zero_EX,
 	input [4:0] Write_register_EX,
 	output reg BranchEQ_MEM,
@@ -40,6 +42,8 @@ module EX_MEM(
 	output reg MemWrite_MEM,
 	output reg RegWrite_MEM,
 	output reg Jump_MEM,
+	output reg [1:0] trunkMode_MEM,
+	output reg ShiftToTrunk_MEM,
 	output reg Zero_MEM,
 	output reg [4:0] Write_register_MEM
     );
@@ -57,6 +61,8 @@ module EX_MEM(
 	Write_register_MEM=0;
 	ALU_result_MEM=0;
 	Read_Data_2_MEM=0;
+	trunkMode_MEM=0;
+	ShiftToTrunk_MEM=0;
 	end
 
 	always@(posedge clk)
@@ -71,6 +77,8 @@ module EX_MEM(
 		RegWrite_MEM<=RegWrite_EX;
 		Jump_MEM<=Jump_EX;
 		Zero_MEM<=Zero_EX;
+		trunkMode_MEM<=trunkMode_EX;
+		ShiftToTrunk_MEM<=ShiftToTrunk_EX;
 		Write_register_MEM[4:0]<=Write_register_EX[4:0];
 	end
 

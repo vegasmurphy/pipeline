@@ -21,16 +21,18 @@
 module Control(
     input [5:0] opcode,
     output reg RegDest,
-	 output reg BranchEQ,
-	 output reg BranchNE,
-	 output reg MemRead,
-	 output reg MemToReg,
-	 output reg ALUOp1,
-	 output reg ALUOp2,
-	 output reg MemWrite,
-	 output reg ALUSrc,
-	 output reg RegWrite,
-	 output reg Jump
+	 output reg BranchEQ,	//Indica la presencia de un Branch Equal
+	 output reg BranchNE,	//Indica la presencia de un Branch NOT Equal
+	 output reg MemRead,		//
+	 output reg MemToReg,	//
+	 output reg ALUOp1,		//
+	 output reg ALUOp2,		//
+	 output reg MemWrite,	//
+	 output reg ALUSrc,		//
+	 output reg RegWrite,	//
+	 output reg Jump,			//Indica la presencia de un Jump
+	 output reg [1:0] trunkMode,	//Indica si se trunca a Byte, Half o Word
+	 output reg ShiftToTrunk		//Indica que hay que hacerle un shift al registro base cuando se necesita un trunk
     );
 
 
@@ -50,6 +52,8 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=1;
 					Jump=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			6'b001000: 	//ADDI [OK]
 				begin
@@ -64,6 +68,8 @@ always @(*)
 					ALUSrc=1;	//ok
 					RegWrite=1;	//ok
 					Jump=0;		//ok
+					trunkMode=0;//ok
+					ShiftToTrunk=0;
 				end
 			6'b100011: //LW
 				begin
@@ -78,6 +84,8 @@ always @(*)
 					ALUSrc=1;
 					RegWrite=1;
 					Jump=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			6'b101011://SW
 				begin
@@ -92,6 +100,8 @@ always @(*)
 					Jump=0;
 					RegDest=0;
 					MemToReg=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			6'b000100: //BEQ
 				begin
@@ -106,6 +116,8 @@ always @(*)
 					Jump=0;
 					RegDest=0;
 					MemToReg=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			6'b000101: //BNE
 				begin
@@ -120,6 +132,8 @@ always @(*)
 					Jump=0;
 					RegDest=0;
 					MemToReg=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			6'b000010://J (Jump) 
 				begin
@@ -134,6 +148,8 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=0;
 					Jump=1;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 			default: //(NOP)
 				begin
@@ -148,6 +164,8 @@ always @(*)
 					ALUSrc=0;
 					RegWrite=0;
 					Jump=0;
+					trunkMode=0;
+					ShiftToTrunk=0;
 				end
 		endcase
 		
