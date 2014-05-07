@@ -48,9 +48,9 @@ module uart_tx (
 // Parameter definitions
 //***************************************************************************
 
-  parameter BAUD_RATE    = 9600;              // Baud rate
+  parameter BAUD_RATE    = 2400;              // Baud rate
 
-  parameter CLOCK_RATE   = 100_000_000;
+  parameter CLOCK_RATE   = 3_125_000;
 
 //***************************************************************************
 // Reg declarations

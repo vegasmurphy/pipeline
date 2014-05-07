@@ -19,12 +19,14 @@
 //
 //////////////////////////////////////////////////////////////////////////////////
 module UART_writer(
-    input clk,
+    input fastClk,
 	 input rx,
-	 output tx_out
+	 input clkPipeline1,
+	 output tx_out,
+	 output [31:0]PC_sumado_IF
 	 
     );
-	 
+
 wire done;
 wire [7:0] palabra,rx_data;
 wire rd_en,wr_en;
@@ -32,6 +34,145 @@ wire tx_done;
 wire fifo_empty;
 wire rx_data_rdy;
 reg ready;
+
+
+localparam [2:0] IDLE = 3'b000,
+					  PROCESSING = 3'b001,
+					  SENDING = 3'b010,
+					  SENDINGMEM = 3'b011,
+					  STEP = 3'b100,
+					  RUNALL = 3'b101;
+						 
+//Declaración de señales (las utilizare para el elemento de memoria por lo tanto son tipo REGISTRO)
+reg[2:0] current_state=IDLE, next_state=IDLE;
+						
+						
+//Registro de estado (Memoria)
+always @(posedge clk)
+		current_state <= next_state;
+
+
+reg [7:0] fifo_din;
+reg fifo_wr_en=1;		
+reg clkPipeline=0;		
+reg [5:0] currentBlock=0;
+reg [1:0] currentByte=0;
+reg rx_data_rdy_ant=0;
+reg [7:0] next=8'b01110011;
+always @(posedge clk)
+	begin
+		case(current_state)
+			IDLE:
+				begin
+					if(rx_data_rdy)
+						next_state = PROCESSING;
+					else
+						next_state = IDLE;
+				fifo_wr_en=0;
+				end
+			PROCESSING:
+				begin
+					if(rx_data_rdy_ant!=rx_data_rdy&&rx_data_rdy)
+						begin
+						fifo_wr_en=1;
+						end
+					else
+						begin
+						fifo_wr_en=0;
+						end
+					
+					if(rx_data=="A")
+					begin
+						next_state = STEP;
+						fifo_din="B";
+					end
+					else
+						begin
+						fifo_din=rx_data;
+						end
+					rx_data_rdy_ant=rx_data_rdy;
+				end
+			STEP:
+				begin
+					/*if(clkPipeline)
+						begin
+						clkPipeline=0;
+						fifo_din="b";
+						next_state = SENDING;
+						end*/
+					//else
+						//begin
+						clkPipeline=1;
+						next_state = SENDING;
+						fifo_din="a";
+						//end	
+				end
+			SENDING:
+				begin
+				clkPipeline=0;
+				fifo_din="b";
+					case(currentBlock)
+						6'b000000: //envio PC
+							begin
+								case(currentByte)
+									2'b00:fifo_din = PC_sumado_IF[7:0];
+									2'b01:fifo_din = PC_sumado_IF[15:8];
+									2'b10:fifo_din = PC_sumado_IF[23:16];
+									2'b11:fifo_din = PC_sumado_IF[31:24];
+								   default:fifo_din = 0;
+								endcase
+								fifo_wr_en=1;
+								next_state=SENDING;
+							end
+						6'b000001: 
+								begin
+								case(currentByte)
+									2'b00:fifo_din = instruction_ID[7:0];
+									2'b01:fifo_din = instruction_ID[15:8];
+									2'b10:fifo_din = instruction_ID[23:16];
+									2'b11:fifo_din = instruction_ID[31:24];
+								   default:fifo_din = 0;
+								endcase
+								fifo_wr_en=1;
+								next_state=SENDING;
+							end
+						6'b000010:
+									begin
+										next_state=IDLE;
+										fifo_wr_en=0;
+									end
+						default: 
+									begin
+										next_state=IDLE;
+										fifo_wr_en=0;
+									end
+					endcase
+					
+					currentByte=currentByte+2'b01;
+					if(currentByte==2'b00)
+						begin
+						currentBlock=currentBlock+1;
+						end
+				end
+			SENDINGMEM:
+				begin
+				end
+			RUNALL:
+					begin
+					end
+			default:
+						begin
+						end
+		endcase
+	end
+
+
+
+
+//assign fifo_din = PC_sumado_IF[7:0];
+
+
+
 
 uart_tx tx(
   .clk_tx(clk),          // Clock input
@@ -41,8 +182,9 @@ uart_tx tx(
   .char_fifo_rd_en(tx_done), // Pop signal to the char FIFO
 	.txd_tx(tx_out)           // The transmit serial signal
 );
-reg [7:0] fifo_din;
-reg fifo_wr_en;
+
+
+wire fifo_full;
 fifo f(
   .clk(clk),
   .rst(1'b0),
@@ -57,15 +199,13 @@ fifo f(
 	wire [3:0] aluInstruction;
 	wire equalFlag;
 	wire [31:0] instruction_IF;
-	wire [31:0] PC_sumado_IF;
 	wire [31:0] instruction_ID;
 	wire [31:0] Read_Data_1_ID;
 	wire [31:0] Read_Data_2_ID;
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
 	wire RegDest_ID;
-	wire BranchEQ_ID;
-	wire BranchNE_ID;
+	wire Branch_ID;
 	wire MemRead_ID;
 	wire MemToReg_ID;
 	wire ALUOp1_ID;
@@ -81,8 +221,7 @@ fifo f(
 	wire [31:0] signExtended_EX;
 	wire [31:0] instruction_EX;
 	wire RegDest_EX;
-	wire BranchEQ_EX;
-	wire BranchNE_EX;
+	wire Branch_EX;
 	wire MemRead_EX;
 	wire MemToReg_EX;
 	wire ALUOp1_EX;
@@ -97,8 +236,7 @@ fifo f(
 	wire [31:0] Read_Data_2_MEM;
 	wire Zero_EX;
 	wire [4:0] Write_register_EX;
-	wire BranchEQ_MEM;
-	wire BranchNE_MEM;
+	wire Branch_MEM;
 	wire MemRead_MEM;
 	wire MemToReg_MEM;
 	wire MemWrite_MEM;
@@ -118,8 +256,9 @@ fifo f(
 	wire Jump_ID;
 	wire IF_Flush;
 
-	// Instantiate the Unit Under Test (UUT)
-	Pipeline uut (
+	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk));
+	
+	Pipeline pipeline (
 		.clk(clkPipeline), 
 		.aluInstruction(aluInstruction), 
 		.equalFlag(equalFlag), 
@@ -131,8 +270,7 @@ fifo f(
 		.signExtended_ID(signExtended_ID), 
 		.PC_sumado_ID(PC_sumado_ID), 
 		.RegDest_ID(RegDest_ID), 
-		.BranchEQ_ID(BranchEQ_ID), 
-		.BranchNE_ID(BranchNE_ID), 
+		.Branch_ID(Branch_ID), 
 		.MemRead_ID(MemRead_ID), 
 		.MemToReg_ID(MemToReg_ID), 
 		.ALUOp1_ID(ALUOp1_ID), 
@@ -148,8 +286,7 @@ fifo f(
 		.signExtended_EX(signExtended_EX), 
 		.instruction_EX(instruction_EX), 
 		.RegDest_EX(RegDest_EX), 
-		.BranchEQ_EX(BranchEQ_EX),
-		.BranchNE_EX(BranchNE_EX),		
+		.Branch_EX(Branch_EX), 
 		.MemRead_EX(MemRead_EX), 
 		.MemToReg_EX(MemToReg_EX), 
 		.ALUOp1_EX(ALUOp1_EX), 
@@ -164,8 +301,7 @@ fifo f(
 		.Read_Data_2_MEM(Read_Data_2_MEM), 
 		.Zero_EX(Zero_EX), 
 		.Write_register_EX(Write_register_EX), 
-		.BranchEQ_MEM(BranchEQ_MEM), 
-		.BranchNE_MEM(BranchNE_MEM),
+		.Branch_MEM(Branch_MEM), 
 		.MemRead_MEM(MemRead_MEM), 
 		.MemToReg_MEM(MemToReg_MEM), 
 		.MemWrite_MEM(MemWrite_MEM), 
@@ -191,25 +327,12 @@ fifo f(
 uart_rx r(
   // Write side inputs
   .clk_rx(clk),       // Clock input
-  .rst_clk_rx(0),   // Active HIGH reset - synchronous to clk_rx
+  .rst_clk_rx(1'b0),   // Active HIGH reset - synchronous to clk_rx
   .rxd_i(rx),        // RS232 RXD pin - Directly from pad
   .rx_data(rx_data),//comando),      // 8 bit data output
                                  //  - valid when rx_data_rdy is asserted
   .rx_data_rdy(rx_data_rdy)  // Ready signal for rx_data
         // The STOP bit was not detected
 );
-
-reg rx_data_rdy_ant;
-always @(posedge clk)
-begin
-	if(rx_data_rdy_ant!=rx_data_rdy&&rx_data_rdy)
-		begin
-		fifo_wr_en=1;
-		fifo_din=8'b01000001;
-		end
-	else
-		fifo_wr_en=0;
-	rx_data_rdy_ant=rx_data_rdy;
-end
 
 endmodule
