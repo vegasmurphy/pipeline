@@ -1,4 +1,6 @@
-# (c) Copyright 2009 - 2010 Xilinx, Inc. All rights reserved.
+# file: planAhead_ise.tcl
+# 
+# (c) Copyright 2008 - 2011 Xilinx, Inc. All rights reserved.
 # 
 # This file contains confidential and proprietary information
 # of Xilinx, Inc. and is protected under U.S. and
@@ -43,25 +45,34 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
+# 
 
-
-set device xc6slx16csg324-3
-set projName InstructionMemory
-set design InstructionMemory
 set projDir [file dirname [info script]]
-create_project $projName $projDir/results/$projName -part $device -force
-set_property design_mode RTL [current_fileset -srcset]
-set top_module InstructionMemory_exdes
-add_files -norecurse {../../example_design/InstructionMemory_exdes.vhd}
-add_files -norecurse {./InstructionMemory.ngc}
-import_files -fileset [get_filesets constrs_1] -force -norecurse {../../example_design/InstructionMemory_exdes.xdc}
-set_property top InstructionMemory_exdes [get_property srcset [current_run]]
-synth_design
-opt_design 
-place_design 
-route_design 
-write_sdf -rename_top_module InstructionMemory_exdes -file routed.sdf 
-write_verilog -nolib -mode timesim -sdf_anno false -rename_top_module InstructionMemory_exdes routed.v
-report_timing -nworst 30 -path_type full -file routed.twr
-report_drc -file report.drc
-write_bitstream -bitgen_options {-g UnconstrainedPins:Allow}
+set projName DCM
+set topName DCM_exdes
+set device xc6slx16csg324-3
+
+create_project $projName $projDir/results/$projName -part $device
+
+set_property design_mode RTL [get_filesets sources_1]
+
+## Source files
+#set verilogSources [glob $srcDir/*.v]
+import_files -fileset [get_filesets sources_1] -force -norecurse ../../example_design/DCM_exdes.v
+import_files -fileset [get_filesets sources_1] -force -norecurse ../../../DCM.v
+
+
+#UCF file
+import_files -fileset [get_filesets constrs_1] -force -norecurse ../../example_design/DCM_exdes.ucf
+
+set_property top $topName [get_property srcset [current_run]]
+
+launch_runs -runs synth_1
+wait_on_run synth_1
+
+set_property add_step Bitgen [get_runs impl_1]
+launch_runs -runs impl_1
+wait_on_run impl_1
+
+
+

@@ -17,41 +17,41 @@ Generating ASY schematic symbol...
 INFO:sim:949 - Finished generation of ASY schematic symbol.
 Generating SYM schematic symbol for 'InstructionMemory'...
 Generating metadata file...
-Regenerating ISE project file for 'InstructionMemory'...
+Generating ISE project file for 'InstructionMemory'...
 Generating ISE project...
 XCO file found: InstructionMemory.xco
 XMDF file found: InstructionMemory_xmdf.tcl
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory.asy -view all -origin_type imported
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory.asy -view all -origin_type imported
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory.ngc -view all -origin_type created
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory.ngc -view all -origin_type created
 Checking file
-"C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instr
-uctionMemory.ngc" for project device match ...
+"C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instru
+ctionMemory.ngc" for project device match ...
 File
-"C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instr
-uctionMemory.ngc" device information matches project device.
+"C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instru
+ctionMemory.ngc" device information matches project device.
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory.sym -view all -origin_type imported
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory.sym -view all -origin_type imported
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory.v -view all -origin_type created
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory.v -view all -origin_type created
 INFO:HDLCompiler:1845 - Analyzing Verilog file
-   "C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/In
-   structionMemory.v" into library work
+   "C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Ins
+   tructionMemory.v" into library work
 INFO:ProjectMgmt - Parsing design hierarchy completed successfully.
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory.veo -view all -origin_type imported
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory.veo -view all -origin_type imported
 Adding
-C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/Instru
-ctionMemory_synth.v -view all -origin_type created
+C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Instruc
+tionMemory_synth.v -view all -origin_type created
 INFO:HDLCompiler:1845 - Analyzing Verilog file
-   "C:/Users/Marcelo/Documents/Xilinx/ArquitecturaPIPELINE/ipcore_dir/tmp/_cg/In
-   structionMemory_synth.v" into library work
+   "C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/ipcore_dir/tmp/_cg/Ins
+   tructionMemory_synth.v" into library work
 INFO:ProjectMgmt - Parsing design hierarchy completed successfully.
 INFO:TclTasksC:2116 - The automatic calculation of top has been turned-off.
    Please set the new top explicitly by running the "project set top" command.

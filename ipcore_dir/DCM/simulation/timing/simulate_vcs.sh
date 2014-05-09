@@ -1,4 +1,7 @@
-# (c) Copyright 2009 - 2010 Xilinx, Inc. All rights reserved.
+#!/bin/sh
+# file: simulate_vcs.sh
+# 
+# (c) Copyright 2008 - 2011 Xilinx, Inc. All rights reserved.
 # 
 # This file contains confidential and proprietary information
 # of Xilinx, Inc. and is protected under U.S. and
@@ -43,25 +46,27 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
+# 
+
+# remove old files
+rm -rf simv* csrc DVEfiles AN.DB
+
+# compile all of the files
+# Note that -sverilog is not strictly required- You can
+#   remove the -sverilog if you change the type of the
+#   localparam for the periods in the testbench file to 
+#   [63:0] from time
+  vlogan -sverilog \
+           DCM_tb.v \
+           ../../implement/results/routed.v
 
 
-set device xc6slx16csg324-3
-set projName InstructionMemory
-set design InstructionMemory
-set projDir [file dirname [info script]]
-create_project $projName $projDir/results/$projName -part $device -force
-set_property design_mode RTL [current_fileset -srcset]
-set top_module InstructionMemory_exdes
-add_files -norecurse {../../example_design/InstructionMemory_exdes.vhd}
-add_files -norecurse {./InstructionMemory.ngc}
-import_files -fileset [get_filesets constrs_1] -force -norecurse {../../example_design/InstructionMemory_exdes.xdc}
-set_property top InstructionMemory_exdes [get_property srcset [current_run]]
-synth_design
-opt_design 
-place_design 
-route_design 
-write_sdf -rename_top_module InstructionMemory_exdes -file routed.sdf 
-write_verilog -nolib -mode timesim -sdf_anno false -rename_top_module InstructionMemory_exdes routed.v
-report_timing -nworst 30 -path_type full -file routed.twr
-report_drc -file report.drc
-write_bitstream -bitgen_options {-g UnconstrainedPins:Allow}
+# prepare the simulation
+vcs -sdf max:DCM_exdes:../../implement/results/routed.sdf +v2k -y $XILINX/verilog/src/simprims \
+        +libext+.v -debug DCM_tb.v ../../implement/results/routed.v
+
+# run the simulation
+./simv -ucli -i ucli_commands.key
+
+# launch the viewer
+#dve -vpd vcdplus.vpd -session vcs_session.tcl

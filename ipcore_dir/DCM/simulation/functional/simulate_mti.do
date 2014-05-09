@@ -1,4 +1,6 @@
-# (c) Copyright 2009 - 2010 Xilinx, Inc. All rights reserved.
+# file: simulate_mti.do
+# 
+# (c) Copyright 2008 - 2011 Xilinx, Inc. All rights reserved.
 # 
 # This file contains confidential and proprietary information
 # of Xilinx, Inc. and is protected under U.S. and
@@ -43,25 +45,21 @@
 # 
 # THIS COPYRIGHT NOTICE AND DISCLAIMER MUST BE RETAINED AS
 # PART OF THIS FILE AT ALL TIMES.
+# 
 
+# set up the working directory
+set work work
+vlib work
 
-set device xc6slx16csg324-3
-set projName InstructionMemory
-set design InstructionMemory
-set projDir [file dirname [info script]]
-create_project $projName $projDir/results/$projName -part $device -force
-set_property design_mode RTL [current_fileset -srcset]
-set top_module InstructionMemory_exdes
-add_files -norecurse {../../example_design/InstructionMemory_exdes.vhd}
-add_files -norecurse {./InstructionMemory.ngc}
-import_files -fileset [get_filesets constrs_1] -force -norecurse {../../example_design/InstructionMemory_exdes.xdc}
-set_property top InstructionMemory_exdes [get_property srcset [current_run]]
-synth_design
-opt_design 
-place_design 
-route_design 
-write_sdf -rename_top_module InstructionMemory_exdes -file routed.sdf 
-write_verilog -nolib -mode timesim -sdf_anno false -rename_top_module InstructionMemory_exdes routed.v
-report_timing -nworst 30 -path_type full -file routed.twr
-report_drc -file report.drc
-write_bitstream -bitgen_options {-g UnconstrainedPins:Allow}
+# compile all of the files
+vlog -work work $env(XILINX)/verilog/src/glbl.v
+vlog -work work ../../../DCM.v
+vlog -work work ../../example_design/DCM_exdes.v
+vlog -work work ../DCM_tb.v
+
+# run the simulation
+vsim  -t ps -voptargs="+acc" -L unisims_ver work.DCM_tb work.glbl
+do wave.do
+log DCM_tb/dut/counter
+log -r /*
+run 50000ns
