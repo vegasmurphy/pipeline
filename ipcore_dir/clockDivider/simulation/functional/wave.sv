@@ -89,16 +89,16 @@ group set -comment {}
 group clear 0 end
 
 group insert \
-    {clockDivider_tb.dut.clk} \
-
+    {clockDivider_tb.dut.clk[1]} \
+    {clockDivider_tb.dut.clk[2]} 
 group using {Counters}
 group set -overlay 0
 group set -comment {}
 group clear 0 end
 
 group insert \
-    {clockDivider_tb.dut.counter} \
-
+    {clockDivider_tb.dut.counter[1]} \
+    {clockDivider_tb.dut.counter[2]} 
 
 set id [waveform add -signals [list {nc::clockDivider_tb.COUNT} ]]
 
