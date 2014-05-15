@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   17:16:14 05/07/2014
+// Create Date:   17:29:00 05/08/2014
 // Design Name:   Pipeline
-// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/LineaDePipa/pipelineTest.v
-// Project Name:  LineaDePipa
+// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/pipelineTest.v
+// Project Name:  PipaDeLinea
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -176,6 +176,7 @@ module pipelineTest;
 		.IF_Flush(IF_Flush)
 	);
 
+	always #10 clk=~clk;
 	initial begin
 		// Initialize Inputs
 		clk = 0;

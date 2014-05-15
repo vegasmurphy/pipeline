@@ -122,7 +122,7 @@ module Pipeline(
 	
 	//Mux2 del PC (Jump)
 	assign PC_next_2 = Jump_ID ? Jump_Addr : PC_next;
-	assign Jump_Addr = {PC_sumado_ID[31:26],instruction_ID[25:0]};
+	assign Jump_Addr = JReg_ID ? Read_Data_1_ID : {PC_sumado_ID[31:26],instruction_ID[25:0]};
 	
 	//Mux de antes de los registros
 	wire [4:0] Write_Addr;
@@ -130,7 +130,7 @@ module Pipeline(
 	
 	//Mux de antes de la ALU
 	//wire [31:0] rsData,rtData;
-	assign rtData = ALUSrc_EX ? signExtended_EX : aluInput2;
+	assign rtData = ALUSrc_EX ? signExtended_usado : aluInput2;
 	assign rsData = ShiftToTrunk_EX ? (aluInput1*4) : aluInput1;
 	
 	//Mux de WriteBack
@@ -152,7 +152,12 @@ module Pipeline(
 	assign Jump_ID 	 = nopMux ? 1'b0 : Jump_control;
 	assign trunkMode_ID= nopMux ? 2'b00 : trunkMode_control;
 	assign ShiftToTrunk_ID = nopMux?1'b0: ShiftToTrunk_control;
+	assign sinSigno_ID = nopMux ? 1'b0 : sinSigno_control;
+	assign JReg_ID = nopMux ? 1'b0 : JReg_control;
 
+	//*Sacar el signo al signExtended_EX (Para LWU, LHU y LBU)*//
+	wire [31:0]signExtended_usado;
+	assign signExtended_usado = sinSigno_EX? (signExtended_EX&32'b00000000000000001111111111111111):signExtended_EX;
 
 	//****************Modulos Instanciados*********************//
 	
@@ -216,7 +221,9 @@ module Pipeline(
 		.RegWrite(RegWrite_control),
 		.Jump(Jump_control),
 		.trunkMode(trunkMode_control),
-		.ShiftToTrunk(ShiftToTrunk_control)
+		.ShiftToTrunk(ShiftToTrunk_control),
+		.sinSigno(sinSigno_control),
+		.JReg(JReg_control)
 		
 	);
 	
@@ -260,6 +267,7 @@ module Pipeline(
 		.Jump_ID(Jump_ID),
 		.trunkMode_ID(trunkMode_ID),
 		.ShiftToTrunk_ID(ShiftToTrunk_ID),
+		.sinSigno_ID(sinSigno_ID),
 		.RegDest_EX(RegDest_EX),
 		.BranchEQ_EX(BranchEQ_EX),
 		.BranchNE_EX(BranchNE_EX),
@@ -272,7 +280,8 @@ module Pipeline(
 		.RegWrite_EX(RegWrite_EX),
 		.Jump_EX(Jump_EX),
 		.trunkMode_EX(trunkMode_EX),
-		.ShiftToTrunk_EX(ShiftToTrunk_EX)
+		.ShiftToTrunk_EX(ShiftToTrunk_EX),
+		.sinSigno_EX(sinSigno_EX)
 	);
 	
 	EX_MEM ex_mem (

@@ -27,7 +27,7 @@ module ALUwithControl(
 	 input ALUOp2,
     output zero,
     output [31:0] result,
-	 output wire [3:0]aluInstruction
+	 output wire [4:0]aluInstruction
     );
 	ALUcontrol control (
 		.instruction(instruction),

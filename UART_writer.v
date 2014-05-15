@@ -27,175 +27,165 @@ module UART_writer(
 	 
     );
 
-wire done;
-wire [7:0] palabra,rx_data;
-wire rd_en,wr_en;
-wire tx_done;
-wire fifo_empty;
-wire rx_data_rdy;
-reg ready;
+	wire done;
+	wire [7:0] palabra,rx_data;
+	wire rd_en,wr_en;
+	wire tx_done;
+	wire fifo_empty;
+	wire rx_data_rdy;
+	reg ready;
 
 
-localparam [2:0] IDLE = 3'b000,
-					  PROCESSING = 3'b001,
-					  SENDING = 3'b010,
-					  SENDINGMEM = 3'b011,
-					  STEP = 3'b100,
-					  RUNALL = 3'b101;
+	localparam [2:0] IDLE = 3'b000,
+						  PROCESSING = 3'b001,
+						  SENDING = 3'b010,
+						  SENDINGMEM = 3'b011,
+						  RUNALL = 3'b101;
 						 
-//Declaración de señales (las utilizare para el elemento de memoria por lo tanto son tipo REGISTRO)
-reg[2:0] current_state=IDLE, next_state=IDLE;
-						
-						
-//Registro de estado (Memoria)
-always @(posedge clk)
-		current_state <= next_state;
+	//Declaración de señales (las utilizare para el elemento de memoria por lo tanto son tipo REGISTRO)
+	reg[2:0] current_state=IDLE, next_state=IDLE;
+							
+							
+	//Registro de estado (Memoria)
+	always @(posedge clk)
+			current_state <= next_state;
 
 
-reg [7:0] fifo_din;
-reg fifo_wr_en=1;		
-reg clkPipeline=0;		
-reg [5:0] currentBlock=0;
-reg [1:0] currentByte=0;
-reg rx_data_rdy_ant=0;
-reg [7:0] next=8'b01110011;
-always @(posedge clk)
-	begin
-		case(current_state)
-			IDLE:
-				begin
-					fifo_din="S";
-					if(rx_data_rdy)
-						next_state = PROCESSING;
-					else
-						next_state = IDLE;
-				fifo_wr_en=0;
-				end
-			PROCESSING://Cargar algo en la fifo si es un dato nuevo
-				begin//Si es una A sigue, sino se queda en este estado.
-					if((rx_data_rdy_ant!=rx_data_rdy)&&rx_data_rdy)
-						begin
-						fifo_wr_en=1;
-						end
-					else
-						begin
-						fifo_wr_en=0;
-						end
-					
-					if(rx_data=="A")
+	reg [7:0] fifo_din;
+	reg fifo_wr_en=1;		
+	reg clkPipeline=0;		
+	reg [5:0] currentBlock=0;
+	reg [1:0] currentByte=0;
+	reg rx_data_rdy_ant=0;
+	reg [7:0] next=8'b01110011;
+	
+	
+	always @(negedge clk)
+		begin
+			case(current_state)
+				IDLE:
 					begin
-						fifo_din="B";
-						next_state = STEP;
+						//fifo_din="S";
+						if(rx_data_rdy)
+							next_state = PROCESSING;
+						else
+							next_state = IDLE;
+					fifo_wr_en=0;
 					end
-					else
-						begin
-						fifo_din=rx_data;
-						end
-					rx_data_rdy_ant=rx_data_rdy;
-				end
-			STEP: //Poner el valor del clock del pipeline en 1
-				begin
-					/*if(clkPipeline)
-						begin
-						clkPipeline=0;
-						fifo_din="b";
-						next_state = SENDING;
-						end*/
-					//else
-						//begin
-						clkPipeline=1;
-						fifo_din="a";
-						next_state = SENDING;
-						//end	
-				end
-			SENDING: //Poner el valor del clk del pipeline en cero y enviar el valor del PC
-				begin
-				clkPipeline=0;
-				fifo_din="b";
-					case(currentBlock)
-						6'b000000: //envio PC
+				PROCESSING://Cargar algo en la fifo si es un dato nuevo
+					begin//Si es una A sigue, sino se queda en este estado.
+						if((rx_data_rdy_ant!=rx_data_rdy)&&rx_data_rdy)
 							begin
-								case(currentByte)
-									2'b00:fifo_din = PC_sumado_IF[7:0];
-									2'b01:fifo_din = PC_sumado_IF[15:8];
-									2'b10:fifo_din = PC_sumado_IF[23:16];
-									2'b11:fifo_din = PC_sumado_IF[31:24];
-								   default:fifo_din = 0;
-								endcase
-								fifo_wr_en=1;
-								//next_state=SENDING;
+							//fifo_wr_en=1;
 							end
-						6'b000001: 
-								begin
-								case(currentByte)
-									2'b00:fifo_din = instruction_ID[7:0];
-									2'b01:fifo_din = instruction_ID[15:8];
-									2'b10:fifo_din = instruction_ID[23:16];
-									2'b11:fifo_din = instruction_ID[31:24];
-								   default:fifo_din = 0;
-								endcase
-								fifo_wr_en=1;
-								//next_state=SENDING;
+						else
+							begin
+							fifo_wr_en=0;
 							end
-						6'b000010:
-									begin
-										fifo_wr_en=0;
-										next_state=IDLE;										
-									end
-						default: 
-									begin
-										fifo_wr_en=0;
-										next_state=IDLE;
-									end
-					endcase
-					
-					currentByte=currentByte+2'b01;
-					if(currentByte==2'b00)
+						
+						if(rx_data=="A")
 						begin
-						currentBlock=currentBlock+1;
+							//fifo_wr_en=1;
+							fifo_din="B";
+							clkPipeline=1;
+							//fifo_wr_en=0;
+							next_state = SENDING;
 						end
-				end
-			SENDINGMEM:
-				begin
-				end
-			RUNALL:
+						else
+							begin
+							fifo_din=rx_data;
+							end
+						rx_data_rdy_ant=rx_data_rdy;
+					end
+				SENDING: //Poner el valor del clk del pipeline en cero y enviar el valor del PC
+					begin
+					clkPipeline=0;
+					fifo_wr_en=1;
+					fifo_din="b";
+						case(currentBlock)
+							6'b000000: //envio PC
+								begin
+									case(currentByte)
+										2'b00:fifo_din = PC_sumado_IF[7:0];
+										2'b01:fifo_din = PC_sumado_IF[15:8];
+										2'b10:fifo_din = PC_sumado_IF[23:16];
+										2'b11:fifo_din = PC_sumado_IF[31:24];
+										default:fifo_din = 0;
+									endcase
+									fifo_wr_en=1;
+									//next_state=SENDING;
+								end
+							6'b000001: 
+									begin
+									case(currentByte)
+										2'b00:fifo_din = instruction_ID[7:0];
+										2'b01:fifo_din = instruction_ID[15:8];
+										2'b10:fifo_din = instruction_ID[23:16];
+										2'b11:fifo_din = instruction_ID[31:24];
+										default:fifo_din = 0;
+									endcase
+									fifo_wr_en=1;
+									//next_state=SENDING;
+								end
+							6'b000010:
+										begin
+											fifo_wr_en=0;
+											next_state=IDLE;										
+										end
+							default: 
+										begin
+											fifo_wr_en=0;
+											next_state=IDLE;
+										end
+						endcase
+						
+						currentByte=currentByte+2'b01;
+						if(currentByte==2'b00)
+							begin
+							currentBlock=currentBlock+1;
+							end
+					end
+				/*SENDINGMEM:
 					begin
 					end
-			default:
-						begin
-						end
-		endcase
-	end
+				RUNALL:
+					begin
+					end
+				default:
+					begin
+					end*/
+			endcase
+		end
 
 
 
 
-//assign fifo_din = PC_sumado_IF[7:0];
+	//assign fifo_din = PC_sumado_IF[7:0];
 
 
 
 
-uart_tx tx(
-  .clk_tx(clk),          // Clock input
-  .rst_clk_tx(1'b0),      // Active HIGH reset - synchronous to clk_tx
-  .char_fifo_empty(fifo_empty), // Empty signal from char FIFO (FWFT)
-  .char_fifo_dout(palabra),  // Data from the char FIFO
-  .char_fifo_rd_en(tx_done), // Pop signal to the char FIFO
-	.txd_tx(tx_out)           // The transmit serial signal
-);
+	uart_tx tx(
+	  .clk_tx(clk),          // Clock input
+	  .rst_clk_tx(1'b0),      // Active HIGH reset - synchronous to clk_tx
+	  .char_fifo_empty(fifo_empty), // Empty signal from char FIFO (FWFT)
+	  .char_fifo_dout(palabra),  // Data from the char FIFO
+	  .char_fifo_rd_en(tx_done), // Pop signal to the char FIFO
+		.txd_tx(tx_out)           // The transmit serial signal
+	);
 
 
-wire fifo_full;
-fifo f(
-  .clk(clk),
-  .rst(1'b0),
-  .din(fifo_din),
-  .wr_en(fifo_wr_en),
-  .rd_en(tx_done),
-  .dout(palabra),
-  .full(fifo_full),
-  .empty(fifo_empty)
-);
+	wire fifo_full;
+	fifo f(
+	  .clk(clk),
+	  .rst(1'b0),
+	  .din(fifo_din),
+	  .wr_en(fifo_wr_en),
+	  .rd_en(tx_done),
+	  .dout(palabra),
+	  .full(fifo_full),
+	  .empty(fifo_empty)
+	);
 
 	wire [3:0] aluInstruction;
 	wire equalFlag;
@@ -340,15 +330,15 @@ fifo f(
 
 
 
-uart_rx r(
-  // Write side inputs
-  .clk_rx(clk),       // Clock input
-  .rst_clk_rx(1'b0),   // Active HIGH reset - synchronous to clk_rx
-  .rxd_i(rx),        // RS232 RXD pin - Directly from pad
-  .rx_data(rx_data),//comando),      // 8 bit data output
-                                 //  - valid when rx_data_rdy is asserted
-  .rx_data_rdy(rx_data_rdy)  // Ready signal for rx_data
-        // The STOP bit was not detected
-);
+	uart_rx r(
+										// Write side inputs
+	  .clk_rx(clk),       		// Clock input
+	  .rst_clk_rx(1'b0),   		// Active HIGH reset - synchronous to clk_rx
+	  .rxd_i(rx),        		// RS232 RXD pin - Directly from pad
+	  .rx_data(rx_data),			//comando),      // 8 bit data output
+										//  - valid when rx_data_rdy is asserted
+	  .rx_data_rdy(rx_data_rdy)// Ready signal for rx_data
+										// The STOP bit was not detected
+	);
 
 endmodule
