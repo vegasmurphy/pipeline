@@ -36,7 +36,7 @@ module UART_writer(
 	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
 
 	//Bloque testeado
-	wire [31:0]instruction;
+	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID;
 	reg clkPipe = 0;
 	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
 	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
@@ -44,8 +44,11 @@ module UART_writer(
 	wire [31:0] reg_array30,reg_array31;
 	Pipeline pipe
 		(	.clk(clkPipe),
+			.Read_Data_1_ID(Read_Data_1_ID),
+			.Read_Data_2_ID(Read_Data_2_ID),
 			.PC_sumado_IF(PC_sumado_IF),
 			.instruction_IF(instruction),
+			.instruction_ID(instructionID),
 			.reg_array0(reg_array0),
 			.reg_array1(reg_array1),
 			.reg_array2(reg_array2),
@@ -325,6 +328,21 @@ module UART_writer(
 						8'b10000110:fifo_din <= reg_array31[15:8];
 						8'b10000111:fifo_din <= reg_array31[23:16];
 						8'b10001000:fifo_din <= reg_array31[31:24];
+						//Instruction ID
+						8'b10001001:fifo_din <= instructionID[7:0];
+						8'b10001010:fifo_din <= instructionID[15:8];
+						8'b10001011:fifo_din <= instructionID[23:16];
+						8'b10001100:fifo_din <= instructionID[31:24];
+						//Read Data 1 ID
+						8'b10001101:fifo_din <= Read_Data_1_ID[7:0];
+						8'b10001110:fifo_din <= Read_Data_1_ID[15:8];
+						8'b10001111:fifo_din <= Read_Data_1_ID[23:16];
+						8'b10010000:fifo_din <= Read_Data_1_ID[31:24];
+						//Read Data 2 ID
+						8'b10010001:fifo_din <= Read_Data_2_ID[7:0];
+						8'b10010010:fifo_din <= Read_Data_2_ID[15:8];
+						8'b10010011:fifo_din <= Read_Data_2_ID[23:16];
+						8'b10010100:fifo_din <= Read_Data_2_ID[31:24];
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
@@ -332,7 +350,7 @@ module UART_writer(
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b10001100)//Ultimo valor +4
+					if(currentRegister==8'b10011000)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;
