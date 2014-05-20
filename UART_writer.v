@@ -150,6 +150,8 @@ module UART_writer(
 					clkPipe=0;
 					fifo_wr_en=1;
 					case(currentRegister)
+						//Un cero al Principio
+						//8'b00000000:fifo_din <= 0;
 						//PC
 						8'b00000001:fifo_din <= PC_sumado_IF[7:0];
 						8'b00000010:fifo_din <= PC_sumado_IF[15:8];
@@ -160,7 +162,9 @@ module UART_writer(
 						8'b00000110:fifo_din <= instruction[15:8];
 						8'b00000111:fifo_din <= instruction[23:16];
 						8'b00001000:fifo_din <= instruction[31:24];
-						//Registros (ID)
+						//****************//
+						//*Registros (ID)*//
+						//****************//
 						//Registro cero
 						8'b00001001:fifo_din <= reg_array0[7:0];
 						8'b00001010:fifo_din <= reg_array0[15:8];
@@ -226,106 +230,109 @@ module UART_writer(
 						8'b00111010:fifo_din <= reg_array12[15:8];
 						8'b00111011:fifo_din <= reg_array12[23:16];
 						8'b00111100:fifo_din <= reg_array12[31:24];
-						/*//Registro Trece
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];
-						//Registro
-						8'b00011100:fifo_din <= reg_array[7:0];
-						8'b00011100:fifo_din <= reg_array[15:8];
-						8'b00011100:fifo_din <= reg_array[23:16];
-						8'b00011100:fifo_din <= reg_array[31:24];*/
+						//Registro Trece
+						8'b00111101:fifo_din <= reg_array13[7:0];
+						8'b00111110:fifo_din <= reg_array13[15:8];
+						8'b00111111:fifo_din <= reg_array13[23:16];
+						8'b01000000:fifo_din <= reg_array13[31:24];
+						//Registro Catorce
+						8'b01000001:fifo_din <= reg_array14[7:0];
+						8'b01000010:fifo_din <= reg_array14[15:8];
+						8'b01000011:fifo_din <= reg_array14[23:16];
+						8'b01000100:fifo_din <= reg_array14[31:24];
+						//Registro Quince
+						8'b01000101:fifo_din <= reg_array15[7:0];
+						8'b01000110:fifo_din <= reg_array15[15:8];
+						8'b01000111:fifo_din <= reg_array15[23:16];
+						8'b01001000:fifo_din <= reg_array15[31:24];
+						//Registro Dieciseis
+						8'b01001001:fifo_din <= reg_array16[7:0];
+						8'b01001010:fifo_din <= reg_array16[15:8];
+						8'b01001011:fifo_din <= reg_array16[23:16];
+						8'b01001100:fifo_din <= reg_array16[31:24];
+						//Registro Diecisiete
+						8'b01001101:fifo_din <= reg_array17[7:0];
+						8'b01001110:fifo_din <= reg_array17[15:8];
+						8'b01001111:fifo_din <= reg_array17[23:16];
+						8'b01010000:fifo_din <= reg_array17[31:24];
+						//Registro Dieciocho
+						8'b01010001:fifo_din <= reg_array18[7:0];
+						8'b01010010:fifo_din <= reg_array18[15:8];
+						8'b01010011:fifo_din <= reg_array18[23:16];
+						8'b01010100:fifo_din <= reg_array18[31:24];
+						//Registro Diecinueve
+						8'b01010101:fifo_din <= reg_array19[7:0];
+						8'b01010110:fifo_din <= reg_array19[15:8];
+						8'b01010111:fifo_din <= reg_array19[23:16];
+						8'b01011000:fifo_din <= reg_array19[31:24];
+						//Registro Veinte
+						8'b01011001:fifo_din <= reg_array20[7:0];
+						8'b01011010:fifo_din <= reg_array20[15:8];
+						8'b01011011:fifo_din <= reg_array20[23:16];
+						8'b01011100:fifo_din <= reg_array20[31:24];
+						//Registro Ventiuno
+						8'b01011101:fifo_din <= reg_array21[7:0];
+						8'b01011110:fifo_din <= reg_array21[15:8];
+						8'b01011111:fifo_din <= reg_array21[23:16];
+						8'b01100000:fifo_din <= reg_array21[31:24];
+						//Registro Ventidos
+						8'b01100001:fifo_din <= reg_array22[7:0];
+						8'b01100010:fifo_din <= reg_array22[15:8];
+						8'b01100011:fifo_din <= reg_array22[23:16];
+						8'b01100100:fifo_din <= reg_array22[31:24];
+						//Registro Ventitres
+						8'b01100101:fifo_din <= reg_array23[7:0];
+						8'b01100110:fifo_din <= reg_array23[15:8];
+						8'b01100111:fifo_din <= reg_array23[23:16];
+						8'b01101000:fifo_din <= reg_array23[31:24];
+						//Registro Venticuatro
+						8'b01101001:fifo_din <= reg_array24[7:0];
+						8'b01101010:fifo_din <= reg_array24[15:8];
+						8'b01101011:fifo_din <= reg_array24[23:16];
+						8'b01101100:fifo_din <= reg_array24[31:24];
+						//Registro Venticinco
+						8'b01101101:fifo_din <= reg_array25[7:0];
+						8'b01101110:fifo_din <= reg_array25[15:8];
+						8'b01101111:fifo_din <= reg_array25[23:16];
+						8'b01110000:fifo_din <= reg_array25[31:24];
+						//Registro Ventiseis
+						8'b01110001:fifo_din <= reg_array26[7:0];
+						8'b01110010:fifo_din <= reg_array26[15:8];
+						8'b01110011:fifo_din <= reg_array26[23:16];
+						8'b01110100:fifo_din <= reg_array26[31:24];
+						//Registro Ventisiete
+						8'b01110101:fifo_din <= reg_array27[7:0];
+						8'b01110110:fifo_din <= reg_array27[15:8];
+						8'b01110111:fifo_din <= reg_array27[23:16];
+						8'b01111000:fifo_din <= reg_array27[31:24];
+						//Registro Ventiocho
+						8'b01111001:fifo_din <= reg_array28[7:0];
+						8'b01111010:fifo_din <= reg_array28[15:8];
+						8'b01111011:fifo_din <= reg_array28[23:16];
+						8'b01111100:fifo_din <= reg_array28[31:24];
+						//Registro Ventinueve
+						8'b01111101:fifo_din <= reg_array29[7:0];
+						8'b01111110:fifo_din <= reg_array29[15:8];
+						8'b01111111:fifo_din <= reg_array29[23:16];
+						8'b10000000:fifo_din <= reg_array29[31:24];
+						//Registro Treinta
+						8'b10000001:fifo_din <= reg_array30[7:0];
+						8'b10000010:fifo_din <= reg_array30[15:8];
+						8'b10000011:fifo_din <= reg_array30[23:16];
+						8'b10000100:fifo_din <= reg_array30[31:24];
+						//Registro Treinta y uno
+						8'b10000101:fifo_din <= reg_array31[7:0];
+						8'b10000110:fifo_din <= reg_array31[15:8];
+						8'b10000111:fifo_din <= reg_array31[23:16];
+						8'b10001000:fifo_din <= reg_array31[31:24];
+						//***************//
+						//* Latch IF/ID *//
+						//***************//
 						//Default
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b00111110)//Ultimo valor +2
+					if(currentRegister==8'b10001100)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;
