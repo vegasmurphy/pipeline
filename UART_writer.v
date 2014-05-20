@@ -21,381 +21,328 @@
 module UART_writer(
     input fastClk,
 	 input rx,
-	 input clkPipeline1,
 	 output tx_out,
 	 output [31:0]PC_sumado_IF,
 	 output [31:0] instruction_IF
 	 
     );
+	//Wires
+	wire clk;
+	wire fifo_full;
 
-wire done;
-wire [7:0] palabra,rx_data;
-wire rd_en,wr_en;
-wire tx_done;
-wire fifo_empty;
-wire rx_data_rdy;
-reg ready;
+	//***Modulos Instanciados***//
+	//Divisor de clock (DCM)
+	wire clk2;
+	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
 
+	//Bloque testeado
+	wire [31:0]instruction;
+	reg clkPipe = 0;
+	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
+	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
+	wire [31:0] reg_array20,reg_array21,reg_array22,reg_array23,reg_array24,reg_array25,reg_array26,reg_array27,reg_array28,reg_array29;
+	wire [31:0] reg_array30,reg_array31;
+	Pipeline pipe
+		(	.clk(clkPipe),
+			.PC_sumado_IF(PC_sumado_IF),
+			.instruction_IF(instruction),
+			.reg_array0(reg_array0),
+			.reg_array1(reg_array1),
+			.reg_array2(reg_array2),
+			.reg_array3(reg_array3),
+			.reg_array4(reg_array4),
+			.reg_array5(reg_array5),
+			.reg_array6(reg_array6),
+			.reg_array7(reg_array7),
+			.reg_array8(reg_array8),
+			.reg_array9(reg_array9),
+			.reg_array10(reg_array10),
+			.reg_array11(reg_array11),
+			.reg_array12(reg_array12),
+			.reg_array13(reg_array13),
+			.reg_array14(reg_array14),
+			.reg_array15(reg_array15),
+			.reg_array16(reg_array16),
+			.reg_array17(reg_array17),
+			.reg_array18(reg_array18),
+			.reg_array19(reg_array19),
+			.reg_array20(reg_array20),
+			.reg_array21(reg_array21),
+			.reg_array22(reg_array22),
+			.reg_array23(reg_array23),
+			.reg_array24(reg_array24),
+			.reg_array25(reg_array25),
+			.reg_array26(reg_array26),
+			.reg_array27(reg_array27),
+			.reg_array28(reg_array28),
+			.reg_array29(reg_array29),
+			.reg_array30(reg_array30),
+			.reg_array31(reg_array31)
+		);
 
-localparam [2:0] IDLE = 3'b000,
-					  PROCESSING = 3'b001,
-					  SENDING = 3'b010,
-					  SENDINGMEM = 3'b011,
-					  STEP = 3'b100,
-					  RUNALL = 3'b101;
-						 
-//Declaración de señales (las utilizare para el elemento de memoria por lo tanto son tipo REGISTRO)
-reg[2:0] current_state=IDLE, next_state=IDLE;
-						
-						
-//Registro de estado (Memoria)
-always @(posedge clk)
-		current_state <= next_state;
-
-
-wire [7:0] fifo_din;
-reg fifo_wr_en=1;		
-reg clkPipeline=0;		
-reg [5:0] currentBlock=0;
-reg [1:0] currentByte=0;
-reg rx_data_rdy_ant=0;
-reg [7:0] next=8'b01110011;
-//always @(posedge clk)
-//	begin
-//		case(current_state)
-//			IDLE:
-//				begin
-//					if(rx_data_rdy)
-//						next_state = PROCESSING;
-//					else
-//						next_state = IDLE;
-//				//fifo_wr_en=0;
-//				end
-//			PROCESSING:
-//				begin
-//					if(rx_data_rdy_ant!=rx_data_rdy&&rx_data_rdy)
-//						begin
-//						//fifo_wr_en=1;
-//						end
-//					else
-//						begin
-//						//fifo_wr_en=0;
-//						end
-//					
-//					if(rx_data=="A")
-//					begin
-//						next_state = STEP;
-//						//fifo_din="B";
-//					end
-//					else
-//						begin
-//						//fifo_din=rx_data;
-//						end
-//					rx_data_rdy_ant=rx_data_rdy;
-//				end
-//			STEP:
-//				begin
-//					/*if(clkPipeline)
-//						begin
-//						clkPipeline=0;
-//						fifo_din="b";
-//						next_state = SENDING;
-//						end*/
-//					//else
-//						//begin
-//						clkPipeline=1;
-//						next_state = SENDING;
-//						//fifo_din="a";
-//						//end	
-//				end
-//			SENDING:
-//				begin
-//				clkPipeline=0;
-//					/*case(currentBlock)
-//						6'b000000: //envio PC
-//							begin
-//								case(currentByte)
-//									2'b00:fifo_din = PC_sumado_IF[7:0];
-//									2'b01:fifo_din = PC_sumado_IF[15:8];
-//									2'b10:fifo_din = PC_sumado_IF[23:16];
-//									2'b11:fifo_din = PC_sumado_IF[31:24];
-//								   default:fifo_din = 0;
-//								endcase
-//								fifo_wr_en=1;
-//								next_state=SENDING;
-//							end
-//						6'b000001: 
-//								begin
-//								case(currentByte)
-//									2'b00:fifo_din = instruction_ID[7:0];
-//									2'b01:fifo_din = instruction_ID[15:8];
-//									2'b10:fifo_din = instruction_ID[23:16];
-//									2'b11:fifo_din = instruction_ID[31:24];
-//								   default:fifo_din = 0;
-//								endcase
-//								fifo_wr_en=1;
-//								next_state=SENDING;
-//							end
-//						6'b000010:
-//									begin
-//										next_state=IDLE;
-//										fifo_wr_en=0;
-//									end
-//						default: 
-//									begin
-//										next_state=IDLE;
-//										fifo_wr_en=0;
-//									end
-//					endcase
-//					
-//					currentByte=currentByte+2'b01;
-//					if(currentByte==2'b00)
-//						begin
-//						currentBlock=currentBlock+1;
-//						end*/
-//						next_state=IDLE;
-//				end
-//			SENDINGMEM:
-//				begin
-//				end
-//			RUNALL:
-//					begin
-//					end
-//			default:
-//						begin
-//						end
-//		endcase
-//	end
-reg [4:0]currentRegister=1;
-reg sent=0;
-reg doneA=0;
-
-wire [31:0]ifbPC;
-wire [31:0]ifbInstruccion;
-reg clkFetch;
-/*
-always @(posedge clk)
-	begin
-		if(rx_data=="A"&&!sent)
-			begin
-			//clkPipeline=1;
-			clkFetch=1;
-			fifo_wr_en=1;
-			sent=1;
-			doneA=0;
-			end
-		else
-		begin
-			//clkPipeline=0;
-			clkFetch=0;
-			if (rx_data!="A"&&doneA)
-			begin
-			sent=0;
-			end
-		end
-		if(sent&&!doneA)
-		begin
-			case(currentRegister)
-				5'b00001:fifo_din = PC_sumado_IF[7:0];
-				5'b00010:fifo_din = PC_sumado_IF[15:8];
-				5'b00011:fifo_din = PC_sumado_IF[23:16];
-				5'b00100:fifo_din = PC_sumado_IF[31:24];
-				5'b00001:fifo_din = ifbPC[7:0];
-				5'b00010:fifo_din = ifbPC[15:8];
-				5'b00011:fifo_din = ifbPC[23:16];
-				5'b00100:fifo_din = ifbPC[31:24];
-				default:fifo_din = PC_sumado_IF[7:0];
-			endcase
-			currentRegister=currentRegister+1;
-			if(currentRegister==5'b00101)
-				begin
-				doneA=1;
-				currentRegister=5'b00001;
-				fifo_wr_en=0;
-				end
-		end
-	end*/
-assign fifo_din=ifbPC[7:0];
-IntructionFetchBlock ifb	
-	(	.clk(clk),										//clock
-		.PC_next(ifbPC),				//Creo que hay que inicializarlo en uno (1)		
-		.PC_write(1'b1),								//Escribir o no el PC (Hazard Detection Unit)	//Salida del valor del PC (para debug)
-		.PC_sumado_value(ifbPC),	//Salida del PC sumado para el bloque IFID
-		.Instruction(ifbInstruccion)			//Instruccion
-   );
-
-
-//assign fifo_din = PC_sumado_IF[7:0];
-//assign fifo_din =instruction_IF[7:0];
-
-
-
-
-
-
-
-
-uart_tx tx(
-  .clk_tx(clk),          // Clock input
-  .rst_clk_tx(1'b0),      // Active HIGH reset - synchronous to clk_tx
-  .char_fifo_empty(fifo_empty), // Empty signal from char FIFO (FWFT)
-  .char_fifo_dout(palabra),  // Data from the char FIFO
-  .char_fifo_rd_en(tx_done), // Pop signal to the char FIFO
-	.txd_tx(tx_out)           // The transmit serial signal
-);
-
-
-wire fifo_full;
-fifo f(
-  .clk(clk),
-  .rst(1'b0),
-  .din(fifo_din),
-  .wr_en(fifo_wr_en),
-  .rd_en(tx_done),
-  .dout(palabra),
-  .full(fifo_full),
-  .empty(fifo_empty)
-);
-wire clk2;
-clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
-
-/*
-	wire [3:0] aluInstruction;
-	wire equalFlag;
-	wire [31:0] instruction_IF;
-	wire [31:0] instruction_ID;
-	wire [31:0] Read_Data_1_ID;
-	wire [31:0] Read_Data_2_ID;
-	wire [31:0] signExtended_ID;
-	wire [31:0] PC_sumado_ID;
-	wire RegDest_ID;
-	wire Branch_ID;
-	wire MemRead_ID;
-	wire MemToReg_ID;
-	wire ALUOp1_ID;
-	wire ALUOp2_ID;
-	wire MemWrite_ID;
-	wire ALUSrc_ID;
-	wire RegWrite_ID;
-	wire [31:0] PC_sumado_EX;
-	wire [31:0] Read_Data_1_EX;
-	wire [31:0] Read_Data_2_EX;
-	wire [31:0] aluInput1;
-	wire [31:0] aluInput2;
-	wire [31:0] signExtended_EX;
-	wire [31:0] instruction_EX;
-	wire RegDest_EX;
-	wire Branch_EX;
-	wire MemRead_EX;
-	wire MemToReg_EX;
-	wire ALUOp1_EX;
-	wire ALUOp2_EX;
-	wire MemWrite_EX;
-	wire ALUSrc_EX;
-	wire RegWrite_EX;
-	wire Jump_EX;
-	wire [31:0] PC_next_ID;
-	wire [31:0] ALU_result_EX;
-	wire [31:0] ALU_result_MEM;
-	wire [31:0] Read_Data_2_MEM;
-	wire Zero_EX;
-	wire [4:0] Write_register_EX;
-	wire Branch_MEM;
-	wire MemRead_MEM;
-	wire MemToReg_MEM;
-	wire MemWrite_MEM;
-	wire RegWrite_MEM;
-	wire Jump_MEM;
-	wire Zero_MEM;
-	wire [4:0] Write_register_MEM;
-	wire [31:0] Read_data_MEM;
-	wire [31:0] Read_data_WB;
-	wire [31:0] ALU_result_WB;
-	wire MemToReg_WB;
-	wire RegWrite_WB;
-	wire [4:0] Write_register_WB;
-	wire [1:0] forwardA;
-	wire [1:0] forwardB;
-	wire BranchTaken;
-	wire Jump_ID;
-	wire IF_Flush;
-
-	
-	Pipeline pipeline (
-		.clk(clkPipeline), 
-		.aluInstruction(aluInstruction), 
-		.equalFlag(equalFlag), 
-		.instruction_IF(instruction_IF), 
-		.PC_sumado_IF(PC_sumado_IF), 
-		.instruction_ID(instruction_ID), 
-		.Read_Data_1_ID(Read_Data_1_ID), 
-		.Read_Data_2_ID(Read_Data_2_ID), 
-		.signExtended_ID(signExtended_ID), 
-		.PC_sumado_ID(PC_sumado_ID), 
-		.RegDest_ID(RegDest_ID), 
-		.Branch_ID(Branch_ID), 
-		.MemRead_ID(MemRead_ID), 
-		.MemToReg_ID(MemToReg_ID), 
-		.ALUOp1_ID(ALUOp1_ID), 
-		.ALUOp2_ID(ALUOp2_ID), 
-		.MemWrite_ID(MemWrite_ID), 
-		.ALUSrc_ID(ALUSrc_ID), 
-		.RegWrite_ID(RegWrite_ID), 
-		.PC_sumado_EX(PC_sumado_EX), 
-		.Read_Data_1_EX(Read_Data_1_EX), 
-		.Read_Data_2_EX(Read_Data_2_EX), 
-		.aluInput1(aluInput1), 
-		.aluInput2(aluInput2), 
-		.signExtended_EX(signExtended_EX), 
-		.instruction_EX(instruction_EX), 
-		.RegDest_EX(RegDest_EX), 
-		.Branch_EX(Branch_EX), 
-		.MemRead_EX(MemRead_EX), 
-		.MemToReg_EX(MemToReg_EX), 
-		.ALUOp1_EX(ALUOp1_EX), 
-		.ALUOp2_EX(ALUOp2_EX), 
-		.MemWrite_EX(MemWrite_EX), 
-		.ALUSrc_EX(ALUSrc_EX), 
-		.RegWrite_EX(RegWrite_EX), 
-		.Jump_EX(Jump_EX), 
-		.PC_next_ID(PC_next_ID), 
-		.ALU_result_EX(ALU_result_EX), 
-		.ALU_result_MEM(ALU_result_MEM), 
-		.Read_Data_2_MEM(Read_Data_2_MEM), 
-		.Zero_EX(Zero_EX), 
-		.Write_register_EX(Write_register_EX), 
-		.Branch_MEM(Branch_MEM), 
-		.MemRead_MEM(MemRead_MEM), 
-		.MemToReg_MEM(MemToReg_MEM), 
-		.MemWrite_MEM(MemWrite_MEM), 
-		.RegWrite_MEM(RegWrite_MEM), 
-		.Jump_MEM(Jump_MEM), 
-		.Zero_MEM(Zero_MEM), 
-		.Write_register_MEM(Write_register_MEM), 
-		.Read_data_MEM(Read_data_MEM), 
-		.Read_data_WB(Read_data_WB), 
-		.ALU_result_WB(ALU_result_WB), 
-		.MemToReg_WB(MemToReg_WB), 
-		.RegWrite_WB(RegWrite_WB), 
-		.Write_register_WB(Write_register_WB), 
-		.forwardA(forwardA), 
-		.forwardB(forwardB), 
-		.BranchTaken(BranchTaken), 
-		.Jump_ID(Jump_ID), 
-		.IF_Flush(IF_Flush)
+	//Uart TX
+	wire fifo_empty;
+	wire [7:0] palabra;
+	wire tx_done;
+	uart_tx tx(
+	  .clk_tx(clk),          			// Clock input
+	  .rst_clk_tx(1'b0),      			// Active HIGH reset - synchronous to clk_tx
+	  .char_fifo_empty(fifo_empty), 	// Empty signal from char FIFO (FWFT)
+	  .char_fifo_dout(palabra),  		// Data from the char FIFO
+	  .char_fifo_rd_en(tx_done), 		// Pop signal to the char FIFO
+	  .txd_tx(tx_out)           		// The transmit serial signal
 	);
 
-*/
+	//Fifo
+	reg [7:0] fifo_din = 5;
+	reg fifo_wr_en=0;
+	reg fifo_reset=0;
+	fifo f(
+	  .clk(clk),
+	  .rst(1'b0),
+	  .din(fifo_din),
+	  .wr_en(fifo_wr_en),
+	  .rd_en(tx_done),
+	  .dout(palabra),
+	  .full(fifo_full),
+	  .empty(fifo_empty)
+	);
 
-uart_rx r(
-  // Write side inputs
-  .clk_rx(clk),       // Clock input
-  .rst_clk_rx(1'b0),   // Active HIGH reset - synchronous to clk_rx
-  .rxd_i(rx),        // RS232 RXD pin - Directly from pad
-  .rx_data(rx_data),//comando),      // 8 bit data output
-                                 //  - valid when rx_data_rdy is asserted
-  .rx_data_rdy(rx_data_rdy)  // Ready signal for rx_data
-        // The STOP bit was not detected
-);
+	//****Assigns****//
+	//assign fifo_din=instruction[7:0];
 
+
+
+	//***************************HOY*************************************//
+		
+	//Uart RX
+	wire [7:0] rx_data;
+	uart_rx r(
+		.clk_rx(clk),
+		.rst_clk_rx(1'b0),
+		.rxd_i(rx),
+		.rx_data(rx_data),
+		.rx_data_rdy(rx_data_rdy)
+	);	
+	
+	//****Maquina de Estados****//
+	localparam [1:0] 	WAITING 	= 2'b00,
+							SENDING 	= 2'b01,
+							DONE 		= 2'b10;
+	
+	//Declaración de señales
+	reg[2:0] current_state=WAITING, next_state=WAITING;
+	reg [7:0] currentRegister=8'b00000001;
+	
+	always @(posedge clk)
+	begin
+		case(current_state)
+			WAITING:
+				begin
+					if(rx_data=="A")
+					begin
+						clkPipe=1;
+						next_state=SENDING;
+					end
+				end
+			SENDING:
+				begin
+					clkPipe=0;
+					fifo_wr_en=1;
+					case(currentRegister)
+						//PC
+						8'b00000001:fifo_din <= PC_sumado_IF[7:0];
+						8'b00000010:fifo_din <= PC_sumado_IF[15:8];
+						8'b00000011:fifo_din <= PC_sumado_IF[23:16];
+						8'b00000100:fifo_din <= PC_sumado_IF[31:24];
+						//Instruccion
+						8'b00000101:fifo_din <= instruction[7:0];
+						8'b00000110:fifo_din <= instruction[15:8];
+						8'b00000111:fifo_din <= instruction[23:16];
+						8'b00001000:fifo_din <= instruction[31:24];
+						//Registros (ID)
+						//Registro cero
+						8'b00001001:fifo_din <= reg_array0[7:0];
+						8'b00001010:fifo_din <= reg_array0[15:8];
+						8'b00001011:fifo_din <= reg_array0[23:16];
+						8'b00001100:fifo_din <= reg_array0[31:24];
+						//Registro Uno
+						8'b00001101:fifo_din <= reg_array1[7:0];
+						8'b00001110:fifo_din <= reg_array1[15:8];
+						8'b00001111:fifo_din <= reg_array1[23:16];
+						8'b00010000:fifo_din <= reg_array1[31:24];
+						//Registro Dos
+						8'b00010001:fifo_din <= reg_array2[7:0];
+						8'b00010010:fifo_din <= reg_array2[15:8];
+						8'b00010011:fifo_din <= reg_array2[23:16];
+						8'b00010100:fifo_din <= reg_array2[31:24];
+						//Registro Tres
+						8'b00010101:fifo_din <= reg_array3[7:0];
+						8'b00010110:fifo_din <= reg_array3[15:8];
+						8'b00010111:fifo_din <= reg_array3[23:16];
+						8'b00011000:fifo_din <= reg_array3[31:24];
+						//Registro Cuatro
+						8'b00011001:fifo_din <= reg_array4[7:0];
+						8'b00011010:fifo_din <= reg_array4[15:8];
+						8'b00011011:fifo_din <= reg_array4[23:16];
+						8'b00011100:fifo_din <= reg_array4[31:24];
+						//Registro Cinco
+						8'b00011101:fifo_din <= reg_array5[7:0];
+						8'b00011110:fifo_din <= reg_array5[15:8];
+						8'b00011111:fifo_din <= reg_array5[23:16];
+						8'b00100000:fifo_din <= reg_array5[31:24];
+						//Registro Seis
+						8'b00100001:fifo_din <= reg_array6[7:0];
+						8'b00100010:fifo_din <= reg_array6[15:8];
+						8'b00100011:fifo_din <= reg_array6[23:16];
+						8'b00100100:fifo_din <= reg_array6[31:24];
+						//Registro Siete
+						8'b00100101:fifo_din <= reg_array7[7:0];
+						8'b00100110:fifo_din <= reg_array7[15:8];
+						8'b00100111:fifo_din <= reg_array7[23:16];
+						8'b00101000:fifo_din <= reg_array7[31:24];
+						//Registro Ocho
+						8'b00101001:fifo_din <= reg_array8[7:0];
+						8'b00101010:fifo_din <= reg_array8[15:8];
+						8'b00101011:fifo_din <= reg_array8[23:16];
+						8'b00101100:fifo_din <= reg_array8[31:24];
+						//Registro Nueve
+						8'b00101101:fifo_din <= reg_array9[7:0];
+						8'b00101110:fifo_din <= reg_array9[15:8];
+						8'b00101111:fifo_din <= reg_array9[23:16];
+						8'b00110000:fifo_din <= reg_array9[31:24];
+						//Registro Diez
+						8'b00110001:fifo_din <= reg_array10[7:0];
+						8'b00110010:fifo_din <= reg_array10[15:8];
+						8'b00110011:fifo_din <= reg_array10[23:16];
+						8'b00110100:fifo_din <= reg_array10[31:24];
+						//Registro Once
+						8'b00110101:fifo_din <= reg_array11[7:0];
+						8'b00110110:fifo_din <= reg_array11[15:8];
+						8'b00110111:fifo_din <= reg_array11[23:16];
+						8'b00111000:fifo_din <= reg_array11[31:24];
+						//Registro Doce
+						8'b00111001:fifo_din <= reg_array12[7:0];
+						8'b00111010:fifo_din <= reg_array12[15:8];
+						8'b00111011:fifo_din <= reg_array12[23:16];
+						8'b00111100:fifo_din <= reg_array12[31:24];
+						/*//Registro Trece
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];
+						//Registro
+						8'b00011100:fifo_din <= reg_array[7:0];
+						8'b00011100:fifo_din <= reg_array[15:8];
+						8'b00011100:fifo_din <= reg_array[23:16];
+						8'b00011100:fifo_din <= reg_array[31:24];*/
+						//Default
+						default:fifo_din <= PC_sumado_IF[7:0];
+					endcase
+					currentRegister=currentRegister+1;
+					if(currentRegister==8'b00111110)//Ultimo valor +2
+						begin
+							currentRegister=8'b00000001;
+							fifo_wr_en=0;
+							next_state=DONE;
+						end
+				end
+			DONE:
+				begin
+					if(rx_data!="A")
+						next_state=WAITING;
+				end
+			default:
+				begin
+					next_state=WAITING;
+				end
+		endcase
+		//Pasar al siguiente estado
+		current_state <= next_state;
+	end
 endmodule
