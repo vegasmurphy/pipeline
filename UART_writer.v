@@ -36,7 +36,7 @@ module UART_writer(
 	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
 
 	//Bloque testeado
-	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID;
+	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID,Read_data_MEM,Read_data_WB,ALU_result_WB;
 	reg clkPipe = 0;
 	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
 	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
@@ -47,6 +47,8 @@ module UART_writer(
 	wire MemWrite_EX,ALUSrc_EX,RegWrite_EX,Jump_EX;
 	wire [1:0] trunkMode_ID,trunkMode_EX;
 	wire ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM;
+	wire [4:0] Write_register_EX,Write_register_MEM,Write_register_WB;
+	wire Jump_MEM,Zero_MEM,MemToReg_WB,RegWrite_WB,BranchTaken,Jump_ID,IF_Flush,forwardA;
 	Pipeline pipe
 		(	.clk(clkPipe),
 			.Read_Data_1_ID(Read_Data_1_ID),
@@ -88,6 +90,22 @@ module UART_writer(
 			.MemToReg_MEM(MemToReg_MEM),
 			.MemWrite_MEM(MemWrite_MEM),
 			.RegWrite_MEM(RegWrite_MEM),
+			.ALU_result_EX(ALU_result_EX),
+			.ALU_result_MEM(ALU_result_MEM),
+			.Write_register_EX(Write_register_EX),
+			.Write_register_MEM(Write_register_MEM),
+			.Write_register_WB(Write_register_WB),
+			.Jump_MEM(Jump_MEM),
+			.Zero_MEM(Zero_MEM),
+			.MemToReg_WB(MemToReg_WB),
+			.RegWrite_WB(RegWrite_WB),
+			.BranchTaken(BranchTaken),
+			.Jump_ID(Jump_ID),
+			.IF_Flush(IF_Flush),
+			.forwardA(forwardA),
+			.Read_data_MEM(Read_data_MEM),
+			.Read_data_WB(Read_data_WB),
+			.ALU_result_WB(ALU_result_WB),
 			.reg_array0(reg_array0),
 			.reg_array1(reg_array1),
 			.reg_array2(reg_array2),
@@ -406,9 +424,38 @@ module UART_writer(
 						8'b10100110:fifo_din <= instruction_EX[23:16];
 						8'b10100111:fifo_din <= instruction_EX[31:24];
 						
-						8'b10101000:fifo_din <= {ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM};
+						8'b10101000:fifo_din <= ALU_result_EX[7:0];
+						8'b10101001:fifo_din <= ALU_result_EX[15:8];
+						8'b10101010:fifo_din <= ALU_result_EX[23:16];
+						8'b10101011:fifo_din <= ALU_result_EX[31:24];
+						
+						8'b10101100:fifo_din <= ALU_result_MEM[7:0];
+						8'b10101101:fifo_din <= ALU_result_MEM[15:8];
+						8'b10101110:fifo_din <= ALU_result_MEM[23:16];
+						8'b10101111:fifo_din <= ALU_result_MEM[31:24];
 						
 						
+						8'b10110000:fifo_din <= {ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM};
+						//write back reg
+						8'b10110001:fifo_din <= {Jump_MEM,Zero_MEM,MemToReg_WB,Write_register_EX};
+						8'b10110010:fifo_din <= {RegWrite_WB,BranchTaken,Jump_ID,Write_register_MEM};
+						8'b10110011:fifo_din <= {IF_Flush,forwardA,Write_register_WB};
+
+						8'b10110100:fifo_din <= Read_data_MEM[7:0];
+						8'b10110101:fifo_din <= Read_data_MEM[15:8];
+						8'b10110110:fifo_din <= Read_data_MEM[23:16];
+						8'b10110111:fifo_din <= Read_data_MEM[31:24];
+						
+						8'b10111000:fifo_din <= Read_data_WB[7:0];
+						8'b10111001:fifo_din <= Read_data_WB[15:8];
+						8'b10111010:fifo_din <= Read_data_WB[23:16];
+						8'b10111011:fifo_din <= Read_data_WB[31:24];
+						
+						8'b10111100:fifo_din <= ALU_result_WB[7:0];
+						8'b10111101:fifo_din <= ALU_result_WB[15:8];
+						8'b10111110:fifo_din <= ALU_result_WB[23:16];
+						8'b10111111:fifo_din <= ALU_result_WB[31:24];
+
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
@@ -416,7 +463,7 @@ module UART_writer(
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b10101100)//Ultimo valor +4
+					if(currentRegister==8'b11000011)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;
