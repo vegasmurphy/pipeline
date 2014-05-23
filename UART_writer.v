@@ -41,7 +41,12 @@ module UART_writer(
 	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
 	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
 	wire [31:0] reg_array20,reg_array21,reg_array22,reg_array23,reg_array24,reg_array25,reg_array26,reg_array27,reg_array28,reg_array29;
-	wire [31:0] reg_array30,reg_array31;
+	wire [31:0] reg_array30,reg_array31,PC_sumado_EX,Read_Data_1_EX,Read_Data_2_EX,instruction_EX;
+	wire RegDest_ID,BranchEQ_ID,BranchNE_ID,MemRead_ID,MemToReg_ID,ALUOp1_ID,ALUOp2_ID,MemWrite_ID;
+	wire ALUSrc_ID,RegWrite_ID,ShiftToTrunk_ID,RegDest_EX,BranchEQ_EX,BranchNE_EX,MemRead_EX,MemToReg_EX;
+	wire MemWrite_EX,ALUSrc_EX,RegWrite_EX,Jump_EX;
+	wire [1:0] trunkMode_ID,trunkMode_EX;
+	wire ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM;
 	Pipeline pipe
 		(	.clk(clkPipe),
 			.Read_Data_1_ID(Read_Data_1_ID),
@@ -49,6 +54,40 @@ module UART_writer(
 			.PC_sumado_IF(PC_sumado_IF),
 			.instruction_IF(instruction),
 			.instruction_ID(instructionID),
+			.RegDest_ID(RegDest_ID),
+			.BranchEQ_ID(BranchEQ_ID),
+			.BranchNE_ID(BranchNE_ID),
+			.MemRead_ID(MemRead_ID),
+			.MemToReg_ID(MemToReg_ID),
+			.ALUOp1_ID(ALUOp1_ID),
+			.ALUOp2_ID(ALUOp2_ID),
+			.MemWrite_ID(MemWrite_ID),
+			.ALUSrc_ID(ALUSrc_ID),
+			.RegWrite_ID(RegWrite_ID),
+			.ShiftToTrunk_ID(ShiftToTrunk_ID),
+			.RegDest_EX(RegDest_EX),
+			.BranchEQ_EX(BranchEQ_EX),
+			.BranchNE_EX(BranchNE_EX),
+			.MemRead_EX(MemRead_EX),
+			.MemToReg_EX(MemToReg_EX),
+			.PC_sumado_EX(PC_sumado_EX),
+			.trunkMode_ID(trunkMode_ID),
+			.Read_Data_1_EX(Read_Data_1_EX),
+			.Read_Data_2_EX(Read_Data_2_EX),
+			.instruction_EX(instruction_EX),
+			.MemWrite_EX(MemWrite_EX),
+			.ALUSrc_EX(ALUSrc_EX),
+			.RegWrite_EX(RegWrite_EX),
+			.Jump_EX(Jump_EX),
+			.trunkMode_EX(trunkMode_EX),
+			.ShiftToTrunk_EX(ShiftToTrunk_EX),
+			.Zero_EX(Zero_EX),
+			.BranchEQ_MEM(BranchEQ_MEM),
+			.BranchNE_MEM(BranchNE_MEM),
+			.MemRead_MEM(MemRead_MEM),
+			.MemToReg_MEM(MemToReg_MEM),
+			.MemWrite_MEM(MemWrite_MEM),
+			.RegWrite_MEM(RegWrite_MEM),
 			.reg_array0(reg_array0),
 			.reg_array1(reg_array1),
 			.reg_array2(reg_array2),
@@ -343,6 +382,33 @@ module UART_writer(
 						8'b10010010:fifo_din <= Read_Data_2_ID[15:8];
 						8'b10010011:fifo_din <= Read_Data_2_ID[23:16];
 						8'b10010100:fifo_din <= Read_Data_2_ID[31:24];
+						//Flags
+						8'b10010101:fifo_din <= {RegDest_ID,BranchEQ_ID,BranchNE_ID,MemRead_ID,MemToReg_ID,ALUOp1_ID,ALUOp2_ID,MemWrite_ID};
+						8'b10010110:fifo_din <= {ALUSrc_ID,RegWrite_ID,ShiftToTrunk_ID,RegDest_EX,BranchEQ_EX,BranchNE_EX,MemRead_EX,MemToReg_EX};
+						8'b10010111:fifo_din <= {trunkMode_ID,MemWrite_EX,ALUSrc_EX,RegWrite_EX,Jump_EX,trunkMode_EX};						
+						//PC sumado EX
+						8'b10011000:fifo_din <= PC_sumado_EX[7:0];
+						8'b10011001:fifo_din <= PC_sumado_EX[15:8];
+						8'b10011010:fifo_din <= PC_sumado_EX[23:16];
+						8'b10011011:fifo_din <= PC_sumado_EX[31:24];
+						//Read data Ex 1 y 2
+						8'b10011100:fifo_din <= Read_Data_1_EX[7:0];
+						8'b10011101:fifo_din <= Read_Data_1_EX[15:8];
+						8'b10011110:fifo_din <= Read_Data_1_EX[23:16];
+						8'b10011111:fifo_din <= Read_Data_1_EX[31:24];
+						8'b10100000:fifo_din <= Read_Data_2_EX[7:0];
+						8'b10100001:fifo_din <= Read_Data_2_EX[15:8];
+						8'b10100010:fifo_din <= Read_Data_2_EX[23:16];
+						8'b10100011:fifo_din <= Read_Data_2_EX[31:24];
+						//instruction EX
+						8'b10100100:fifo_din <= instruction_EX[7:0];
+						8'b10100101:fifo_din <= instruction_EX[15:8];
+						8'b10100110:fifo_din <= instruction_EX[23:16];
+						8'b10100111:fifo_din <= instruction_EX[31:24];
+						
+						8'b10101000:fifo_din <= {ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM};
+						
+						
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
@@ -350,7 +416,7 @@ module UART_writer(
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b10011000)//Ultimo valor +4
+					if(currentRegister==8'b10101100)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;
