@@ -15,7 +15,7 @@ public class Main {
     static SerialPort serialPort;
     static byte b[];
     public static void main(String[] args) {
-        serialPort = new SerialPort("COM7"); 
+        serialPort = new SerialPort("COM5"); 
         try {
             
             while(true){
@@ -51,14 +51,14 @@ public class Main {
     	try {
 			
     	b=serialPort.readBytes(4);
-        System.out.print("PC: ");
+        print("PC: ");
         ByteBuffer bb = ByteBuffer.wrap(b);
         bb.order(ByteOrder.LITTLE_ENDIAN);
     	print(bb.getInt()+"");	
         println("");
         
         b=serialPort.readBytes(4);
-        System.out.println("Instruccion:");
+        println("Instruccion:");
         for (int i=0;i<b.length;i++)
     		print(b[i]+" ");
         println("");
@@ -307,6 +307,174 @@ public class Main {
         bb.order(ByteOrder.LITTLE_ENDIAN);
     	print(bb.getInt()+" ");	
         println("");
+        
+        boolean RegDest_ID,BranchEQ_ID,BranchNE_ID,MemRead_ID,MemToReg_ID,ALUOp1_ID,ALUOp2_ID,MemWrite_ID;
+        
+        b=serialPort.readBytes(1);
+        //print("Flags: ");
+        //bb = ByteBuffer.wrap(b);
+        //bb.order(ByteOrder.LITTLE_ENDIAN);
+        RegDest_ID=(b[0] & 0xFE)!=0;
+        BranchEQ_ID=(b[0] & 0xFD)!=0;
+        BranchNE_ID=(b[0] & 0xFB)!=0;
+        MemRead_ID=(b[0] & 0xF7)!=0;
+        MemToReg_ID=(b[0] & 0xEF)!=0;
+        ALUOp1_ID=(b[0] & 0xDF)!=0;
+        ALUOp2_ID=(b[0] & 0xBF)!=0;
+        MemWrite_ID=(b[0] & 0x7F)!=0;
+        println("RegDest_ID: "+RegDest_ID+" BranchEQ_ID: "+BranchEQ_ID+" BranchNE_ID: "+BranchNE_ID+" MemRead_ID: "+MemRead_ID+" MemToReg_ID: "+MemToReg_ID+" ALUOp1_ID: "+ALUOp1_ID+" ALUOp2_ID: "+ALUOp2_ID+" MemWrite_ID: "+MemWrite_ID);
+    	//print(""+RegDest_ID+BranchEQ_ID+BranchNE_ID+MemRead_ID+MemToReg_ID+ALUOp1_ID+ALUOp2_ID+MemWrite_ID);	
+        println("");
+        
+        
+ boolean ALUSrc_ID,RegWrite_ID,ShiftToTrunk_ID,RegDest_EX,BranchEQ_EX,BranchNE_EX,MemRead_EX,MemToReg_EX;
+        
+        b=serialPort.readBytes(1);
+        //print("Flags: ");
+        //bb = ByteBuffer.wrap(b);
+        //bb.order(ByteOrder.LITTLE_ENDIAN);
+        ALUSrc_ID=(b[0] & 0xFE)!=0;
+        RegWrite_ID=(b[0] & 0xFD)!=0;
+        ShiftToTrunk_ID=(b[0] & 0xFB)!=0;
+        RegDest_EX=(b[0] & 0xF7)!=0;
+        BranchEQ_EX=(b[0] & 0xEF)!=0;
+        BranchNE_EX=(b[0] & 0xDF)!=0;
+        MemRead_EX=(b[0] & 0xBF)!=0;
+        MemToReg_EX=(b[0] & 0x7F)!=0;
+        println("ALUSrc_ID: "+ALUSrc_ID+" RegWrite_ID: "+RegWrite_ID+" ShiftToTrunk_ID: "+ShiftToTrunk_ID+" RegDest_EX: "+RegDest_EX+" BranchEQ_EX: "+BranchEQ_EX+" BranchNE_EX: "+BranchNE_EX+" MemRead_EX: "+MemRead_EX+" MemToReg_EX: "+MemToReg_EX);
+    	//print(""+RegDest_ID+BranchEQ_ID+BranchNE_ID+MemRead_ID+MemToReg_ID+ALUOp1_ID+ALUOp2_ID+MemWrite_ID);	
+        println("");
+        
+        
+ boolean trunkMode_ID1,trunkMode_ID2,MemWrite_EX,ALUSrc_EX,RegWrite_EX,Jump_EX,trunkMode_EX1,trunkMode_EX2;
+        
+        b=serialPort.readBytes(1);
+        //print("Flags: ");
+        //bb = ByteBuffer.wrap(b);
+        //bb.order(ByteOrder.LITTLE_ENDIAN);
+        trunkMode_ID1=(b[0] & 0xFE)!=0;
+        trunkMode_ID2=(b[0] & 0xFD)!=0;
+        MemWrite_EX=(b[0] & 0xFB)!=0;
+        ALUSrc_EX=(b[0] & 0xF7)!=0;
+        RegWrite_EX=(b[0] & 0xEF)!=0;
+        Jump_EX=(b[0] & 0xDF)!=0;
+        trunkMode_EX1=(b[0] & 0xBF)!=0;
+        trunkMode_EX2=(b[0] & 0x7F)!=0;
+        println("trunkMode_ID1: "+trunkMode_ID1+" trunkMode_ID2: "+trunkMode_ID2+" MemWrite_EX: "+MemWrite_EX+" ALUSrc_EX: "+ALUSrc_EX+" RegWrite_EX: "+RegWrite_EX+" Jump_EX: "+Jump_EX+" trunkMode_EX1: "+trunkMode_EX1+" trunkMode_EX2: "+trunkMode_EX2);
+    	//print(""+RegDest_ID+BranchEQ_ID+BranchNE_ID+MemRead_ID+MemToReg_ID+ALUOp1_ID+ALUOp2_ID+MemWrite_ID);	
+        println("");   
+        
+        
+        b=serialPort.readBytes(4);
+        print("PC sumado Ex: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("Read data ex 1: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("Read data ex 2: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("Instruction Ex: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        
+        b=serialPort.readBytes(4);
+        print("ALU_result_EX: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("ALU_result_MEM: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        boolean ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM;        
+        b=serialPort.readBytes(1);
+        //print("Flags: ");
+        //bb = ByteBuffer.wrap(b);
+        //bb.order(ByteOrder.LITTLE_ENDIAN);
+        ShiftToTrunk_EX=(b[0] & 0xFE)!=0;
+        Zero_EX=(b[0] & 0xFD)!=0;
+        BranchEQ_MEM=(b[0] & 0xFB)!=0;
+        BranchNE_MEM=(b[0] & 0xF7)!=0;
+        MemRead_MEM=(b[0] & 0xEF)!=0;
+        MemToReg_MEM=(b[0] & 0xDF)!=0;
+        MemWrite_MEM=(b[0] & 0xBF)!=0;
+        RegWrite_MEM=(b[0] & 0x7F)!=0;
+        println("ShiftToTrunk_EX: "+ShiftToTrunk_EX+" Zero_EX: "+Zero_EX+" BranchEQ_MEM: "+BranchEQ_MEM+" BranchNE_MEM: "+BranchNE_MEM+" MemRead_MEM: "+MemRead_MEM+" MemToReg_MEM: "+MemToReg_MEM+" MemWrite_MEM: "+MemWrite_MEM+" RegWrite_MEM: "+RegWrite_MEM);
+    	//print(""+RegDest_ID+BranchEQ_ID+BranchNE_ID+MemRead_ID+MemToReg_ID+ALUOp1_ID+ALUOp2_ID+MemWrite_ID);	
+        println(""); 
+        
+        
+        boolean Jump_MEM,Zero_MEM,MemToReg_WB;        
+        b=serialPort.readBytes(1);
+        Jump_MEM=(b[0] & 0xDF)!=0;
+        Zero_MEM=(b[0] & 0xBF)!=0;
+        MemToReg_WB=(b[0] & 0x7F)!=0;
+        int Write_register_EX=b[0] & 0x1F;
+        println("Jump_MEM: "+Jump_MEM+" Zero_MEM: "+Zero_MEM+" MemToReg_WB: "+MemToReg_WB+" Write_register_EX: "+Write_register_EX);
+        println(""); 
+        
+        boolean RegWrite_WB,BranchTaken,Jump_ID;        
+        b=serialPort.readBytes(1);
+        RegWrite_WB=(b[0] & 0xDF)!=0;
+        BranchTaken=(b[0] & 0xBF)!=0;
+        Jump_ID=(b[0] & 0x7F)!=0;
+        int Write_register_MEM=b[0] & 0x1F;
+        println("RegWrite_WB: "+RegWrite_WB+" BranchTaken: "+BranchTaken+" Jump_ID: "+Jump_ID+" Write_register_MEM: "+Write_register_MEM);
+        println("");
+        
+        boolean IF_Flush1,IF_Flush2,forwardA;        
+        b=serialPort.readBytes(1);
+        IF_Flush1=(b[0] & 0xDF)!=0;
+        IF_Flush2=(b[0] & 0xBF)!=0;
+        forwardA=(b[0] & 0x7F)!=0;
+        int Write_register_WB=b[0] & 0x1F;
+        println("IF_Flush1: "+IF_Flush1+" IF_Flush2: "+IF_Flush2+" forwardA: "+forwardA+" Write_register_WB: "+Write_register_WB);
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("Read_data_MEM: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("Read_data_WB: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        b=serialPort.readBytes(4);
+        print("ALU_result_WB: ");
+        bb = ByteBuffer.wrap(b);
+        bb.order(ByteOrder.LITTLE_ENDIAN);
+    	print(bb.getInt()+" ");	
+        println("");
+        
+        
         
         
         //b=serialPort.readBytes(1);
