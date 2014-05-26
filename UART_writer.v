@@ -36,7 +36,7 @@ module UART_writer(
 	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
 
 	//Bloque testeado
-	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID,Read_data_MEM,Read_data_WB,ALU_result_WB;
+	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID,Read_data_MEM,Read_data_WB,ALU_result_WB,ALU_result_EX,ALU_result_MEM;
 	reg clkPipe = 0;
 	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
 	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
