@@ -61,6 +61,7 @@ module Pipeline(
 	output [31:0] reg_array30,
 	output [31:0] reg_array31,
 	
+	input debugClk,
 		 
 	//IF_ID  WIRES
 	output [31:0] instruction_IF, 
@@ -82,7 +83,6 @@ module Pipeline(
 	output MemWrite_ID,
 	output ALUSrc_ID,
 	output RegWrite_ID,
-	//output Jump_ID,
 	output ShiftToTrunk_ID,
 	output [1:0] trunkMode_ID,
 	output [31:0] PC_sumado_EX,
@@ -106,7 +106,6 @@ module Pipeline(
 	output [1:0] trunkMode_EX,
 	output ShiftToTrunk_EX,
 	
-	
 	//EX_MEM WIRES
 	output [31:0] PC_next_ID,
 	output [31:0] ALU_result_EX,
@@ -119,7 +118,7 @@ module Pipeline(
 	output MemRead_MEM,
 	output MemToReg_MEM,
 	output MemWrite_MEM,
-	output RegWrite_MEM,
+	output RegWrite_MEM,//LLEgue aca con los flags
 	output Jump_MEM,
 	output [1:0] trunkMode_MEM,
 	output ShiftToTrunk_MEM,
@@ -141,7 +140,11 @@ module Pipeline(
 	//Brances and Jump
 	output BranchTaken,
 	output Jump_ID,
-	output IF_Flush
+	output IF_Flush,
+	
+	
+	input [31:0]  DebugAddress,
+	input debugMode
 	 );
 
 	//Internal Wires
@@ -222,11 +225,14 @@ module Pipeline(
 	
 	DataMemoryAccessBlock dataMemoryAccessBlock (
 		.clk(clk),
+		.debugClk(debugClk),
+		.debugMode(debugMode),
+		.DebugAddress(DebugAddress),
 		.MemWrite(MemWrite_MEM),
 		.MemRead(MemRead_MEM),
 		.BasePlusOffset(ALU_result_MEM),
 		.WriteData(Read_Data_2_MEM),
-		.trunkMode(trunkMode_MEM),
+		.trunkModeAux(trunkMode_MEM),
 		.ShiftToTrunk(ShiftToTrunk_MEM),
 		.TrunkedReadData(Read_data_MEM)
 	);

@@ -36,7 +36,9 @@ module UART_writer(
 	clockDivider dcm (.CLK_IN1(fastClk),.CLK_OUT1(clk),.CLK_OUT2(clk2));
 
 	//Bloque testeado
-	wire [31:0]instruction,instructionID,Read_Data_1_ID,Read_Data_2_ID,Read_data_MEM,Read_data_WB,ALU_result_WB,ALU_result_EX,ALU_result_MEM;
+	reg debugMode,debugClk;
+	reg [31:0] DebugAddress=-1;
+	wire [31:0]instruction,Read_Data_2_MEM,instructionID,Read_Data_1_ID,Read_Data_2_ID,Read_data_MEM,Read_data_WB,ALU_result_WB,ALU_result_EX,ALU_result_MEM;
 	reg clkPipe = 0;
 	wire [31:0] reg_array0,reg_array1,reg_array2,reg_array3,reg_array4,reg_array5,reg_array6,reg_array7,reg_array8,reg_array9;
 	wire [31:0] reg_array10,reg_array11,reg_array12,reg_array13,reg_array14,reg_array15,reg_array16,reg_array17,reg_array18,reg_array19;
@@ -51,6 +53,7 @@ module UART_writer(
 	wire Jump_MEM,Zero_MEM,MemToReg_WB,RegWrite_WB,BranchTaken,Jump_ID,IF_Flush,forwardA;
 	Pipeline pipe
 		(	.clk(clkPipe),
+			.debugClk(debugClk),
 			.Read_Data_1_ID(Read_Data_1_ID),
 			.Read_Data_2_ID(Read_Data_2_ID),
 			.PC_sumado_IF(PC_sumado_IF),
@@ -106,6 +109,9 @@ module UART_writer(
 			.Read_data_MEM(Read_data_MEM),
 			.Read_data_WB(Read_data_WB),
 			.ALU_result_WB(ALU_result_WB),
+			.DebugAddress(DebugAddress),
+			.debugMode(debugMode),
+			.Read_Data_2_MEM(Read_Data_2_MEM),
 			.reg_array0(reg_array0),
 			.reg_array1(reg_array1),
 			.reg_array2(reg_array2),
@@ -186,14 +192,19 @@ module UART_writer(
 	);	
 	
 	//****Maquina de Estados****//
-	localparam [1:0] 	WAITING 	= 2'b00,
-							SENDING 	= 2'b01,
-							DONE 		= 2'b10;
+	localparam [2:0] 	WAITING 	= 3'b000,
+							SENDING 	= 3'b001,
+							DONE 		= 3'b010,
+							READ_MEMORY = 3'b011,
+							SENDMEMORY = 3'b100,
+							STARTRAM='b101,
+							NEXTRAM='b110;
 	
 	//Declaración de señales
+
 	reg[2:0] current_state=WAITING, next_state=WAITING;
 	reg [7:0] currentRegister=8'b00000001;
-	
+	reg [3:0] currentMEM=4'b0001;
 	always @(posedge clk)
 	begin
 		case(current_state)
@@ -203,6 +214,11 @@ module UART_writer(
 					begin
 						clkPipe=1;
 						next_state=SENDING;
+					end
+					if(rx_data=="B")
+					begin
+						next_state=STARTRAM;
+						
 					end
 				end
 			SENDING:
@@ -456,6 +472,11 @@ module UART_writer(
 						8'b10111110:fifo_din <= ALU_result_WB[23:16];
 						8'b10111111:fifo_din <= ALU_result_WB[31:24];
 
+						
+						8'b11000000:fifo_din <= Read_Data_2_MEM[7:0];
+						8'b11000001:fifo_din <= Read_Data_2_MEM[15:8];
+						8'b11000010:fifo_din <= Read_Data_2_MEM[23:16];
+						8'b11000011:fifo_din <= Read_Data_2_MEM[31:24];
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
@@ -463,16 +484,59 @@ module UART_writer(
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b11000011)//Ultimo valor +4
+					if(currentRegister==8'b11000111)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;
 							next_state=DONE;
 						end
 				end
+			STARTRAM:
+				begin
+					DebugAddress=DebugAddress+1;;
+					debugMode=1;
+					debugClk=1;
+					next_state=NEXTRAM;
+				end
+			NEXTRAM:
+				begin
+					debugClk=0;
+					next_state=READ_MEMORY;
+				end
+			READ_MEMORY:
+				begin
+					debugClk=1;
+					if(DebugAddress<21)
+						next_state=SENDMEMORY;
+					else
+						begin
+							next_state=DONE;
+							debugMode=0;
+							DebugAddress=-1;
+						end
+				end
+			SENDMEMORY:
+			begin
+					debugClk=0;
+					fifo_wr_en=1;
+					case(currentMEM)
+						4'b0001:fifo_din <= Read_data_MEM[7:0];
+						4'b0010:fifo_din <= Read_data_MEM[15:8];
+						4'b0011:fifo_din <= Read_data_MEM[23:16];
+						4'b0100:fifo_din <= Read_data_MEM[31:24];
+						default:fifo_din <= Read_data_MEM[7:0];
+					endcase
+					currentMEM=currentMEM+1;
+					if(currentMEM==4'b0110)//Ultimo valor +4
+						begin
+							currentMEM=4'b0001;
+							fifo_wr_en=0;
+							next_state=STARTRAM;
+						end
+			end
 			DONE:
 				begin
-					if(rx_data!="A")
+					if(rx_data!="A"&&rx_data!="B")
 						next_state=WAITING;
 				end
 			default:
