@@ -45,7 +45,7 @@
 # PART OF THIS FILE AT ALL TIMES.
 
 
-set device xc6slx4tqg144-3
+set device xc6slx16csg324-3
 set projName DataMemory
 set design DataMemory
 set projDir [file dirname [info script]]

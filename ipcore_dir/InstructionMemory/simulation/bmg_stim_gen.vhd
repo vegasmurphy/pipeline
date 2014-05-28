@@ -286,7 +286,7 @@ impure FUNCTION init_memory( C_USE_DEFAULT_DATA : INTEGER;
   -- convert bit to STD_LOGIC
   --***************************************************************
 
-constant c_init : mem_type := init_memory(0,
+constant c_init : mem_type := init_memory(1,
                                           1,
 										  "InstructionMemory.mif",
                                            DEFAULT_DATA,

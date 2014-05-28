@@ -30,7 +30,7 @@ cp ../example_design/DataMemory_exdes.ucf results/
 cd results
 
 echo 'Running ngdbuild'
-ngdbuild -p xc6slx4-tqg144-3 DataMemory_exdes
+ngdbuild -p xc6slx16-csg324-3 DataMemory_exdes
 
 echo 'Running map'
 map DataMemory_exdes -o mapped.ncd -pr i
