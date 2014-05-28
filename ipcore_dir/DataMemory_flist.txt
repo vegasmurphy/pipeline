@@ -1,6 +1,7 @@
 # Output products list for <DataMemory>
 DataMemory.asy
 DataMemory.gise
+DataMemory.mif
 DataMemory.ngc
 DataMemory.sym
 DataMemory.v

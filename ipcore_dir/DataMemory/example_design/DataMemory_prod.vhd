@@ -85,10 +85,10 @@
 --    C_BYTE_SIZE                 :  9 
 --    C_ALGORITHM                 :  1 
 --    C_PRIM_TYPE                 :  1 
---    C_LOAD_INIT_FILE            :  0 
---    C_INIT_FILE_NAME            :  no_coe_file_loaded 
---    C_USE_DEFAULT_DATA          :  0 
---    C_DEFAULT_DATA              :  0 
+--    C_LOAD_INIT_FILE            :  1 
+--    C_INIT_FILE_NAME            :  DataMemory.mif 
+--    C_USE_DEFAULT_DATA          :  1 
+--    C_DEFAULT_DATA              :  AAAA 
 --    C_RST_TYPE                  :  SYNC 
 --    C_HAS_RSTA                  :  0 
 --    C_RST_PRIORITY_A            :  CE 
@@ -130,8 +130,8 @@
 --    C_HAS_INJECTERR             :  0 
 --    C_SIM_COLLISION_CHECK       :  ALL 
 --    C_COMMON_CLK                :  0 
---    C_DISABLE_WARN_BHV_COLL     :  1 
---    C_DISABLE_WARN_BHV_RANGE    :  1 
+--    C_DISABLE_WARN_BHV_COLL     :  0 
+--    C_DISABLE_WARN_BHV_RANGE    :  0 
 
 --------------------------------------------------------------------------------
 -- Library Declarations
