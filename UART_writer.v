@@ -198,7 +198,8 @@ module UART_writer(
 							READ_MEMORY = 3'b011,
 							SENDMEMORY = 3'b100,
 							STARTRAM='b101,
-							NEXTRAM='b110;
+							NEXTRAM='b110,
+							RESETRAM='b111;
 	
 	//Declaración de señales
 
@@ -510,9 +511,9 @@ module UART_writer(
 						next_state=SENDMEMORY;
 					else
 						begin
-							next_state=DONE;
-							debugMode=0;
-							DebugAddress=-1;
+							debugClk=0;
+							next_state=RESETRAM;
+							DebugAddress=ALU_result_MEM;
 						end
 				end
 			SENDMEMORY:
@@ -534,8 +535,17 @@ module UART_writer(
 							next_state=STARTRAM;
 						end
 			end
+			RESETRAM:
+				begin
+					DebugAddress=ALU_result_MEM;
+					debugClk=1;
+					next_state=DONE;
+				end
 			DONE:
 				begin
+					DebugAddress=-1;
+					debugMode=0;
+					debugClk=0;
 					if(rx_data!="A"&&rx_data!="B")
 						next_state=WAITING;
 				end
