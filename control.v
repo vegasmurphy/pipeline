@@ -35,7 +35,8 @@ module Control(
 	 output reg [1:0] trunkMode,	//Indica si se trunca a Byte, Half o Word
 	 output reg ShiftToTrunk,		//Indica que hay que hacerle un shift al registro base cuando se necesita un trunk
 	 output reg sinSigno,	//Indica que SignExtender tiene que ir sin signo (LWU, LHU o LBU)
-	 output reg JReg			//Indica un Jump con uso de Registros
+	 output reg JReg,			//Indica un Jump con uso de Registros
+	 output reg savePc
 	 );
 
 
@@ -45,6 +46,7 @@ always @(*)
 			6'b000000: 	//R-type (ALU)
 				if(LSB==6'b001000)//JR
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -63,6 +65,7 @@ always @(*)
 				end
 				//else if(LSB==001001)//JALR (es lo mismo que JAL pero JReg=1 y RegDest=1)
 				else begin //R-Type
+					savePc=0;
 					RegDest=1;
 					BranchEQ=0;
 					BranchNE=0;
@@ -82,6 +85,7 @@ always @(*)
 			//****Instrucciones Load y Store****//
 			6'b100011: //LW (Load Word)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -100,6 +104,7 @@ always @(*)
 				end
 			6'b100001: //LH (Load Half)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -118,6 +123,7 @@ always @(*)
 				end
 			6'b100000: //LB (Load Byte)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -136,6 +142,7 @@ always @(*)
 				end
 			6'b101011:	//SW (Store Word)
 				begin
+					savePc=0;
 					BranchEQ=0;
 					BranchNE=0;
 					MemRead=0;
@@ -154,6 +161,7 @@ always @(*)
 				end
 			6'b101001:	//SH (Store Half)
 				begin
+					savePc=0;
 					BranchEQ=0;
 					BranchNE=0;
 					MemRead=0;
@@ -172,6 +180,7 @@ always @(*)
 				end
 			6'b101000:	//SB (Store Byte)
 				begin
+					savePc=0;
 					BranchEQ=0;
 					BranchNE=0;
 					MemRead=0;
@@ -190,6 +199,7 @@ always @(*)
 				end
 			6'b100111: //LWU (Load Word Unsigned)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -208,6 +218,7 @@ always @(*)
 				end
 			6'b100101: //LHU (Load Half Unsigned)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -226,6 +237,7 @@ always @(*)
 				end
 			6'b100100: //LBU (Load Byte Unsigned)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -245,6 +257,7 @@ always @(*)
 			//****Instrucciones aritmeticas I-type****//
 			6'b001000: 	//ADDI [OK]
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -263,6 +276,7 @@ always @(*)
 				end
 			6'b001001: 	//ADDIU
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -281,6 +295,7 @@ always @(*)
 				end
 			6'b001100: 	//ANDI
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -299,6 +314,7 @@ always @(*)
 				end
 			6'b001101: 	//ORI
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -317,6 +333,7 @@ always @(*)
 				end
 			6'b001110: 	//XORI
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -335,6 +352,7 @@ always @(*)
 				end
 			6'b001010: 	//SLTI
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -353,6 +371,7 @@ always @(*)
 				end
 			6'b001011: 	//SLTIU
 				begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -371,6 +390,7 @@ always @(*)
 				end
 			6'b001111:	//LUI (Load Upper Immediate)
 			begin
+					savePc=0;
 					RegDest=0;	//ok
 					BranchEQ=0;	//ok
 					BranchNE=0;	//ok
@@ -390,6 +410,7 @@ always @(*)
 			//****Instrucciones de Branch y Salto****//
 			6'b000100: //BEQ (Branch Equal)
 				begin
+					savePc=0;
 					BranchEQ=1;
 					BranchNE=0;
 					MemRead=0;
@@ -408,6 +429,7 @@ always @(*)
 				end
 			6'b000101: //BNE
 				begin
+					savePc=0;
 					BranchEQ=0;
 					BranchNE=1;
 					MemRead=0;
@@ -426,6 +448,7 @@ always @(*)
 				end
 			6'b000010://J (Jump) 
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;
@@ -442,12 +465,28 @@ always @(*)
 					sinSigno=0;
 					JReg=0;
 				end
-			/*6'b000011://JAL (Jump and Link)
+			6'b000011://JAL (Jump and Link)
 				begin
-					??????
-				end*/
+					savePc=1;
+					RegDest=0;
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=0;
+					MemToReg=0;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=0;
+					ALUSrc=0;
+					RegWrite=1;
+					Jump=1;
+					trunkMode=0;
+					ShiftToTrunk=0;
+					sinSigno=0;
+					JReg=0;
+				end
 			default: //(NOP)
 				begin
+					savePc=0;
 					RegDest=0;
 					BranchEQ=0;
 					BranchNE=0;

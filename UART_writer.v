@@ -51,6 +51,8 @@ module UART_writer(
 	wire ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM;
 	wire [4:0] Write_register_EX,Write_register_MEM,Write_register_WB;
 	wire Jump_MEM,Zero_MEM,MemToReg_WB,RegWrite_WB,BranchTaken,Jump_ID,IF_Flush,forwardA;
+	wire savePc_ID,savePc_EX,savePc_MEM,savePc_WB;
+	
 	Pipeline pipe
 		(	.clk(clkPipe),
 			.debugClk(debugClk),
@@ -143,7 +145,11 @@ module UART_writer(
 			.reg_array28(reg_array28),
 			.reg_array29(reg_array29),
 			.reg_array30(reg_array30),
-			.reg_array31(reg_array31)
+			.reg_array31(reg_array31),
+			.savePc_ID(savePc_ID),
+			.savePc_EX(savePc_EX),
+			.savePc_MEM(savePc_MEM),
+			.savePc_WB(savePc_WB)
 		);
 
 	//Uart TX
@@ -478,6 +484,8 @@ module UART_writer(
 						8'b11000001:fifo_din <= Read_Data_2_MEM[15:8];
 						8'b11000010:fifo_din <= Read_Data_2_MEM[23:16];
 						8'b11000011:fifo_din <= Read_Data_2_MEM[31:24];
+						
+						8'b11000100:fifo_din <= {savePc_ID,savePc_EX,savePc_MEM,savePc_WB,4'b0000};
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
@@ -485,7 +493,7 @@ module UART_writer(
 						default:fifo_din <= PC_sumado_IF[7:0];
 					endcase
 					currentRegister=currentRegister+1;
-					if(currentRegister==8'b11000111)//Ultimo valor +4
+					if(currentRegister==8'b11001000)//Ultimo valor +4
 						begin
 							currentRegister=8'b00000001;
 							fifo_wr_en=0;

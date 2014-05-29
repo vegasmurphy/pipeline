@@ -25,6 +25,10 @@ module MEM_WB(
     input RegWrite_MEM,
 	 input MemToReg_MEM,
 	 input [4:0] Write_register_MEM,
+	 input [31:0] PC_sumado_MEM,
+	 input savePc_MEM,
+	 output reg savePc_WB,
+	 output reg [31:0] PC_sumado_WB,
 	 output reg [31:0] Read_data_WB,
     output reg [31:0] ALU_result_WB,
 	 output reg MemToReg_WB,
@@ -38,6 +42,8 @@ initial
 	MemToReg_WB=0;
 	RegWrite_WB=0;
 	Write_register_WB=0;
+	PC_sumado_WB=0;
+	savePc_WB=0;
 	end
 
 
@@ -48,6 +54,8 @@ begin
 	MemToReg_WB<=MemToReg_MEM;
    RegWrite_WB<=RegWrite_MEM;
 	Write_register_WB[4:0]<=Write_register_MEM[4:0];
+	PC_sumado_WB<=PC_sumado_MEM;
+	savePc_WB<=savePc_MEM;
 end
 
 endmodule

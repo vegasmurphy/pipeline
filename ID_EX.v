@@ -39,6 +39,7 @@ module ID_EX(
 	 input [1:0] trunkMode_ID,
 	 input ShiftToTrunk_ID,
 	 input sinSigno_ID,
+	 input savePc_ID,
 	 output reg [31:0] PC_sumado_EX,
     output reg [31:0] Read_Data_1_EX,
     output reg [31:0] Read_Data_2_EX,
@@ -57,7 +58,8 @@ module ID_EX(
 	 output reg Jump_EX,
 	 output reg [1:0] trunkMode_EX,
 	 output reg ShiftToTrunk_EX,
-	 output reg sinSigno_EX
+	 output reg sinSigno_EX,
+	 output reg savePc_EX
     );
 initial
 	begin
@@ -80,6 +82,7 @@ initial
 		trunkMode_EX=2'b00;
 		ShiftToTrunk_EX=0;
 		sinSigno_EX=0;
+		savePc_EX=0;
 	end
 always @(posedge clk)
 begin
@@ -102,6 +105,7 @@ begin
 	trunkMode_EX<=trunkMode_ID;
 	ShiftToTrunk_EX<=ShiftToTrunk_ID;
 	sinSigno_EX<=sinSigno_ID;
+	savePc_EX<=savePc_ID;
 end
 
 endmodule

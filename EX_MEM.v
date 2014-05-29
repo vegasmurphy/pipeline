@@ -35,6 +35,9 @@ module EX_MEM(
 	input ShiftToTrunk_EX,
 	input Zero_EX,
 	input [4:0] Write_register_EX,
+	input savePc_EX,
+	input [31:0] PC_sumado_EX,
+	output reg [31:0] PC_sumado_MEM,
 	output reg BranchEQ_MEM,
 	output reg BranchNE_MEM,
 	output reg MemRead_MEM,
@@ -45,7 +48,8 @@ module EX_MEM(
 	output reg [1:0] trunkMode_MEM,
 	output reg ShiftToTrunk_MEM,
 	output reg Zero_MEM,
-	output reg [4:0] Write_register_MEM
+	output reg [4:0] Write_register_MEM,
+	output reg savePc_MEM
     );
 
 	initial
@@ -63,6 +67,8 @@ module EX_MEM(
 	Read_Data_2_MEM=0;
 	trunkMode_MEM=0;
 	ShiftToTrunk_MEM=0;
+	PC_sumado_MEM=0;
+	savePc_MEM=0;
 	end
 
 	always@(posedge clk)
@@ -79,7 +85,12 @@ module EX_MEM(
 		Zero_MEM<=Zero_EX;
 		trunkMode_MEM<=trunkMode_EX;
 		ShiftToTrunk_MEM<=ShiftToTrunk_EX;
-		Write_register_MEM[4:0]<=Write_register_EX[4:0];
+		savePc_MEM<=savePc_EX;
+		PC_sumado_MEM<=PC_sumado_EX;
+		if (savePc_EX)
+			Write_register_MEM[4:0]<=5'b11111;
+		else
+			Write_register_MEM[4:0]<=Write_register_EX[4:0];
 	end
 
 

@@ -69,10 +69,17 @@ module Pipeline(
 	output [31:0] instruction_ID,
 
 	//ID_EX WIRES
+	output savePc_ID,
+	output savePc_EX,
+	output savePc_MEM,
+	output savePc_WB,
 	output [31:0] Read_Data_1_ID,
 	output [31:0] Read_Data_2_ID,
 	output [31:0] signExtended_ID,
 	output [31:0] PC_sumado_ID,
+	output [31:0] PC_sumado_EX,
+	output [31:0] PC_sumado_MEM,
+	output [31:0] PC_sumado_WB,
 	output RegDest_ID,
 	output BranchEQ_ID,
 	output BranchNE_ID,
@@ -85,7 +92,6 @@ module Pipeline(
 	output RegWrite_ID,
 	output ShiftToTrunk_ID,
 	output [1:0] trunkMode_ID,
-	output [31:0] PC_sumado_EX,
 	output [31:0] Read_Data_1_EX,
 	output [31:0] Read_Data_2_EX,
 	output reg [31:0] aluInput1,
@@ -173,6 +179,7 @@ module Pipeline(
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
+	wire [31:0] Write_Data_final;
 	assign Write_Data = MemToReg_WB ? Read_data_WB : ALU_result_WB;
 
 	//Muxes de Hazard Detection Unit
@@ -189,6 +196,7 @@ module Pipeline(
 	assign RegWrite_ID = nopMux ? 1'b0 : RegWrite_control;
 	assign Jump_ID 	 = nopMux ? 1'b0 : Jump_control;
 	assign trunkMode_ID= nopMux ? 2'b00 : trunkMode_control;
+	assign savePc_ID = nopMux ? 1'b0 : savePc_control;
 	assign ShiftToTrunk_ID = nopMux?1'b0: ShiftToTrunk_control;
 	assign sinSigno_ID = nopMux ? 1'b0 : sinSigno_control;
 	assign JReg_ID = nopMux ? 1'b0 : JReg_control;
@@ -237,13 +245,15 @@ module Pipeline(
 		.TrunkedReadData(Read_data_MEM)
 	);
 	
+	assign Write_Data_Final = savePc_WB ? PC_sumado_WB : Write_Data;
+	
 	Registers registers (
 		.clk(clk),									//clock
 		.RegWrite(RegWrite_WB),					// (debe ser un Write Enable)
 		.Read_Addr_1(instruction_ID[25:21]),//Se pueden leer dos registros
 		.Read_Addr_2(instruction_ID[20:16]),//(-)
 		.Write_Addr(Write_register_WB),		//Direccion (numero de registro) a escribir
-		.Write_Data(Write_Data),				//Dato a escribir (Viene del Mux)
+		.Write_Data(Write_Data_Final),				//Dato a escribir (Viene del Mux)
 		.Read_Data_1(Read_Data_1_ID),			//Dato leido con la direccion Read_Addr_1
 		.Read_Data_2(Read_Data_2_ID),
 		.reg_array0(reg_array0),
@@ -296,7 +306,8 @@ module Pipeline(
 		.trunkMode(trunkMode_control),
 		.ShiftToTrunk(ShiftToTrunk_control),
 		.sinSigno(sinSigno_control),
-		.JReg(JReg_control)
+		.JReg(JReg_control),
+		.savePc(savePc_control)
 		
 	);
 	
@@ -341,6 +352,8 @@ module Pipeline(
 		.trunkMode_ID(trunkMode_ID),
 		.ShiftToTrunk_ID(ShiftToTrunk_ID),
 		.sinSigno_ID(sinSigno_ID),
+		.savePc_ID(savePc_ID),
+		.savePc_EX(savePc_EX),
 		.RegDest_EX(RegDest_EX),
 		.BranchEQ_EX(BranchEQ_EX),
 		.BranchNE_EX(BranchNE_EX),
@@ -374,6 +387,8 @@ module Pipeline(
 		.ShiftToTrunk_EX(ShiftToTrunk_EX),
 		.Zero_EX(Zero_EX),
 		.Write_register_EX(Write_register_EX),
+		.PC_sumado_EX(PC_sumado_EX),
+		.PC_sumado_MEM(PC_sumado_MEM),
 		.BranchEQ_MEM(BranchEQ_MEM),
 		.BranchNE_MEM(BranchNE_MEM),
 		.MemRead_MEM(MemRead_MEM),
@@ -384,7 +399,9 @@ module Pipeline(
 		.trunkMode_MEM(trunkMode_MEM),
 		.ShiftToTrunk_MEM(ShiftToTrunk_MEM),
 		.Zero_MEM(Zero_MEM),
-		.Write_register_MEM(Write_register_MEM)
+		.Write_register_MEM(Write_register_MEM),
+		.savePc_EX(savePc_EX),
+		.savePc_MEM(savePc_MEM)
 	);
 	
 	
@@ -394,12 +411,16 @@ module Pipeline(
 		.ALU_result_MEM(ALU_result_MEM),
 		.RegWrite_MEM(RegWrite_MEM),
 		.MemToReg_MEM(MemToReg_MEM),
+		.PC_sumado_MEM(PC_sumado_MEM),
+		.PC_sumado_WB(PC_sumado_WB),
 		.Write_register_MEM(Write_register_MEM),
 		.Read_data_WB(Read_data_WB),
 		.ALU_result_WB(ALU_result_WB),
 		.MemToReg_WB(MemToReg_WB),
 		.RegWrite_WB(RegWrite_WB),
-		.Write_register_WB(Write_register_WB)
+		.Write_register_WB(Write_register_WB),
+		.savePc_MEM(savePc_MEM),
+		.savePc_WB(savePc_WB)
 	);
 	
 	IF_ID if_id (
@@ -449,5 +470,6 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 
 // ********************************** IF_Flush flag ********************************************
 	assign IF_Flush = BranchTaken || Jump_ID;
+	
 endmodule
 
