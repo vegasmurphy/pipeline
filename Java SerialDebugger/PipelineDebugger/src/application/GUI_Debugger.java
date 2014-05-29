@@ -56,7 +56,7 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		generatePrintingArea(panelContenedor);
 
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setSize(700, 400);
+		setSize(900, 700);
 		setLocationRelativeTo(null);
 		setTitle(NOMBREVENTANA);
 		// setResizable(false);
@@ -91,30 +91,24 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		// Para que queden parejos el boton y las luces
 		upperFlowPanel.add(Box.createRigidArea(new Dimension(0, 1)));
 		upperFlowPanel.add(generateNextPCButton());
-		/*JButton printButton = new JButton("BlackTestText");
-		printButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evento) {
-				// printer.append("Apretaste el Boton\n");
-				printBlack("Registro1: ");
-			}
-		});
-		JButton printButtonGray = new JButton("GrayTestText");
-		printButtonGray.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent evento) {
-				// printer.append("Apretaste el Boton\n");
-				printGray("FF4562F1\n");
-			}
-		});
-		upperFlowPanel.add(printButton);
-		upperFlowPanel.add(printButtonGray);*/
-
+		upperFlowPanel.add(generateReadMemoryButton());
+		JButton boton = new JButton("MostrarFlags");
+		//BOTON PROVISORIO
+			boton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent evento) {
+					// printer.append("Apretaste el Boton\n");
+					serialManager.printAllFlags();
+				}
+			});
+			upperFlowPanel.add(boton);
+		//FIN BOTON PROVISORIO
 		boxPanel.add(upperFlowPanel);
 
 		panelContenedor.add(boxPanel, BorderLayout.NORTH);
 	}
 
 	/**
-	 * @brief Funcion que crea el boton que cambia la temperatura maxima
+	 * @brief Funcion que crea el boton que hace avanzar el PC
 	 * @return
 	 */
 	private JButton generateNextPCButton() {
@@ -127,6 +121,23 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		});
 		return boton;
 	}
+	
+	/**
+	 * @brief Funcion que crea el boton que cambia la temperatura maxima
+	 * @return
+	 */
+	private JButton generateReadMemoryButton() {
+		JButton boton = new JButton("Leer Memoria RAM");
+		boton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evento) {
+				// printer.append("Apretaste el Boton\n");
+				readSerialRAM();
+				//printOrange("Apretaste el Boton que lee la memoria\n");
+			}
+		});
+		return boton;
+	}
+	
 
 	/**
 	 * @brief Funcion que actualiza el valor del PC
@@ -146,6 +157,7 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	private void generatePrintingArea(Container panelContenedor) {
 		printer = new JTextPane();
 		printer.setEditable(false);
+		printer.setBackground(Color.DARK_GRAY);
 		JScrollPane scrollPane = new JScrollPane(printer);
 		panelContenedor.add(scrollPane, BorderLayout.CENTER);
 	}
@@ -173,7 +185,15 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	private JMenu createFileMenu() {
 		JMenu fileMenu = new JMenu("Archivo");
 
-		// Falta preguntar si desea guardar
+		
+		JMenuItem elementoLimpiar = new JMenuItem("Limpiar Pantalla");
+		fileMenu.add(elementoLimpiar);
+		elementoLimpiar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evento) {
+				printer.setText("");
+			}
+		});
+		
 		JMenuItem elementoSalir = new JMenuItem("Salir");
 		fileMenu.add(elementoSalir);
 		elementoSalir.addActionListener(new ActionListener() {
@@ -266,45 +286,72 @@ public class GUI_Debugger extends JFrame implements Runnable {
 			serialManager.serialComunication();
 		}
 	}
-
-	public void printBlack(String cadena) {
-		// Agregar el include coloreado y devolver una linea vacia
-		SimpleAttributeSet[] formatos = initAttributes(cadena.length() + 10);
-		try {
-			printer.getStyledDocument().insertString(printer.getStyledDocument().getLength(), cadena, formatos[1]);
-		} catch (BadLocationException h) {
-			System.err.println("Excepcion de mala ubicacion (TextPane)");
+	
+	
+	private void readSerialRAM() {
+		if (serialManager.getSerialPort() == null) {
+			JOptionPane
+					.showMessageDialog(null, "ERROR: Puerto serie Nulo",
+							"Instrucciones Soportadas",
+							JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			// System.err.println("Falta Implementar");
+			serialManager.serialMemory();
 		}
 	}
 	
-	public void printGray(String cadena) {
-		// Agregar el include coloreado y devolver una linea vacia
-		SimpleAttributeSet[] formatos = initAttributes(cadena.length() + 10);
-		try {
-			printer.getStyledDocument().insertString(printer.getStyledDocument().getLength(), cadena, formatos[4]);
-		} catch (BadLocationException h) {
-			System.err.println("Excepcion de mala ubicacion (TextPane)");
-		}
+
+	public void printBlack(String cadena) {
+		printColor(cadena, 1);
 	}
+	
+	public void printBlue(String cadena) {
+		printColor(cadena, 2);
+	}
+
+	public void printGray(String cadena) {
+		printColor(cadena, 4);
+	}
+
+	
+	public void printOrange(String cadena) {
+		printColor(cadena, 5);
+	}
+	
+	public void printRed(String cadena) {
+		printColor(cadena, 6);
+	}
+	
 
 	/**
 	 * @brief Funcion que permite imprimir texto en el area de texto de la GUI
 	 * @param cadena
 	 */
 	public void printText(String cadena) {
+		printColor(cadena, 0);
+	}
+	
+	private void printColor(String cadena, int color) {
+		
 		// Agregar el include coloreado y devolver una linea vacia
 		SimpleAttributeSet[] formatos = initAttributes(cadena.length() + 10);
 		try {
-			printer.getStyledDocument().insertString(printer.getStyledDocument().getLength(), cadena, formatos[0]);
+			printer.getStyledDocument().insertString(
+					printer.getStyledDocument().getLength(), cadena,
+					formatos[color]);
 		} catch (BadLocationException h) {
 			System.err.println("Excepcion de mala ubicacion (TextPane)");
 		}
 	}
+	
 
 	public void printTextLine(String cadena) {
-		printText(cadena+"\n");
+		printText(cadena + "\n");
 	}
 
+
+	
+	
 	/**
 	 * @brief: Metodo que inicializa la fuente por defecto del campo de texto.
 	 * @param length
@@ -319,29 +366,38 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		StyleConstants.setFontFamily(attrs[0], "SansSerif");
 		StyleConstants.setFontSize(attrs[0], 12);
 
-		// Palabras reservadas (negrita)
+		// Negrita
 		attrs[1] = new SimpleAttributeSet(attrs[0]);
+		StyleConstants.setForeground(attrs[1], Color.white);
 		StyleConstants.setBold(attrs[1], true);
 
-		// Registros (azul)
+		// Azul
 		attrs[2] = new SimpleAttributeSet(attrs[0]);
-		StyleConstants.setForeground(attrs[2], Color.blue);
+		StyleConstants.setForeground(attrs[2], Color.cyan);
+		StyleConstants.setBold(attrs[2], true);
+		StyleConstants.setItalic(attrs[2], true);
 
-		// Literales (magenta)
+		// Magenta
 		attrs[3] = new SimpleAttributeSet(attrs[0]);
 		StyleConstants.setForeground(attrs[3], Color.magenta);
 
-		// Comentarios (gris)
+		// Gris
 		attrs[4] = new SimpleAttributeSet(attrs[0]);
-		StyleConstants.setForeground(attrs[4], Color.gray);
+		StyleConstants.setForeground(attrs[4], Color.green);
 		StyleConstants.setBold(attrs[4], true);
 		StyleConstants.setItalic(attrs[4], true);
 
-		// Includes (verde)
+		// Anaranjado
 		attrs[5] = new SimpleAttributeSet(attrs[0]);
 		StyleConstants.setForeground(attrs[5], Color.orange);
 		StyleConstants.setBold(attrs[5], true);
 		StyleConstants.setItalic(attrs[5], false);
+		
+		// Rojo
+		attrs[6] = new SimpleAttributeSet(attrs[0]);
+		StyleConstants.setForeground(attrs[6], Color.red);
+		StyleConstants.setBold(attrs[6], true);
+		StyleConstants.setItalic(attrs[6], true);
 
 		return attrs;
 	}
