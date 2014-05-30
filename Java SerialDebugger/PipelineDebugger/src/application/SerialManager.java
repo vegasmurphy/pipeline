@@ -28,6 +28,7 @@ public class SerialManager {
 	private static ArrayList<Flag> flagsMEM;
 	private static ArrayList<Flag> flagsWB;
 	private static ArrayList<Flag> flagsIF;
+	private static ArrayList<Flag> InstruccionesYRegistros;
 
 	/**
 	 * @brief Constructor
@@ -36,6 +37,7 @@ public class SerialManager {
 	public SerialManager(GUI_Debugger gui) {
 		this.gui = gui;
 		inicializarFLags();
+		inicializarInstruccionesYRegistros();
 	}
 
 	public void setSerialPort(String port) {
@@ -167,6 +169,8 @@ public class SerialManager {
 		readAndPrintValue("\tRead_Data (WB): ", bb);
 		readAndPrintValue("\tALU_Result (WB): ", bb);
 		readAndPrintValue("\tRead_Data_2 (MEM)",bb);
+		
+		readAndSaveJALFlags();
 		printAllFlags();
 	}
 
@@ -219,14 +223,25 @@ public class SerialManager {
 	private static void readAndPrintInstruction(String nombre) {
 		try {
 			b = serialPort.readBytes(4);
+			byte[] b2=new byte[4];
 			printBlack(nombre);
-			for (int i = 0; i < b.length; i++)
-				printGray(b[b.length-i-1] + " ");
-
+			for (int i = 0; i < b.length; i++){
+				b2[3-i]=b[i];
+				//printGray(b[b.length-i-1] + " ");
+				}
+			printGray(bytArrayToHex(b2));
 		} catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
 		}
 	}
+	
+	private static String bytArrayToHex(byte[] a) {
+		   StringBuilder sb = new StringBuilder();
+		   for(byte b: a)
+		      sb.append(String.format("%02x", b&0xff));
+		   return sb.toString();
+		}
+
 
 	/**
 	 * @brief Funcion que actualiza el PC
@@ -412,8 +427,7 @@ public class SerialManager {
 			/*printBlack("\nIF_Flush1: \t");printFlag(IF_Flush1);
 			printBlack("\tIF_Flush2: \t");printFlag(IF_Flush2);
 			printBlack("\nforwardA: \t");printFlag(forwardA);
-			printBlack("\tWrite_Register (WB): ");printGray("\t"+Write_register_WB+"");
-			printBlack("\n");*/
+			printBlack("\tWrite_Register (WB): ");printGray("\t"+Write_register_WB+"");*/
 		} catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
 		}
@@ -445,6 +459,27 @@ public class SerialManager {
 	}
 	
 	
+	private static void readAndSaveJALFlags(){
+		try {
+			boolean savePc_ID,savePc_EX,savePc_MEM,savePc_WB,JReg_ID;
+			b = serialPort.readBytes(1);
+			savePc_ID = (b[0] & 0x80) != 0;
+			savePc_EX = (b[0] & 0x40) != 0;
+			savePc_MEM = (b[0] & 0x20) != 0;
+			savePc_WB = (b[0] & 0x10) != 0;
+			JReg_ID = (b[0] & 0x08) != 0;
+			printBlack("\nSavePc (ID): ");printFlag(savePc_ID);
+			printBlack("\tSavePc (EX): ");printFlag(savePc_EX);
+			printBlack("\tSavePc (MEM): ");printFlag(savePc_MEM);
+			printBlack("\nSavePc (WB): ");printFlag(savePc_WB);
+			printBlack("\tJReg (ID): ");printFlag(JReg_ID);
+			
+		}catch (SerialPortException e) {
+			System.err.println("Serial Port Exception");
+		}
+	}
+	
+	
 	
 	private void inicializarFLags(){
 		flagsID = new ArrayList<Flag>();		
@@ -463,6 +498,7 @@ public class SerialManager {
 		flagsID.add(new Flag("\tTrunkMode_2 (ID): "));
 		flagsID.add(new Flag("\tBranchTaken (ID): "));
 		flagsID.add(new Flag("\nJump (ID): \t")); 
+		//flagsID.add(new Flag("\tSavePc (ID): ")); 
 		
 		flagsEX = new ArrayList<Flag>();
 		flagsEX.add(new Flag("\nRegDest (EX): "));
@@ -478,6 +514,7 @@ public class SerialManager {
 		flagsEX.add(new Flag("\tTrunkMode_2 (EX): "));
 		flagsEX.add(new Flag("\nShiftToTrunk (EX): "));
 		flagsEX.add(new Flag("\tZero (EX): \t"));
+		//flagsEX.add(new Flag("\tSavePc (ID): "));
 		flagsEX.add(new Flag("\nWrite_Register (EX): "));
 		
 		flagsMEM = new ArrayList<Flag>();
@@ -500,6 +537,32 @@ public class SerialManager {
 		flagsIF.add(new Flag("\nIF_Flush1: \t"));
 		flagsIF.add(new Flag("\tIF_Flush2: \t"));
 		flagsIF.add(new Flag("\tForwardA: \t"));
+		
+		/*
+		 *printBlack("\nSavePc (ID): ");printFlag(savePc_ID);
+			printBlack("\tSavePc (EX): ");printFlag(savePc_EX);
+			printBlack("\tSavePc (MEM): ");printFlag(savePc_MEM);
+			printBlack("\nSavePc (WB): ");printFlag(savePc_WB);
+			printBlack("\tJReg (ID): ");printFlag(JReg_ID);*/
+	}
+	
+	
+	private void inicializarInstruccionesYRegistros(){
+		InstruccionesYRegistros=new ArrayList<Flag>();
+		InstruccionesYRegistros.add(new Flag("\nInstruccion(IF): "));
+		InstruccionesYRegistros.add(new Flag("\n\nInstruccion(ID): "));
+		InstruccionesYRegistros.add(new Flag("\nInstruction(EX):   "));
+		InstruccionesYRegistros.add(new Flag("\tReg-s: "));
+		InstruccionesYRegistros.add(new Flag("\t\tReg-t: "));
+		InstruccionesYRegistros.add(new Flag("\n\nPC sumado (EX): "));
+		InstruccionesYRegistros.add(new Flag("\t\tRead_Data_1 (EX): "));
+		InstruccionesYRegistros.add(new Flag("\tRead_Data_2 (EX): "));
+		InstruccionesYRegistros.add(new Flag("\tALU_Result (EX):    "));
+		InstruccionesYRegistros.add(new Flag("\tALU_Result (MEM): "));
+		InstruccionesYRegistros.add(new Flag("\nRead_Data (MEM): "));
+		InstruccionesYRegistros.add(new Flag("\tRead_Data (WB): "));
+		InstruccionesYRegistros.add(new Flag("\tALU_Result (WB): "));
+		InstruccionesYRegistros.add(new Flag("\tRead_Data_2 (MEM)"));
 	}
 	
 	
@@ -557,6 +620,8 @@ public class SerialManager {
 		printAllFlagsWB();
 		printAllFlagsIF();
 	}
+	
+	
 	
 
 	// *************************************************************************************************************//

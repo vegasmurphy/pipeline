@@ -36,12 +36,12 @@ module DataMemoryAccessBlock #
    );
 	
 	wire WriteEnable;
-	wire [9:0] address;
+	wire [9:0] address,addressAux;
 	wire [31:0] TrunkedWriteData, ReadData;
 	assign WriteEnableAux = MemWrite & (~MemRead);	 
 	assign addressAux = ShiftToTrunk? BasePlusOffset[11:2] : BasePlusOffset[9:0];
 	assign WriteEnable = debugMode?1'b0 : WriteEnableAux;
-	assign address = debugMode?DebugAddress[9:0] : addressAux;
+	assign address = debugMode?DebugAddress[9:0] : addressAux[9:0];
 	assign trunkMode = debugMode?2'b00 : trunkModeAux;
 	assign clkAux = debugMode?debugClk:clk;
 //Haciendo un shift en aluinput1 (shifteando la base) se podria obtener una direccion de 12 bits y tomar los 2LSB para elegir el byte, dado que estos van a ser solo del offset y los 10MSB ya seran la suma del registro base shifteado mas los 14 MSB del offset.	
@@ -49,7 +49,7 @@ module DataMemoryAccessBlock #
 	//Modulos Instanciados
 	//Memoria RAM
 	DataMemory RAM (
-	  .clka(clkAux), 			//Entrada de Clock
+	  .clka(~clkAux), 			//Entrada de Clock
 	  .wea(WriteEnable), //WriteEnable (1bit)
 	  .addra(address), 	//Bus de Direccion (10 bits)
 	  .dina(TrunkedWriteData),	//Bus de Datos (entrada) (32bits)

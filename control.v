@@ -63,7 +63,25 @@ always @(*)
 					sinSigno=0;
 					JReg=1;
 				end
-				//else if(LSB==001001)//JALR (es lo mismo que JAL pero JReg=1 y RegDest=1)
+				else if(LSB==6'b001001)//JALR (es lo mismo que JAL pero JReg=1 y RegDest=1)
+				begin
+					savePc=1;
+					RegDest=1;
+					BranchEQ=0;
+					BranchNE=0;
+					MemRead=0;
+					MemToReg=0;
+					ALUOp1=0;
+					ALUOp2=0;
+					MemWrite=0;
+					ALUSrc=0;
+					RegWrite=1;
+					Jump=1;
+					trunkMode=0;
+					ShiftToTrunk=0;
+					sinSigno=0;
+					JReg=1;
+				end
 				else begin //R-Type
 					savePc=0;
 					RegDest=1;

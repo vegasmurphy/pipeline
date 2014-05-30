@@ -147,7 +147,7 @@ module Pipeline(
 	output BranchTaken,
 	output Jump_ID,
 	output IF_Flush,
-	
+	output JReg_ID,
 	
 	input [31:0]  DebugAddress,
 	input debugMode
@@ -179,7 +179,7 @@ module Pipeline(
 	
 	//Mux de WriteBack
 	wire [31:0] Write_Data;
-	wire [31:0] Write_Data_final;
+	wire [31:0] Write_Data_Final;
 	assign Write_Data = MemToReg_WB ? Read_data_WB : ALU_result_WB;
 
 	//Muxes de Hazard Detection Unit
@@ -245,7 +245,7 @@ module Pipeline(
 		.TrunkedReadData(Read_data_MEM)
 	);
 	
-	assign Write_Data_Final = savePc_WB ? PC_sumado_WB : Write_Data;
+	assign Write_Data_Final = savePc_WB ? PC_sumado_WB-1 : Write_Data;
 	
 	Registers registers (
 		.clk(clk),									//clock
@@ -292,6 +292,7 @@ module Pipeline(
 	
 	Control control (
 		.opcode(instruction_ID[31:26]),
+		.LSB(instruction_ID[5:0]),
 		.RegDest(RegDest_control),
 		.BranchEQ(BranchEQ_control),
 		.BranchNE(BranchNE_control),

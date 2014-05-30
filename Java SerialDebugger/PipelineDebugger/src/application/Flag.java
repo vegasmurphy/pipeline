@@ -4,17 +4,20 @@ public class Flag {
 	private String nombre;
 	private boolean estado;
 	private int registro;
+	private String valor;
 
 	public Flag() {
 		nombre = null;
 		estado = false;
 		registro = 0;
+		valor="";
 	}
 
 	public Flag(String nombre) {
 		this.nombre = nombre;
 		estado=false;
 		registro = 0;
+		valor="";
 	}
 
 	public void setEstado(boolean nuevoEstado) {
@@ -39,6 +42,14 @@ public class Flag {
 	
 	public int getRegistro(){
 		return registro;
+	}
+	
+	public String getValor(){
+		return valor;
+	}
+	
+	public void setValor(String valor){
+		this.valor=valor;
 	}
 
 }

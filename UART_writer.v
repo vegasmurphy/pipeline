@@ -51,7 +51,7 @@ module UART_writer(
 	wire ShiftToTrunk_EX,Zero_EX,BranchEQ_MEM,BranchNE_MEM,MemRead_MEM,MemToReg_MEM,MemWrite_MEM,RegWrite_MEM;
 	wire [4:0] Write_register_EX,Write_register_MEM,Write_register_WB;
 	wire Jump_MEM,Zero_MEM,MemToReg_WB,RegWrite_WB,BranchTaken,Jump_ID,IF_Flush,forwardA;
-	wire savePc_ID,savePc_EX,savePc_MEM,savePc_WB;
+	wire savePc_ID,savePc_EX,savePc_MEM,savePc_WB,JReg_ID;
 	
 	Pipeline pipe
 		(	.clk(clkPipe),
@@ -106,6 +106,7 @@ module UART_writer(
 			.RegWrite_WB(RegWrite_WB),
 			.BranchTaken(BranchTaken),
 			.Jump_ID(Jump_ID),
+			.JReg_ID(JReg_ID),
 			.IF_Flush(IF_Flush),
 			.forwardA(forwardA),
 			.Read_data_MEM(Read_data_MEM),
@@ -485,7 +486,7 @@ module UART_writer(
 						8'b11000010:fifo_din <= Read_Data_2_MEM[23:16];
 						8'b11000011:fifo_din <= Read_Data_2_MEM[31:24];
 						
-						8'b11000100:fifo_din <= {savePc_ID,savePc_EX,savePc_MEM,savePc_WB,4'b0000};
+						8'b11000100:fifo_din <= {savePc_ID,savePc_EX,savePc_MEM,savePc_WB,JReg_ID,3'b000};
 						//***************//
 						//* Latch IF/ID *//
 						//***************//
