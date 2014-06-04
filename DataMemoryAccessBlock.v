@@ -38,6 +38,7 @@ module DataMemoryAccessBlock #
 	wire WriteEnable;
 	wire [9:0] address,addressAux;
 	wire [31:0] TrunkedWriteData, ReadData;
+	wire [1:0] trunkMode;
 	assign WriteEnableAux = MemWrite & (~MemRead);	 
 	assign addressAux = ShiftToTrunk? BasePlusOffset[11:2] : BasePlusOffset[9:0];
 	assign WriteEnable = debugMode?1'b0 : WriteEnableAux;
