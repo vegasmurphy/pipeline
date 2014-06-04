@@ -36,7 +36,8 @@ module Control(
 	 output reg ShiftToTrunk,		//Indica que hay que hacerle un shift al registro base cuando se necesita un trunk
 	 output reg sinSigno,	//Indica que SignExtender tiene que ir sin signo (LWU, LHU o LBU)
 	 output reg JReg,			//Indica un Jump con uso de Registros
-	 output reg savePc
+	 output reg savePc,
+	 output reg I_Type
 	 );
 
 
@@ -62,6 +63,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=1;
+					I_Type=0;
 				end
 				else if(LSB==6'b001001)//JALR (es lo mismo que JAL pero JReg=1 y RegDest=1)
 				begin
@@ -81,6 +83,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=1;
+					I_Type=0;
 				end
 				else begin //R-Type
 					savePc=0;
@@ -99,6 +102,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			//****Instrucciones Load y Store****//
 			6'b100011: //LW (Load Word)
@@ -119,6 +123,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b100001: //LH (Load Half)
 				begin
@@ -138,6 +143,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b100000: //LB (Load Byte)
 				begin
@@ -157,6 +163,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b101011:	//SW (Store Word)
 				begin
@@ -176,6 +183,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b101001:	//SH (Store Half)
 				begin
@@ -195,6 +203,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b101000:	//SB (Store Byte)
 				begin
@@ -214,6 +223,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b100111: //LWU (Load Word Unsigned)
 				begin
@@ -233,6 +243,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=1;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b100101: //LHU (Load Half Unsigned)
 				begin
@@ -252,6 +263,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=1;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b100100: //LBU (Load Byte Unsigned)
 				begin
@@ -271,6 +283,7 @@ always @(*)
 					ShiftToTrunk=1;
 					sinSigno=1;
 					JReg=0;
+					I_Type=0;
 				end
 			//****Instrucciones aritmeticas I-type****//
 			6'b001000: 	//ADDI [OK]
@@ -291,6 +304,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001001: 	//ADDIU
 				begin
@@ -310,6 +324,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001100: 	//ANDI
 				begin
@@ -329,6 +344,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001101: 	//ORI
 				begin
@@ -348,6 +364,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001110: 	//XORI
 				begin
@@ -367,6 +384,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001010: 	//SLTI
 				begin
@@ -386,6 +404,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001011: 	//SLTIU
 				begin
@@ -405,6 +424,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			6'b001111:	//LUI (Load Upper Immediate)
 			begin
@@ -415,7 +435,7 @@ always @(*)
 					MemRead=0;	//ok
 					MemToReg=0;	//ok
 					ALUOp1=1;	//ok
-					ALUOp2=0;	//ok
+					ALUOp2=1;	//ok
 					MemWrite=0;	//ok
 					ALUSrc=1;	//ok
 					RegWrite=1;	//ok
@@ -424,6 +444,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=1;
 				end
 			//****Instrucciones de Branch y Salto****//
 			6'b000100: //BEQ (Branch Equal)
@@ -444,6 +465,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b000101: //BNE
 				begin
@@ -463,6 +485,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b000010://J (Jump) 
 				begin
@@ -482,6 +505,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			6'b000011://JAL (Jump and Link)
 				begin
@@ -501,6 +525,7 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 			default: //(NOP)
 				begin
@@ -520,9 +545,9 @@ always @(*)
 					ShiftToTrunk=0;
 					sinSigno=0;
 					JReg=0;
+					I_Type=0;
 				end
 		endcase
 		
 	end
-
 endmodule

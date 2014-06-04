@@ -7,7 +7,10 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
+import javax.imageio.ImageIO;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -35,6 +38,7 @@ import jssc.SerialPort;
 public class GUI_Debugger extends JFrame implements Runnable {
 	private JTextPane PCPaneActual;
 	private JTextPane printer;
+	private int cantidadDeEjecuciones = 0;
 	private static String NOMBREVENTANA = "Debugger MIPS: Arquitectura de Computadoras";
 	private SerialManager serialManager;
 
@@ -42,6 +46,8 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	 * @brief Funcion principal de la GUI
 	 */
 	public void run() {
+		setIcon();
+		
 		serialManager = new SerialManager(this);
 		Container panelContenedor = getContentPane(); // Panel general (border
 														// layout)
@@ -63,6 +69,16 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		setVisible(true);
 	}
 
+	
+	private void setIcon(){
+		BufferedImage image = null;
+		try {
+		   image = ImageIO.read(this.getClass().getResource("icon.png"));
+		} catch (IOException e) {e.printStackTrace();}
+		this.setIconImage(image);  
+	}
+	
+	
 	/**
 	 * @brief Funcion que genera el display donde se muestran los valores
 	 *        numericos
@@ -92,16 +108,7 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		upperFlowPanel.add(Box.createRigidArea(new Dimension(0, 1)));
 		upperFlowPanel.add(generateNextPCButton());
 		upperFlowPanel.add(generateReadMemoryButton());
-		JButton boton = new JButton("MostrarFlags");
-		//BOTON PROVISORIO
-			boton.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent evento) {
-					// printer.append("Apretaste el Boton\n");
-					serialManager.printAllFlags();
-				}
-			});
-			upperFlowPanel.add(boton);
-		//FIN BOTON PROVISORIO
+		upperFlowPanel.add(generateExecuteAllButton());
 		boxPanel.add(upperFlowPanel);
 
 		panelContenedor.add(boxPanel, BorderLayout.NORTH);
@@ -121,7 +128,18 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		});
 		return boton;
 	}
-	
+
+	private JButton generateExecuteAllButton() {
+		JButton boton = new JButton("Ejecutar Todo");
+		boton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evento) {
+				// printer.append("Apretaste el Boton\n");
+				maySerialCom();
+			}
+		});
+		return boton;
+	}
+
 	/**
 	 * @brief Funcion que crea el boton que cambia la temperatura maxima
 	 * @return
@@ -132,12 +150,11 @@ public class GUI_Debugger extends JFrame implements Runnable {
 			public void actionPerformed(ActionEvent evento) {
 				// printer.append("Apretaste el Boton\n");
 				readSerialRAM();
-				//printOrange("Apretaste el Boton que lee la memoria\n");
+				// printOrange("Apretaste el Boton que lee la memoria\n");
 			}
 		});
 		return boton;
 	}
-	
 
 	/**
 	 * @brief Funcion que actualiza el valor del PC
@@ -185,7 +202,6 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	private JMenu createFileMenu() {
 		JMenu fileMenu = new JMenu("Archivo");
 
-		
 		JMenuItem elementoLimpiar = new JMenuItem("Limpiar Pantalla");
 		fileMenu.add(elementoLimpiar);
 		elementoLimpiar.addActionListener(new ActionListener() {
@@ -193,7 +209,7 @@ public class GUI_Debugger extends JFrame implements Runnable {
 				printer.setText("");
 			}
 		});
-		
+
 		JMenuItem elementoSalir = new JMenuItem("Salir");
 		fileMenu.add(elementoSalir);
 		elementoSalir.addActionListener(new ActionListener() {
@@ -217,6 +233,24 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		serialPort.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent evento) {
 				chooseSerialPort();
+			}
+		});
+
+		JMenuItem manyEx = new JMenuItem("Establecer Cantidad de Instrucciones");
+		optionsMenu.add(manyEx);
+		manyEx.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent evento) {
+				// chooseSerialPort();
+				cantidadDeEjecuciones = Integer.parseInt(JOptionPane
+						.showInputDialog("Ingrese el numero de Instrucciones a ejecutar"));
+				if (cantidadDeEjecuciones < 1) {
+					JOptionPane
+							.showMessageDialog(
+									null,
+									"ERROR: El valor ingresado debe ser mayor que cero",
+									"Error", JOptionPane.INFORMATION_MESSAGE);
+				}
+				// System.out.println(cantidadDeEjecuciones);
 			}
 		});
 
@@ -251,9 +285,11 @@ public class GUI_Debugger extends JFrame implements Runnable {
 						"Integrantes:\n"
 								+ "  - Murphy Vegas\n"
 								+ "  - Schild Marcelo\n\n"
-								+ "Version 0.04"
+								+ "Version 1.00"
 								+ "\nFunciones implementadas:\n"
-								+ "  - Interfaz Grafica\n  - Boton para avanzar una instruccion\n",
+								+ "  - Interfaz Grafica\n  - Comunicacion Serial\n  - Boton para avanzar una instruccion\n"
+								+ "  - Boton para leer la RAM\n  - Avance de multiples ciclos\n"
+								+ "  - Limpiar Pantalla\n  - Colores en la GUI\n  - Elegir el puerto COM",
 						"Acerca de " + NOMBREVENTANA,
 						JOptionPane.INFORMATION_MESSAGE);
 	}// **************************************************************************************************************//
@@ -277,34 +313,28 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	 */
 	private void startSerialCom() {
 		if (serialManager.getSerialPort() == null) {
-			JOptionPane
-					.showMessageDialog(null, "ERROR: Puerto serie Nulo",
-							"Instrucciones Soportadas",
-							JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "ERROR: Puerto serie Nulo",
+					"Error", JOptionPane.INFORMATION_MESSAGE);
 		} else {
 			// System.err.println("Falta Implementar");
 			serialManager.serialComunication();
 		}
 	}
-	
-	
+
 	private void readSerialRAM() {
 		if (serialManager.getSerialPort() == null) {
-			JOptionPane
-					.showMessageDialog(null, "ERROR: Puerto serie Nulo",
-							"Instrucciones Soportadas",
-							JOptionPane.INFORMATION_MESSAGE);
+			JOptionPane.showMessageDialog(null, "ERROR: Puerto serie Nulo",
+					"Error", JOptionPane.INFORMATION_MESSAGE);
 		} else {
 			// System.err.println("Falta Implementar");
 			serialManager.serialMemory();
 		}
 	}
-	
 
 	public void printBlack(String cadena) {
 		printColor(cadena, 1);
 	}
-	
+
 	public void printBlue(String cadena) {
 		printColor(cadena, 2);
 	}
@@ -313,15 +343,13 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		printColor(cadena, 4);
 	}
 
-	
 	public void printOrange(String cadena) {
 		printColor(cadena, 5);
 	}
-	
+
 	public void printRed(String cadena) {
 		printColor(cadena, 6);
 	}
-	
 
 	/**
 	 * @brief Funcion que permite imprimir texto en el area de texto de la GUI
@@ -330,9 +358,9 @@ public class GUI_Debugger extends JFrame implements Runnable {
 	public void printText(String cadena) {
 		printColor(cadena, 0);
 	}
-	
+
 	private void printColor(String cadena, int color) {
-		
+
 		// Agregar el include coloreado y devolver una linea vacia
 		SimpleAttributeSet[] formatos = initAttributes(cadena.length() + 10);
 		try {
@@ -343,15 +371,34 @@ public class GUI_Debugger extends JFrame implements Runnable {
 			System.err.println("Excepcion de mala ubicacion (TextPane)");
 		}
 	}
-	
 
 	public void printTextLine(String cadena) {
 		printText(cadena + "\n");
 	}
 
 
-	
-	
+	private void maySerialCom() {
+		if (serialManager.getSerialPort() == null) {
+			JOptionPane.showMessageDialog(null, "ERROR: Puerto serie Nulo",
+					"Error", JOptionPane.INFORMATION_MESSAGE);
+		} else {
+			if (cantidadDeEjecuciones > 0) {
+				// System.err.println("Falta Implementar");
+				printBlack("\n\n");
+				for (int i = 0; i < cantidadDeEjecuciones - 1; i++) {
+					serialManager.manySerialComunications();
+				}
+				try {
+					Thread.sleep(200);
+				} catch (InterruptedException e) {
+					System.err.println("ERROR: SLEEP");
+				}
+				serialManager.serialComunication();
+				serialManager.serialMemory();
+			}
+		}
+	}
+
 	/**
 	 * @brief: Metodo que inicializa la fuente por defecto del campo de texto.
 	 * @param length
@@ -392,7 +439,7 @@ public class GUI_Debugger extends JFrame implements Runnable {
 		StyleConstants.setForeground(attrs[5], Color.orange);
 		StyleConstants.setBold(attrs[5], true);
 		StyleConstants.setItalic(attrs[5], false);
-		
+
 		// Rojo
 		attrs[6] = new SimpleAttributeSet(attrs[0]);
 		StyleConstants.setForeground(attrs[6], Color.red);

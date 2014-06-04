@@ -4,10 +4,10 @@
 // Company: 
 // Engineer:
 //
-// Create Date:   17:29:00 05/08/2014
+// Create Date:   16:55:54 06/04/2014
 // Design Name:   Pipeline
-// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/PipaDeLinea/pipelineTest.v
-// Project Name:  PipaDeLinea
+// Module Name:   C:/Users/Marcelo/Documents/XilinxProjects/Pipeline/pipelineTest.v
+// Project Name:  Pipeline
 // Target Device:  
 // Tool versions:  
 // Description: 
@@ -26,19 +26,61 @@ module pipelineTest;
 
 	// Inputs
 	reg clk;
+	reg debugClk;
+	reg [31:0] DebugAddress;
+	reg debugMode;
 
 	// Outputs
 	wire [3:0] aluInstruction;
 	wire equalFlag;
 	wire [31:0] rtData;
 	wire [31:0] rsData;
+	wire [31:0] reg_array0;
+	wire [31:0] reg_array1;
+	wire [31:0] reg_array2;
+	wire [31:0] reg_array3;
+	wire [31:0] reg_array4;
+	wire [31:0] reg_array5;
+	wire [31:0] reg_array6;
+	wire [31:0] reg_array7;
+	wire [31:0] reg_array8;
+	wire [31:0] reg_array9;
+	wire [31:0] reg_array10;
+	wire [31:0] reg_array11;
+	wire [31:0] reg_array12;
+	wire [31:0] reg_array13;
+	wire [31:0] reg_array14;
+	wire [31:0] reg_array15;
+	wire [31:0] reg_array16;
+	wire [31:0] reg_array17;
+	wire [31:0] reg_array18;
+	wire [31:0] reg_array19;
+	wire [31:0] reg_array20;
+	wire [31:0] reg_array21;
+	wire [31:0] reg_array22;
+	wire [31:0] reg_array23;
+	wire [31:0] reg_array24;
+	wire [31:0] reg_array25;
+	wire [31:0] reg_array26;
+	wire [31:0] reg_array27;
+	wire [31:0] reg_array28;
+	wire [31:0] reg_array29;
+	wire [31:0] reg_array30;
+	wire [31:0] reg_array31;
 	wire [31:0] instruction_IF;
 	wire [31:0] PC_sumado_IF;
 	wire [31:0] instruction_ID;
+	wire savePc_ID;
+	wire savePc_EX;
+	wire savePc_MEM;
+	wire savePc_WB;
 	wire [31:0] Read_Data_1_ID;
 	wire [31:0] Read_Data_2_ID;
 	wire [31:0] signExtended_ID;
 	wire [31:0] PC_sumado_ID;
+	wire [31:0] PC_sumado_EX;
+	wire [31:0] PC_sumado_MEM;
+	wire [31:0] PC_sumado_WB;
 	wire RegDest_ID;
 	wire BranchEQ_ID;
 	wire BranchNE_ID;
@@ -51,7 +93,6 @@ module pipelineTest;
 	wire RegWrite_ID;
 	wire ShiftToTrunk_ID;
 	wire [1:0] trunkMode_ID;
-	wire [31:0] PC_sumado_EX;
 	wire [31:0] Read_Data_1_EX;
 	wire [31:0] Read_Data_2_EX;
 	wire [31:0] aluInput1;
@@ -99,6 +140,7 @@ module pipelineTest;
 	wire BranchTaken;
 	wire Jump_ID;
 	wire IF_Flush;
+	wire JReg_ID;
 
 	// Instantiate the Unit Under Test (UUT)
 	Pipeline uut (
@@ -107,13 +149,53 @@ module pipelineTest;
 		.equalFlag(equalFlag), 
 		.rtData(rtData), 
 		.rsData(rsData), 
+		.reg_array0(reg_array0), 
+		.reg_array1(reg_array1), 
+		.reg_array2(reg_array2), 
+		.reg_array3(reg_array3), 
+		.reg_array4(reg_array4), 
+		.reg_array5(reg_array5), 
+		.reg_array6(reg_array6), 
+		.reg_array7(reg_array7), 
+		.reg_array8(reg_array8), 
+		.reg_array9(reg_array9), 
+		.reg_array10(reg_array10), 
+		.reg_array11(reg_array11), 
+		.reg_array12(reg_array12), 
+		.reg_array13(reg_array13), 
+		.reg_array14(reg_array14), 
+		.reg_array15(reg_array15), 
+		.reg_array16(reg_array16), 
+		.reg_array17(reg_array17), 
+		.reg_array18(reg_array18), 
+		.reg_array19(reg_array19), 
+		.reg_array20(reg_array20), 
+		.reg_array21(reg_array21), 
+		.reg_array22(reg_array22), 
+		.reg_array23(reg_array23), 
+		.reg_array24(reg_array24), 
+		.reg_array25(reg_array25), 
+		.reg_array26(reg_array26), 
+		.reg_array27(reg_array27), 
+		.reg_array28(reg_array28), 
+		.reg_array29(reg_array29), 
+		.reg_array30(reg_array30), 
+		.reg_array31(reg_array31), 
+		.debugClk(debugClk), 
 		.instruction_IF(instruction_IF), 
 		.PC_sumado_IF(PC_sumado_IF), 
 		.instruction_ID(instruction_ID), 
+		.savePc_ID(savePc_ID), 
+		.savePc_EX(savePc_EX), 
+		.savePc_MEM(savePc_MEM), 
+		.savePc_WB(savePc_WB), 
 		.Read_Data_1_ID(Read_Data_1_ID), 
 		.Read_Data_2_ID(Read_Data_2_ID), 
 		.signExtended_ID(signExtended_ID), 
 		.PC_sumado_ID(PC_sumado_ID), 
+		.PC_sumado_EX(PC_sumado_EX), 
+		.PC_sumado_MEM(PC_sumado_MEM), 
+		.PC_sumado_WB(PC_sumado_WB), 
 		.RegDest_ID(RegDest_ID), 
 		.BranchEQ_ID(BranchEQ_ID), 
 		.BranchNE_ID(BranchNE_ID), 
@@ -126,7 +208,6 @@ module pipelineTest;
 		.RegWrite_ID(RegWrite_ID), 
 		.ShiftToTrunk_ID(ShiftToTrunk_ID), 
 		.trunkMode_ID(trunkMode_ID), 
-		.PC_sumado_EX(PC_sumado_EX), 
 		.Read_Data_1_EX(Read_Data_1_EX), 
 		.Read_Data_2_EX(Read_Data_2_EX), 
 		.aluInput1(aluInput1), 
@@ -173,13 +254,20 @@ module pipelineTest;
 		.forwardB(forwardB), 
 		.BranchTaken(BranchTaken), 
 		.Jump_ID(Jump_ID), 
-		.IF_Flush(IF_Flush)
+		.IF_Flush(IF_Flush), 
+		.JReg_ID(JReg_ID), 
+		.DebugAddress(DebugAddress), 
+		.debugMode(debugMode)
 	);
 
-	always #10 clk=~clk;
+	always #20 clk=~clk;
+
 	initial begin
 		// Initialize Inputs
 		clk = 0;
+		debugClk = 0;
+		DebugAddress = 0;
+		debugMode = 0;
 
 		// Wait 100 ns for global reset to finish
 		#100;

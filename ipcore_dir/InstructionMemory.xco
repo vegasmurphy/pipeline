@@ -1,7 +1,7 @@
 ##############################################################
 #
 # Xilinx Core Generator version 14.2
-# Date: Fri May 30 20:51:08 2014
+# Date: Wed Jun 04 19:31:46 2014
 #
 ##############################################################
 #
@@ -46,7 +46,7 @@ CSET axi_id_width=4
 CSET axi_slave_type=Memory_Slave
 CSET axi_type=AXI4_Full
 CSET byte_size=9
-CSET coe_file=C:\Users\Marcelo\Desktop\Archivo.coe
+CSET coe_file="D:\Facultad\Aplicaciones Java\MIPS Assembler\Archivo.coe"
 CSET collision_warnings=ALL
 CSET component_name=InstructionMemory
 CSET disable_collision_warnings=false
@@ -103,4 +103,4 @@ CSET write_width_b=32
 MISC pkg_timestamp=2012-06-25T21:54:09Z
 # END Extra information
 GENERATE
-# CRC:  a292311
+# CRC: f013cc84

@@ -23,6 +23,7 @@ public class SerialManager {
 			"Reg18: ", "Reg19: ", "Reg20: ", "Reg21: ", "Reg22: ", "Reg23: ",
 			"Reg24: ", "Reg25: ", "Reg26: ", "Reg27: ", "Reg28: ", "Reg29: ",
 			"Reg30: ", "Reg31: " };
+	private static String[] valoresRegistros = new String[32];
 	private static ArrayList<Flag> flagsID;
 	private static ArrayList<Flag> flagsEX;
 	private static ArrayList<Flag> flagsMEM;
@@ -52,6 +53,9 @@ public class SerialManager {
 		return ports;
 	}
 
+
+	
+	
 	/**
 	 * @brief Funcion que lleva a cabo la comunicacion serie. ESTA ES LA QUE HAY
 	 *        QUE MODIFICIAR PARA AGREGAR COSAS
@@ -70,6 +74,8 @@ public class SerialManager {
 			printOrange("\n\nNueva Lectura:\n---------------------------------------------------------------------------------------------"
 					+ "-----------------------------------------------------------------------------------------------------------------\n");
 			readAllData();
+			printRegisters();
+			printStages();
 			serialPort.closePort();
 			// }
 		} catch (SerialPortException ex) {
@@ -77,6 +83,25 @@ public class SerialManager {
 		}
 	}
 	
+	
+	public static void manySerialComunications(){
+		try {
+			// while (true) {
+			serialPort.openPort();// Open port
+			serialPort.setParams(2400, 8, 1, 0);// Set params
+			int mask = SerialPort.MASK_RXCHAR + SerialPort.MASK_CTS
+					+ SerialPort.MASK_DSR;// Prepare mask
+			serialPort.setEventsMask(mask);// Set mask
+			serialPort.writeBytes("A".getBytes());
+			serialPort.writeBytes("o".getBytes());
+			b = serialPort.readBytes(1);
+			readAllData();;
+			serialPort.closePort();
+			// }
+		} catch (SerialPortException ex) {
+			System.out.println(ex);
+		}
+	}
 	
 	public void serialMemory() {
 		try {
@@ -138,61 +163,76 @@ public class SerialManager {
 		readAndUpdateProgramCounter(bb);
 
 		// Imprimir Instruccion y registros
-		readAndPrintInstruction("\nInstruccion(IF): ");
+		readAndSaveInstruction("\nInstruccion(IF): ", 0);
 
 		// Imprimir los 32 Registros
-		readAndPrintRegisters(bb);
+		readAndSaveRegisters(bb);
 
 		// Imprimir el contenido del Latch ID
-		readAndPrintInstruction("\n\nInstruccion(ID): ");
+		readAndSaveInstruction("\nInstruccion(ID): ",1);
 
-		readAndPrintValue("\tReg-s: ", bb);
-		readAndPrintValue("\t\tReg-t: ", bb);
+		readAndSaveValue("\tReg-s: ", bb,3);
+		readAndSaveValue("\t\tReg-t: ", bb,4);
 
 		// Print Flags ID
 		readAndSaveIDEXFlags(bb);
 
 		// Print Etapa EX
-		readAndPrintValue("\n\nPC sumado (EX): ", bb);
-		readAndPrintValue("\t\tRead_Data_1 (EX): ", bb);
-		readAndPrintValue("\tRead_Data_2 (EX): ", bb);
-		readAndPrintInstruction("\nInstruction(EX):   ");
+		readAndSaveValue("\nPC sumado (EX): ", bb,5);
+		readAndSaveValue("\t\tRead_Data_1 (EX): ", bb,6);
+		readAndSaveValue("\tRead_Data_2 (EX): ", bb,7);
+		readAndSaveInstruction("\nInstruction(EX):   ",2);
 
-		readAndPrintValue("\tALU_Result (EX):    ", bb);
-		readAndPrintValue("\tALU_Result (MEM): ", bb);
+		readAndSaveValue("\tALU_Result (EX):    ", bb,9);
+		readAndSaveValue("\tALU_Result (MEM): ", bb,10);
 
 		//Print Flags EX/MEM
-		readAndPrintEXFlags(bb);
-		readAndPrintMEMFlags(bb);
+		readAndSaveEXFlags(bb);
+		readAndSaveMEMFlags(bb);
 
-		readAndPrintValue("\nRead_Data (MEM): ", bb);
-		readAndPrintValue("\tRead_Data (WB): ", bb);
-		readAndPrintValue("\tALU_Result (WB): ", bb);
-		readAndPrintValue("\tRead_Data_2 (MEM)",bb);
+		readAndSaveValue("\nRead_Data (MEM): ", bb,12);
+		readAndSaveValue("\tRead_Data (WB): ", bb,13);
+		readAndSaveValue("\tALU_Result (WB): ", bb,11);
+		readAndSaveValue("\tRead_Data_2 (MEM)",bb,8);
 		
 		readAndSaveJALFlags();
-		printAllFlags();
 	}
 
+	
+	
+	
 	/*
 	 * @brief Funion que imprime los 32 Registros
 	 */
-	private static void readAndPrintRegisters(ByteBuffer bb) {
+	private static void readAndSaveRegisters(ByteBuffer bb) {
 		try {
 			for (int i = 0; i < 32; i++) {
 				b = serialPort.readBytes(4);
-				if (i % 5 == 0) {
+				/*if (i % 5 == 0) {
 					printBlack("\n");
 				} else {
 					printBlack("\t");
 				}
-				printBlack(registros[i]);
+				printBlack(registros[i]);*/
 				bb = ByteBuffer.wrap(b);
 				bb.order(ByteOrder.LITTLE_ENDIAN);
-				printGray(bb.getInt() + " ");
+				valoresRegistros[i]=bb.getInt() + "";
+				//printGray(bb.getInt() + " ");
 			}
 		} catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
+		}
+	}
+	
+	private static void printRegisters(){
+		for (int i = 0; i < 32; i++) {
+			if (i % 5 == 0) {
+				printBlack("\n");
+			} else {
+				printBlack("\t");
+			}
+			printBlack(registros[i]);
+			printGray(valoresRegistros[i]);
 		}
 	}
 
@@ -201,14 +241,15 @@ public class SerialManager {
 	 * @param nombre
 	 * @param bb
 	 */
-	private static void readAndPrintValue(String nombre, ByteBuffer bb) {
+	private static void readAndSaveValue(String nombre, ByteBuffer bb, int index) {
 		try {
 
 			b = serialPort.readBytes(4);
-			printBlack(nombre);
 			bb = ByteBuffer.wrap(b);
 			bb.order(ByteOrder.LITTLE_ENDIAN);
-			printGray(bb.getInt() + " ");
+			InstruccionesYRegistros.get(index).setValor(bb.getInt() + "");
+			//printBlack(nombre);
+			//printGray(bb.getInt() + " ");
 
 		} catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
@@ -220,16 +261,18 @@ public class SerialManager {
 	 * @param nombre
 	 * @param bb
 	 */
-	private static void readAndPrintInstruction(String nombre) {
+	private static void readAndSaveInstruction(String nombre, int index) {
 		try {
 			b = serialPort.readBytes(4);
 			byte[] b2=new byte[4];
-			printBlack(nombre);
 			for (int i = 0; i < b.length; i++){
 				b2[3-i]=b[i];
 				//printGray(b[b.length-i-1] + " ");
 				}
-			printGray(bytArrayToHex(b2));
+			String cadena = bytArrayToHex(b2);
+			InstruccionesYRegistros.get(index).setValor(cadena);
+			//printBlack(nombre);
+			//printGray(cadena);
 		} catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
 		}
@@ -350,7 +393,7 @@ public class SerialManager {
 
 	}
 
-	private static void readAndPrintEXFlags(ByteBuffer bb) {
+	private static void readAndSaveEXFlags(ByteBuffer bb) {
 		try {
 			print("\n");
 			boolean ShiftToTrunk_EX, Zero_EX, BranchEQ_MEM, BranchNE_MEM, MemRead_MEM, MemToReg_MEM, MemWrite_MEM, RegWrite_MEM;
@@ -382,7 +425,7 @@ public class SerialManager {
 		}
 	}
 
-	private static void readAndPrintMEMFlags(ByteBuffer bb) {
+	private static void readAndSaveMEMFlags(ByteBuffer bb) {
 		try {
 			boolean Jump_MEM, Zero_MEM, MemToReg_WB;
 			b = serialPort.readBytes(1);
@@ -393,7 +436,7 @@ public class SerialManager {
 			flagsMEM.get(4).setEstado(Jump_MEM);
 			flagsMEM.get(5).setEstado(Zero_MEM);
 			flagsWB.get(0).setEstado(MemToReg_WB);
-			flagsEX.get(11).setRegistro(Write_register_EX);
+			flagsEX.get(12).setRegistro(Write_register_EX);
 			/*printBlack("\nJump (MEM): ");printFlag(Jump_MEM);
 			printBlack("\tZero (MEM): \t");printFlag(Zero_MEM);
 			printBlack("\nMemToReg (WB): ");printFlag(MemToReg_WB);
@@ -408,7 +451,7 @@ public class SerialManager {
 			flagsWB.get(1).setEstado(RegWrite_WB);
 			flagsID.get(11).setEstado(BranchTaken);
 			flagsID.get(12).setEstado(Jump_ID);
-			flagsMEM.get(6).setRegistro(Write_register_MEM);
+			flagsMEM.get(7).setRegistro(Write_register_MEM);
 			/*printBlack("\nRegWrite (WB): ");printFlag(RegWrite_WB);
 			printBlack("\tBranchTaken (ID): ");printFlag(BranchTaken);
 			printBlack("\nJump (ID): \t");printFlag(Jump_ID);
@@ -423,7 +466,7 @@ public class SerialManager {
 			flagsIF.get(0).setEstado(IF_Flush1);
 			flagsIF.get(1).setEstado(IF_Flush2);
 			flagsIF.get(2).setEstado(forwardA);
-			flagsWB.get(2).setRegistro(Write_register_WB);
+			flagsWB.get(3).setRegistro(Write_register_WB);
 			/*printBlack("\nIF_Flush1: \t");printFlag(IF_Flush1);
 			printBlack("\tIF_Flush2: \t");printFlag(IF_Flush2);
 			printBlack("\nforwardA: \t");printFlag(forwardA);
@@ -468,11 +511,16 @@ public class SerialManager {
 			savePc_MEM = (b[0] & 0x20) != 0;
 			savePc_WB = (b[0] & 0x10) != 0;
 			JReg_ID = (b[0] & 0x08) != 0;
-			printBlack("\nSavePc (ID): ");printFlag(savePc_ID);
-			printBlack("\tSavePc (EX): ");printFlag(savePc_EX);
-			printBlack("\tSavePc (MEM): ");printFlag(savePc_MEM);
-			printBlack("\nSavePc (WB): ");printFlag(savePc_WB);
-			printBlack("\tJReg (ID): ");printFlag(JReg_ID);
+			flagsID.get(13).setEstado(savePc_ID);
+			flagsEX.get(11).setEstado(savePc_EX);
+			flagsMEM.get(7).setEstado(savePc_MEM);
+			flagsWB.get(2).setEstado(savePc_WB);
+			flagsID.get(14).setEstado(JReg_ID);
+			//printBlack("\nSavePc (ID): ");printFlag(savePc_ID);
+			//printBlack("\tSavePc (EX): ");printFlag(savePc_EX);
+			//printBlack("\tSavePc (MEM): ");printFlag(savePc_MEM);
+			//printBlack("\nSavePc (WB): ");printFlag(savePc_WB);
+			//printBlack("\tJReg (ID): ");printFlag(JReg_ID);
 			
 		}catch (SerialPortException e) {
 			System.err.println("Serial Port Exception");
@@ -498,7 +546,8 @@ public class SerialManager {
 		flagsID.add(new Flag("\tTrunkMode_2 (ID): "));
 		flagsID.add(new Flag("\tBranchTaken (ID): "));
 		flagsID.add(new Flag("\nJump (ID): \t")); 
-		//flagsID.add(new Flag("\tSavePc (ID): ")); 
+		flagsID.add(new Flag("\tSavePc (ID): ")); //13
+		flagsID.add(new Flag("\tJReg (ID): \t")); //14
 		
 		flagsEX = new ArrayList<Flag>();
 		flagsEX.add(new Flag("\nRegDest (EX): "));
@@ -514,8 +563,8 @@ public class SerialManager {
 		flagsEX.add(new Flag("\tTrunkMode_2 (EX): "));
 		flagsEX.add(new Flag("\nShiftToTrunk (EX): "));
 		flagsEX.add(new Flag("\tZero (EX): \t"));
-		//flagsEX.add(new Flag("\tSavePc (ID): "));
-		flagsEX.add(new Flag("\nWrite_Register (EX): "));
+		flagsEX.add(new Flag("\tSavePc (EX): "));
+		flagsEX.add(new Flag("\t\tWrite_Register (EX): "));
 		
 		flagsMEM = new ArrayList<Flag>();
 		//flagsMEM.add(new Flag("\nBranchEQ (MEM): "));
@@ -526,12 +575,14 @@ public class SerialManager {
 		flagsMEM.add(new Flag("\nRegWrite (MEM): "));
 		flagsMEM.add(new Flag("\tJump (MEM): "));
 		flagsMEM.add(new Flag("\tZero (MEM): \t"));
-		flagsMEM.add(new Flag("\nWrite_Register (MEM): "));
+		flagsMEM.add(new Flag("\nSavePc (MEM): "));
+		flagsMEM.add(new Flag("\tWrite_Register (MEM): "));
 		
 		flagsWB = new ArrayList<Flag>();
 		flagsWB.add(new Flag("\nMemToReg (WB): "));
 		flagsWB.add(new Flag("\tRegWrite (WB): "));
-		flagsWB.add(new Flag("\nWrite_Register (WB): "));
+		flagsWB.add(new Flag("\nSavePc (WB): "));
+		flagsWB.add(new Flag("\tWrite_Register (WB): "));
 		
 		flagsIF = new ArrayList<Flag>();
 		flagsIF.add(new Flag("\nIF_Flush1: \t"));
@@ -550,75 +601,107 @@ public class SerialManager {
 	private void inicializarInstruccionesYRegistros(){
 		InstruccionesYRegistros=new ArrayList<Flag>();
 		InstruccionesYRegistros.add(new Flag("\nInstruccion(IF): "));
-		InstruccionesYRegistros.add(new Flag("\n\nInstruccion(ID): "));
-		InstruccionesYRegistros.add(new Flag("\nInstruction(EX):   "));
+		InstruccionesYRegistros.add(new Flag("\nInstruccion(ID): "));
+		InstruccionesYRegistros.add(new Flag("\nInstruction(EX):    "));
 		InstruccionesYRegistros.add(new Flag("\tReg-s: "));
-		InstruccionesYRegistros.add(new Flag("\t\tReg-t: "));
-		InstruccionesYRegistros.add(new Flag("\n\nPC sumado (EX): "));
-		InstruccionesYRegistros.add(new Flag("\t\tRead_Data_1 (EX): "));
-		InstruccionesYRegistros.add(new Flag("\tRead_Data_2 (EX): "));
-		InstruccionesYRegistros.add(new Flag("\tALU_Result (EX):    "));
-		InstruccionesYRegistros.add(new Flag("\tALU_Result (MEM): "));
-		InstruccionesYRegistros.add(new Flag("\nRead_Data (MEM): "));
-		InstruccionesYRegistros.add(new Flag("\tRead_Data (WB): "));
-		InstruccionesYRegistros.add(new Flag("\tALU_Result (WB): "));
-		InstruccionesYRegistros.add(new Flag("\tRead_Data_2 (MEM)"));
+		InstruccionesYRegistros.add(new Flag("\tReg-t: "));
+		InstruccionesYRegistros.add(new Flag("\nPC sumado (EX): "));
+		InstruccionesYRegistros.add(new Flag("\tRead_Data_1 (EX):\t"));
+		InstruccionesYRegistros.add(new Flag("\tRead_Data_2 (EX):\t"));
+		InstruccionesYRegistros.add(new Flag("\nRead_Data_2 (MEM): "));
+		InstruccionesYRegistros.add(new Flag("\nALU_Result (EX): "));
+		InstruccionesYRegistros.add(new Flag("\nALU_Result (MEM):    "));
+		InstruccionesYRegistros.add(new Flag("\nALU_Result (WB): "));
+		InstruccionesYRegistros.add(new Flag("\t\tRead_Data (MEM):\t"));
+		InstruccionesYRegistros.add(new Flag("\t\tRead_Data (WB): "));
 	}
 	
 	
-	private static void printAllFlagsID(){
-		printOrange("\nFlags ID:");
-		for(int i=0;i<flagsID.size();i++){
-			printBlack(flagsID.get(i).getNombre()+"["+i+"] ");
-			printFlag(flagsID.get(i).getEstado());
+	private static void printNameAndValue(int index){
+		printBlack(InstruccionesYRegistros.get(index).getNombre());
+		printGray(InstruccionesYRegistros.get(index).getValor());
+	}
+	
+	private static void printList(ArrayList<Flag> flags, boolean minusOne){
+		if(minusOne){
+			for(int i=0;i<flags.size()-1;i++){
+				//printBlack(flags.get(i).getNombre()+"["+i+"] ");
+				printBlack(flags.get(i).getNombre());
+				printFlag(flags.get(i).getEstado());
+			}
+		}
+		else{
+			for(int i=0;i<flags.size();i++){
+				//printBlack(flags.get(i).getNombre()+"["+i+"] ");
+				printBlack(flags.get(i).getNombre());
+				
+				printFlag(flags.get(i).getEstado());
+			}
 		}
 	}
 	
-	private static void printAllFlagsEX(){
-		printOrange("\nFlags EX:");
-		for(int i=0;i<flagsEX.size()-1;i++){
-			printBlack(flagsEX.get(i).getNombre()+"["+i+"] ");
-			printFlag(flagsEX.get(i).getEstado());
-		}
-		printBlack(flagsEX.get(flagsEX.size()-1).getNombre()+"["+(flagsEX.size()-1)+"] ");
+	private static void printID(){
+		printOrange("\nEtapa ID:");
+		printNameAndValue(1); //Instruction ID
+		printNameAndValue(3); //Reg-s
+		printNameAndValue(4); //Reg-t
+		//Print ID Flags
+		printList(flagsID,false);
+	}
+	
+	private static void printEX(){
+		printOrange("\nEtapa EX:");
+		printNameAndValue(2); //Instruction EX
+		printNameAndValue(6); //Read Data 1 EX
+		printNameAndValue(7); //Read Data 2 EX
+		printNameAndValue(9); //ALU Result EX
+		//Write_Register
+		//printBlack(flagsEX.get(flagsEX.size()-1).getNombre()+"["+(flagsEX.size()-1)+"] ");
+		printBlack(flagsEX.get(flagsEX.size()-1).getNombre()+"\t");
 		printGray(flagsEX.get(flagsEX.size()-1).getRegistro()+"");
+		//Print flags EX
+		printList(flagsEX,true);
 	}
 	
 	
-	private static void printAllFlagsMEM(){
-		printOrange("\nFlags MEM:");
-		for(int i=0;i<flagsMEM.size()-1;i++){
-			printBlack(flagsMEM.get(i).getNombre()+"["+i+"] ");
-			printFlag(flagsMEM.get(i).getEstado());
-		}
-		printBlack(flagsMEM.get(flagsMEM.size()-1).getNombre()+"["+(flagsMEM.size()-1)+"] ");
+	private static void printMEM(){
+		printOrange("\nEtapa MEM:");
+		printNameAndValue(8); //Read_Data_2 (MEM)
+		printNameAndValue(12);//Read_Data (MEM)
+		printNameAndValue(10);//Alu_Result (MEM)
+		//Write Register MEM
+		//printBlack(flagsMEM.get(flagsMEM.size()-1).getNombre()+"["+(flagsMEM.size()-1)+"] ");
+		printBlack("\t"+flagsMEM.get(flagsMEM.size()-1).getNombre()+"\t");
 		printGray(flagsMEM.get(flagsMEM.size()-1).getRegistro()+"");
+		//Flags MEM
+		printList(flagsMEM, true);
 		
 	}
 	
-	private static void printAllFlagsWB(){
-		printOrange("\nFlags WB:");
-		for(int i=0;i<flagsWB.size()-1;i++){
-			printBlack(flagsWB.get(i).getNombre()+"["+i+"] ");
-			printFlag(flagsWB.get(i).getEstado());
-		}
-		printBlack(flagsWB.get(flagsWB.size()-1).getNombre()+"["+(flagsWB.size()-1)+"] ");
+	private static void printWB(){
+		printOrange("\nEtapa WB:");
+		printNameAndValue(11);
+		printNameAndValue(13);
+		
+		//Write Register WB
+		//printBlack(flagsWB.get(flagsWB.size()-1).getNombre()+"["+(flagsWB.size()-1)+"] ");
+		printBlack(flagsWB.get(flagsWB.size()-1).getNombre());
 		printGray(flagsWB.get(flagsWB.size()-1).getRegistro()+"");
-	}
-	private static void printAllFlagsIF(){
-		printOrange("\nFlags IF:");
-		for(int i=0;i<flagsIF.size();i++){
-			printBlack(flagsIF.get(i).getNombre()+"["+i+"] ");
-			printFlag(flagsIF.get(i).getEstado());
-		}
+		//Flags WB
+		printList(flagsWB, true);
 	}
 	
-	public static void printAllFlags(){
-		printAllFlagsID();
-		printAllFlagsEX();
-		printAllFlagsMEM();
-		printAllFlagsWB();
-		printAllFlagsIF();
+	private static void printIF(){
+		printOrange("\nEtapa IF:");
+		printList(flagsIF, false);
+	}
+	
+	public static void printStages(){
+		printIF();
+		printID();
+		printEX();
+		printMEM();
+		printWB();
 	}
 	
 	

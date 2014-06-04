@@ -200,6 +200,7 @@ module Pipeline(
 	assign ShiftToTrunk_ID = nopMux?1'b0: ShiftToTrunk_control;
 	assign sinSigno_ID = nopMux ? 1'b0 : sinSigno_control;
 	assign JReg_ID = nopMux ? 1'b0 : JReg_control;
+	assign I_Type_ID = nopMux? 1'b0:I_Type_control;
 
 	//*Sacar el signo al signExtended_EX (Para LWU, LHU y LBU)*//
 	wire [31:0]signExtended_usado;
@@ -308,16 +309,20 @@ module Pipeline(
 		.ShiftToTrunk(ShiftToTrunk_control),
 		.sinSigno(sinSigno_control),
 		.JReg(JReg_control),
-		.savePc(savePc_control)
+		.savePc(savePc_control),
+		.I_Type(I_Type_control)
 		
 	);
+	wire [5:0] AluOpcode;
+	assign AluOpcode = I_Type_EX? instruction_EX[31:26]:instruction_EX[5:0];
 	
 	ALUwithControl alu (
 		//.data1(aluInput1),
 		.data1(rsData),
 		.data2(rtData),
 		.sa(instruction_EX[10:6]),
-		.instruction(signExtended_EX[5:0]),
+		//.instruction(signExtended_EX[5:0]),
+		.instruction(AluOpcode),
 		.ALUOp1(ALUOp1_EX),
 		.ALUOp2(ALUOp2_EX),
 		.zero(Zero_EX),
@@ -353,6 +358,7 @@ module Pipeline(
 		.trunkMode_ID(trunkMode_ID),
 		.ShiftToTrunk_ID(ShiftToTrunk_ID),
 		.sinSigno_ID(sinSigno_ID),
+		.I_Type_ID(I_Type_ID),
 		.savePc_ID(savePc_ID),
 		.savePc_EX(savePc_EX),
 		.RegDest_EX(RegDest_EX),
@@ -368,7 +374,8 @@ module Pipeline(
 		.Jump_EX(Jump_EX),
 		.trunkMode_EX(trunkMode_EX),
 		.ShiftToTrunk_EX(ShiftToTrunk_EX),
-		.sinSigno_EX(sinSigno_EX)
+		.sinSigno_EX(sinSigno_EX),
+		.I_Type_EX(I_Type_EX)
 	);
 	
 	EX_MEM ex_mem (
