@@ -77,7 +77,7 @@ module Registers#(
 	reg_array[5]=0;
 	reg_array[6]=0;
 	reg_array[7]=9;
-	reg_array[8]=10;
+	reg_array[8]=258;
 	reg_array[9]=11;
 	reg_array[10]=12;
 	reg_array[11]=13;
