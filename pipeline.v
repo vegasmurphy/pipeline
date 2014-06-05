@@ -22,7 +22,7 @@ module Pipeline(
     input wire clk,
     
 	//Debugging outputs
-	output wire [3:0]aluInstruction,
+	output wire [4:0]aluInstruction,
 	output wire equalFlag,
 	output wire [31:0] rtData,
 	output wire [31:0] rsData,
@@ -159,7 +159,7 @@ module Pipeline(
 		
 		
 	//assign PCSrc = Zero_MEM & Branch_MEM;
-	assign PC_next_ID = signExtended_ID + PC_sumado_ID;
+	assign PC_next_ID = signExtended_ID + PC_sumado_ID-2;
 	//***********************MUXes*****************************//
 	//Mux del PC (Branch)
 	assign PC_next = BranchTaken ? PC_next_ID : PC_sumado_IF;

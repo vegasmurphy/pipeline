@@ -70,37 +70,37 @@ module Registers#(
 	reg [width_B-1:0] reg_array [2**Addr_B-1:0]; //arreglo de 2^Addr_B posiciones (32 registros)
 	initial begin
 	reg_array[0]=0;
-	reg_array[1]=2;
-	reg_array[2]=12;
-	reg_array[3]=5;
-	reg_array[4]=6;
+	reg_array[1]=0;
+	reg_array[2]=0;
+	reg_array[3]=0;
+	reg_array[4]=0;
 	reg_array[5]=0;
 	reg_array[6]=0;
-	reg_array[7]=9;
-	reg_array[8]=258;
-	reg_array[9]=11;
-	reg_array[10]=12;
-	reg_array[11]=13;
-	reg_array[12]=14;
-	reg_array[13]=15;
-	reg_array[14]=16;
-	reg_array[15]=17;
-	reg_array[16]=18;
-	reg_array[17]=19;
-	reg_array[18]=20;
-	reg_array[19]=21;
-	reg_array[20]=22;
-	reg_array[21]=23;
-	reg_array[22]=24;
-	reg_array[23]=25;
-	reg_array[24]=26;
-	reg_array[25]=27;
-	reg_array[26]=28;
-	reg_array[27]=29;
-	reg_array[28]=30;
-	reg_array[29]=31;
-	reg_array[30]=32;
-	reg_array[31]=33;
+	reg_array[7]=0;
+	reg_array[8]=0;
+	reg_array[9]=0;
+	reg_array[10]=0;
+	reg_array[11]=0;
+	reg_array[12]=0;
+	reg_array[13]=0;
+	reg_array[14]=0;
+	reg_array[15]=0;
+	reg_array[16]=0;
+	reg_array[17]=0;
+	reg_array[18]=0;
+	reg_array[19]=0;
+	reg_array[20]=0;
+	reg_array[21]=0;
+	reg_array[22]=0;
+	reg_array[23]=0;
+	reg_array[24]=0;
+	reg_array[25]=0;
+	reg_array[26]=0;
+	reg_array[27]=0;
+	reg_array[28]=0;
+	reg_array[29]=0;
+	reg_array[30]=0;
+	reg_array[31]=0;
 	end
 	
 	assign reg_array0=reg_array[0];
@@ -136,7 +136,7 @@ module Registers#(
 	assign reg_array30=reg_array[30];
 	assign reg_array31=reg_array[31];
 	//Operacion de Escritura
-	always @(posedge clk)
+	always @(negedge clk)
 		if(RegWrite)
 			reg_array[Write_Addr]<=Write_Data;
 	

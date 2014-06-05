@@ -50,7 +50,7 @@ module DataMemoryAccessBlock #
 	//Modulos Instanciados
 	//Memoria RAM
 	DataMemory RAM (
-	  .clka(~clkAux), 			//Entrada de Clock
+	  .clka(clkAux), 			//Entrada de Clock
 	  .wea(WriteEnable), //WriteEnable (1bit)
 	  .addra(address), 	//Bus de Direccion (10 bits)
 	  .dina(TrunkedWriteData),	//Bus de Datos (entrada) (32bits)

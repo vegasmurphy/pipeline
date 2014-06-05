@@ -31,7 +31,7 @@ module pipelineTest;
 	reg debugMode;
 
 	// Outputs
-	wire [3:0] aluInstruction;
+	wire [4:0] aluInstruction;
 	wire equalFlag;
 	wire [31:0] rtData;
 	wire [31:0] rsData;

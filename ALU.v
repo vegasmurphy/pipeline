@@ -24,7 +24,7 @@ module ALU #(parameter WORD_WIDTH = 32)(a_input,b_input,sa,opcode,zero,resultado
    input signed [WORD_WIDTH-1:0] a_input;
    input signed [WORD_WIDTH-1:0] b_input;
 	input [4:0]	sa;
-	input [3:0] opcode;
+	input [4:0] opcode;
 	output reg zero;
 	output reg [WORD_WIDTH-1:0] resultado;
   

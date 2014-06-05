@@ -435,14 +435,14 @@ always @(*)
 					MemRead=0;	//ok
 					MemToReg=0;	//ok
 					ALUOp1=1;	//ok
-					ALUOp2=1;	//ok
+					ALUOp2=0;	//ok
 					MemWrite=0;	//ok
 					ALUSrc=1;	//ok
 					RegWrite=1;	//ok
 					Jump=0;		//ok
 					trunkMode=0;//ok
 					ShiftToTrunk=0;
-					sinSigno=0;
+					sinSigno=1;//Ver si esta bien o no
 					JReg=0;
 					I_Type=1;
 				end
