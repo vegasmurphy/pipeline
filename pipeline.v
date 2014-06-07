@@ -23,7 +23,8 @@ module Pipeline(
     
 	//Debugging outputs
 	output wire [4:0]aluInstruction,
-	output wire equalFlag,
+	//output wire equalFlag,
+	output equalFlag,
 	output wire [31:0] rtData,
 	output wire [31:0] rsData,
 	
@@ -144,6 +145,7 @@ module Pipeline(
 	output [1:0] forwardB,
  
 	//Brances and Jump
+	//output BranchTaken,
 	output BranchTaken,
 	output Jump_ID,
 	output IF_Flush,
@@ -471,6 +473,11 @@ always @(forwardB, Read_Data_2_EX, ALU_result_MEM, Write_Data)
 
 
 // ********************************* Register Comparison for Branch *************************************
+	/*always@(negedge clk)
+	begin
+		equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
+		BranchTaken = (equalFlag & BranchEQ_ID)||(~equalFlag & BranchNE_ID);
+	end*/
 	assign equalFlag = (Read_Data_1_ID == Read_Data_2_ID)? 1'b1:1'b0;
 
 // ********************************* Branch Flag **********************************************

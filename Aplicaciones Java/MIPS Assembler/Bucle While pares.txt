@@ -1,0 +1,38 @@
+;Inicializar los registros
+LUI $R1,0x0000	;Cargar un cero en R1
+SRA $R1,$R1,0x10	;Desplazarlo a los LSB
+LUI $R2,0x0002	;Cargar un cero en R1
+SRA $R2,$R2,16	;Desplazarlo a los LSB
+LUI $R3,0x000A	;Cargar un cero en R1
+SRA $R3,$R3,16	;Desplazarlo a los LSB
+LUI $R4,0x0000	;Cargar un cero en R4
+SRA $R4,$R4,16	;Desplazarlo a los LSB
+
+;Guardar los diez primeros numeros pares en la RAM
+SW $R2,0($R1)	;Guardar el contenido de R2 en [R1]
+ADDI $R1,$R1,0x0001	;Incrementar R1 en 1
+ADDI $R2,$R2,0x0002	;Incrementar R2 en 2
+ADDI $R4,$R4,0x0003	;Incrementar R4 en 3
+BNE $R1,$R3,0xFFFC	;While(R1!=R3) saltar 4 posiciones para atras
+
+;Poner R1 denuevo en cero
+LUI $R1,0x0000	;Cargar un cero en R1
+SRA $R1,$R1,16	;Desplazarlo a los LSB
+
+;Call Subrutina
+JAL 19		;Saltar a la posicion 14
+ADDI $R1,$R1,0x0001	;Incrementar R1 en uno
+LW $R7,0($R1)	;Guardar en $R6 el contenido de [R1]
+
+;Volver a cero
+J 0x0000		;Volver a empezar
+
+;Subrutina Leer RAM
+LW $R4,0($R1)	;Guardar en $R4 el contenido de [R1]
+ADDI $R1,$R1,0x0001	;Incrementar R1 en uno
+LW $R5,0($R1)	;Guardar en $R5 el contenido de [R1]
+ADDI $R1,$R1,0x0001	;Incrementar R1 en uno
+LW $R6,0($R1)	;Guardar en $R6 el contenido de [R1]
+ADDI $R1,$R1,0x0001	;Incrementar R1 en uno
+JR $R31		;Retornar de la subrutina
+;Fin de la Subrutina

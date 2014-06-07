@@ -233,6 +233,7 @@ module UART_writer(
 				begin
 					clkPipe=0;
 					fifo_wr_en=1;
+					fifo_din <= PC_sumado_IF[7:0];
 					case(currentRegister)
 						//Un cero al Principio
 						//8'b00000000:fifo_din <= 0;
